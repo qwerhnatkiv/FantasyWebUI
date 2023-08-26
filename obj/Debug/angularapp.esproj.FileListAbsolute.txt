@@ -1,0 +1,2 @@
+D:\Programming\FantasyWeb\angularapp\obj\Debug\angularapp.esproj.SuggestedBindingRedirects.cache
+D:\Programming\FantasyWeb\angularapp\obj\Debug\angularapp.esproj.CoreCompileInputs.cache
