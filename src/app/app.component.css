@@ -1,0 +1,18 @@
+* {
+    font-family: 'Inter';
+    font-size: 16px;
+}
+
+table {
+    width: 800px;
+  }
+
+td:nth-child(1) {
+  color: black;
+  font-weight: 400;
+  background-color: #E1E1E1;
+
+  width: 12em;
+  min-width: 12em;
+  max-width: 12em;
+}
