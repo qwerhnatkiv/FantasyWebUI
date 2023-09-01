@@ -5,6 +5,13 @@
 
 table {
     width: 800px;
+    margin-left: 10px;
+  }
+
+  .example-container {
+    max-width: 100%;
+    width: 90%;
+    overflow: auto;
   }
 
 td:nth-child(1) {
@@ -12,7 +19,55 @@ td:nth-child(1) {
   font-weight: 400;
   background-color: #E1E1E1;
 
-  width: 12em;
-  min-width: 12em;
-  max-width: 12em;
+  width: 218px;
+  min-width: 218px;
+  max-width: 218px;
 }
+
+  .mat-mdc-table thead, .mat-mdc-header-row, .mat-mdc-header-cell {
+    background: #00C2FF;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 21.78px;
+    height: 24px;
+}
+
+.mat-mdc-header-cell {
+    width: 96px;
+}
+
+.mat-mdc-header-cell:first-child {
+    background: white;
+}
+
+.mat-mdc-cell {
+    height: 25px;
+}
+
+.mat-mdc-table-sticky-border-elem-left {
+    border-right: 10px solid white;
+  }
+
+.filtersBlock {
+    height: 40px;
+}
+
+.hideCalendarButton {
+    font-weight: 600;
+    line-height: 19px;
+    letter-spacing: 0em;
+    text-align: center;
+
+    width: 205px;
+    height: 27px;
+    background: #FEF524;
+
+    border-radius: 5px;
+
+    position: absolute;
+    top: 26px;
+    left: 10px;
+
+    z-index: 10;
+}
+

@@ -13,6 +13,8 @@ export class AppComponent {
   columnsToDisplay: string[] = this.columns.map((x) => x.columnDef).slice();
   dataSource: any[] = [];
 
+  isCalendarVisible = true;
+
   constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
