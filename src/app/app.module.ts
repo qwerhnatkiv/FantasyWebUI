@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatTableModule} from '@angular/material/table';
 import { MapKeysPipe } from './pipes/mapkeys.pipe';
 import { NgxUiLoaderModule } from "ngx-ui-loader";
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { NgxUiLoaderModule } from "ngx-ui-loader";
     BrowserAnimationsModule,
     MatTableModule,
     NgxUiLoaderModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

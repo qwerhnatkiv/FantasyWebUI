@@ -43,6 +43,7 @@ td:nth-child(1) {
   border-right: 1px dashed rgba(128, 128, 128, .5);
   -webkit-background-clip: padding-box; /* for Safari */
   background-clip: padding-box;
+  text-align: center;
 }
 
 .mat-mdc-header-cell:first-child {
@@ -59,6 +60,30 @@ td:nth-child(1) {
 
 .mat-mdc-table-sticky-border-elem-left {
   border-right: 10px solid white;
+}
+
+.calendar-cell {
+  font-weight: 600;
+  width: 70px;
+  height: 25px;
+  font-family: Inter;
+  line-height: 25px;
+  letter-spacing: 0em;
+  text-align: center;
+
+  border-radius: 10px;
+}
+
+.calendar-cell-empty .calendar-cell-normal {
+  background: white;
+}
+
+.calendar-cell-green {
+  background: #64FF8F;
+}
+
+.calendar-cell-red {
+  background: #FF7E7E;
 }
 
 .filtersBlock {
