@@ -23,6 +23,7 @@
     "@angular/router": "^16.2.0",
     "jest-editor-support": "*",
     "lodash": "^4.17.21",
+    "ng-table-virtual-scroll": "^1.6.0",
     "ngx-ui-loader": "^13.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

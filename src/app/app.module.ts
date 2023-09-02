@@ -18,7 +18,7 @@ import { NgxUiLoaderModule } from "ngx-ui-loader";
     HttpClientModule, 
     BrowserAnimationsModule,
     MatTableModule,
-    NgxUiLoaderModule
+    NgxUiLoaderModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

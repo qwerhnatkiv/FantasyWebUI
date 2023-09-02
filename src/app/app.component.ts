@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,12 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 export class AppComponent {
   columns: Array<TableColumn> = [];
   columnsToDisplay: string[] = this.columns.map((x) => x.columnDef).slice();
-  dataSource: any[] = [];
+  dataSourceArray: any[] = [];
+  dataSource: MatTableDataSource<any> = new MatTableDataSource(this.dataSourceArray);
 
   isCalendarVisible = true;
 
-  constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
+  constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
       .get<GamePredictionDTO[]>(
@@ -61,7 +63,6 @@ export class AppComponent {
     this.columnsToDisplay = ['team'].concat(
       this.columns.map((x) => x.columnDef).slice()
     );
-
     teams.forEach((teamName) => {
       let teamSpecificRow: string[] = [teamName];
       dates.forEach((date) => {
@@ -84,7 +85,7 @@ export class AppComponent {
         teamSpecificRow.push('');
       });
 
-      this.dataSource.push(
+      this.dataSourceArray.push(
         Object.fromEntries(
           this.columnsToDisplay.map((_, i) => [
             this.columnsToDisplay[i],
@@ -93,6 +94,7 @@ export class AppComponent {
         )
       );
     });
+    console.log(this.dataSource);
   }
 
   private sortTypes(n1: any, n2: any) {
