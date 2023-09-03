@@ -37,7 +37,7 @@
           <td mat-cell *matCellDef="let element">
             <div
               class="calendar-cell"
-              [ngClass]="getCellClass(element[column.columnDef].cellValue)"
+              [ngClass]="getCellClass(element[column.columnDef])"
               [matTooltip]="generateCellToolTip(element[column.columnDef].game)"
               matTooltipPosition="below"
               matTooltipClass="cellTooltip"

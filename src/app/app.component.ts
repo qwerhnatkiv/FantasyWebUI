@@ -17,7 +17,7 @@ export class AppComponent {
     this.dataSourceArray
   );
 
-  title = "Fantasy Web";
+  title = 'Fantasy Web';
 
   isCalendarVisible = true;
 
@@ -49,46 +49,67 @@ export class AppComponent {
       .filter(this.onlyUnique)
       .sort((n1, n2) => this.sortTypes(n1, n2));
 
-    let minDate: Date = new Date(games.reduce((min, game) => game.gameDate < min ? game.gameDate : min, games[0].gameDate));
-    let maxDate: Date = new Date(games.reduce((max, game) => game.gameDate > max ? game.gameDate : max, games[0].gameDate));
+    let weeks: number[] = games
+      ?.map((x) => x.weekNumber)
+      .filter(this.onlyUnique)
+      .sort((n1, n2) => n1 - n2);
 
     const datepipe: DatePipe = new DatePipe('en-US');
-    let dates: Date[] = this.getDates(minDate, maxDate, datepipe);
-
-    this.columns = [];
-
-    dates.forEach((x) =>
-      this.columns.push({
-        columnDef: datepipe.transform(x, 'dd.MM')!,
-        header: datepipe.transform(x, 'dd.MM')!,
-      })
-    );
+    this.columns = this.generateAllColumns(weeks, games, datepipe);
 
     this.columnsToDisplay = ['team'].concat(
       this.columns.map((x) => x.columnDef).slice()
     );
     teams.forEach((teamName) => {
       let teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
-      dates.forEach((date) => {
-        let formattedGameDate: string | null = datepipe.transform(date, 'dd.MM');
-
+      this.columns.forEach((column) => {
         let homeGame: GamePredictionDTO | undefined = games.find(
-          (x) => x.homeTeamName == teamName && datepipe.transform(x.gameDate, 'dd.MM')! == formattedGameDate!
+          (x) =>
+            x.homeTeamName == teamName &&
+            datepipe.transform(x.gameDate, 'dd.MM')! == column.columnDef
         );
         if (homeGame != null) {
-          teamSpecificRow.push(new TableCell(homeGame.awayTeamAcronym, homeGame.homeTeamWinChance, homeGame));
+          teamSpecificRow.push(
+            new TableCell(
+              homeGame.awayTeamAcronym,
+              homeGame.homeTeamWinChance,
+              homeGame
+            )
+          );
           return;
         }
 
         let awayGame: GamePredictionDTO | undefined = games.find(
-          (x) => x.awayTeamName == teamName && datepipe.transform(x.gameDate, 'dd.MM')! == formattedGameDate!
+          (x) =>
+            x.awayTeamName == teamName &&
+            datepipe.transform(x.gameDate, 'dd.MM')! == column.columnDef
         );
         if (awayGame != null) {
-          teamSpecificRow.push(new TableCell('@' + awayGame.homeTeamAcronym, awayGame.awayTeamWinChance, awayGame));
+          teamSpecificRow.push(
+            new TableCell(
+              '@' + awayGame.homeTeamAcronym,
+              awayGame.awayTeamWinChance,
+              awayGame
+            )
+          );
           return;
         }
 
-        teamSpecificRow.push(new TableCell( '', -1));
+        if (column.columnDef.includes('w')) {
+          let gamesForWeekCount: number =
+            games.filter(
+              (game) =>
+                (game.homeTeamName == teamName ||
+                  game.awayTeamName == teamName) &&
+                `w${game.weekNumber}` === column.columnDef
+            ).length;
+
+          teamSpecificRow.push(
+            new TableCell(gamesForWeekCount.toString(), gamesForWeekCount)
+          );
+          return;
+        }
+        teamSpecificRow.push(new TableCell('', -1));
       });
       this.dataSourceArray.push(
         Object.fromEntries(
@@ -101,32 +122,45 @@ export class AppComponent {
     });
   }
 
-  public getCellClass(value: any) {
-    let numericValue = Number(value);
+  public getCellClass(column: TableCell) {
+    let numericValue: number = Number(column.cellValue);
+
+    // If not NaN when parsed to number, then it's week count cell
+    if (column.displayValue != '' && !isNaN(+column.displayValue)) {
+      if (column.cellValue > 3) {
+        return 'calendar-cell-week-green';
+      }
+
+      if (column.cellValue < 2) {
+        return 'calendar-cell-week-red';
+      }
+
+      return 'calendar-cell-week';
+    }
 
     if (numericValue < 0) {
-      return "calendar-cell-empty";
+      return 'calendar-cell-empty';
     }
 
     if (numericValue >= 49) {
-      return "calendar-cell-green";
+      return 'calendar-cell-green';
     }
 
     if (numericValue >= 30) {
-      return "calendar-cell-normal";
+      return 'calendar-cell-normal';
     }
 
-    return "calendar-cell-red";
+    return 'calendar-cell-red';
   }
 
   public generateCellToolTip(game: GamePredictionDTO): string {
-
     if (game == null) {
       return '';
     }
 
-    let generatedTooltip: string = 
-    `${game.homeTeamAcronym}: Победа ${Math.round(game.homeTeamWinChance)}% |
+    let generatedTooltip: string = `${
+      game.homeTeamAcronym
+    }: Победа ${Math.round(game.homeTeamWinChance)}% |
     ${game.awayTeamAcronym}: Победа ${Math.round(game.awayTeamWinChance)}% |
     `;
 
@@ -149,7 +183,7 @@ export class AppComponent {
     return array.indexOf(value) === index;
   }
 
-  private getDates(startDate: Date, endDate: Date, datepipe: DatePipe): Date[] {
+  private getDates(startDate: Date, endDate: Date): Date[] {
     var dateArray = new Array<Date>();
     var currentDate = startDate;
     while (currentDate <= endDate) {
@@ -159,14 +193,72 @@ export class AppComponent {
     return dateArray;
   }
 
+  private generateAllColumns(
+    weeks: number[],
+    games: GamePredictionDTO[],
+    datepipe: DatePipe
+  ): TableColumn[] {
+    let minDate: Date = this.getMinDateForGames(games);
+    let maxDate: Date = this.getMaxDateForGames(games);
+
+    let dates: Date[] = this.getDates(minDate, maxDate);
+
+    let allColumns: TableColumn[] = [];
+
+    weeks.forEach((week) => {
+      let thisWeekMinDate: Date = this.getMinDateForGames(
+        games.filter((game) => game.weekNumber == week)
+      );
+      let nextWeekMinDate: Date = this.getMinDateForGames(
+        games.filter((game) => game.weekNumber == week + 1)
+      );
+
+      allColumns.push({
+        columnDef: `w${week}`,
+        header: `w${week}`,
+      });
+      dates.forEach((date) => {
+        if (date >= thisWeekMinDate && date < nextWeekMinDate) {
+          allColumns.push({
+            columnDef: datepipe.transform(date, 'dd.MM')!,
+            header: datepipe.transform(date, 'dd.MM')!,
+          });
+        }
+      });
+    });
+
+    return allColumns;
+  }
+
   private addDateDays(date: Date, days: number): Date {
     if (!days) return date;
     let newDate: Date = date;
     newDate.setDate(newDate.getDate() + days);
- 
-    return newDate;
- };
 
+    return newDate;
+  }
+
+  private getMinDateForGames(games: GamePredictionDTO[]): Date {
+    if (games === undefined || games.length == 0) {
+      return new Date(3000,1,1);
+    }
+
+    return new Date(
+      games.reduce(
+        (min, game) => (game.gameDate < min ? game.gameDate : min),
+        games[0].gameDate
+      )
+    );
+  }
+
+  private getMaxDateForGames(games: GamePredictionDTO[]): Date {
+    return new Date(
+      games.reduce(
+        (max, game) => (game.gameDate > max ? game.gameDate : max),
+        games[0].gameDate
+      )
+    );
+  }
 }
 
 interface GamePredictionDTO {
@@ -191,7 +283,11 @@ export class TableCell {
   public cellValue: any;
   public game: GamePredictionDTO | undefined;
 
-  constructor(pDisplayValue: string, pCellValue: any, pGame: GamePredictionDTO | undefined = undefined) {
+  constructor(
+    pDisplayValue: string,
+    pCellValue: any,
+    pGame: GamePredictionDTO | undefined = undefined
+  ) {
     this.displayValue = pDisplayValue;
     this.cellValue = pCellValue;
     this.game = pGame;
