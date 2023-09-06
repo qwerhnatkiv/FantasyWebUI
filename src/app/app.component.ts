@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { parse } from "date-fns";
 
 @Component({
   selector: 'app-root',
@@ -11,7 +13,7 @@ import { MatTableDataSource } from '@angular/material/table';
 })
 export class AppComponent {
   columns: Array<TableColumn> = [];
-  columnsToDisplay: string[] = this.columns.map((x) => x.columnDef).slice();
+  columnsToDisplay: string[] = this.columns.map((x) => x.header).slice();
   dataSourceArray: any[] = [];
   dataSource: MatTableDataSource<any> = new MatTableDataSource(
     this.dataSourceArray
@@ -20,6 +22,8 @@ export class AppComponent {
   title = 'Fantasy Web';
 
   isCalendarVisible = true;
+  maxFilterDate: Date | undefined = undefined;
+  minFilterDate: Date | undefined = undefined;
 
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
@@ -42,6 +46,7 @@ export class AppComponent {
         },
       });
   }
+  
 
   private setUpDataSourceAndColumns(games: GamePredictionDTO[]) {
     let teams: string[] = games
@@ -58,7 +63,7 @@ export class AppComponent {
     this.columns = this.generateAllColumns(weeks, games, datepipe);
 
     this.columnsToDisplay = ['team'].concat(
-      this.columns.map((x) => x.columnDef).slice()
+      this.columns.map((x) => x.header).slice()
     );
     teams.forEach((teamName) => {
       let teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
@@ -66,7 +71,7 @@ export class AppComponent {
         let homeGame: GamePredictionDTO | undefined = games.find(
           (x) =>
             x.homeTeamName == teamName &&
-            datepipe.transform(x.gameDate, 'dd.MM')! == column.columnDef
+            datepipe.transform(x.gameDate, 'dd.MM')! == column.header
         );
         if (homeGame != null) {
           teamSpecificRow.push(
@@ -82,7 +87,7 @@ export class AppComponent {
         let awayGame: GamePredictionDTO | undefined = games.find(
           (x) =>
             x.awayTeamName == teamName &&
-            datepipe.transform(x.gameDate, 'dd.MM')! == column.columnDef
+            datepipe.transform(x.gameDate, 'dd.MM')! == column.header
         );
         if (awayGame != null) {
           teamSpecificRow.push(
@@ -95,13 +100,14 @@ export class AppComponent {
           return;
         }
 
-        if (column.columnDef.includes('w')) {
+        
+        if (column.header.includes('w')) {
           let gamesForWeekCount: number =
             games.filter(
               (game) =>
                 (game.homeTeamName == teamName ||
                   game.awayTeamName == teamName) &&
-                `w${game.weekNumber}` === column.columnDef
+                `w${game.weekNumber}` === column.header
             ).length;
 
           teamSpecificRow.push(
@@ -122,16 +128,24 @@ export class AppComponent {
     });
   }
 
-  public getCellClass(column: TableCell) {
-    let numericValue: number = Number(column.cellValue);
+  public onMinDateChanged(event: MatDatepickerInputEvent<Date>): void {
+    this.minFilterDate = event.value!;
+  }
+
+  public onMaxDateChanged(event: MatDatepickerInputEvent<Date>): void {
+    this.maxFilterDate = event.value!;
+  }
+
+  public getCellTextClass(cell: TableCell) {
+    let numericValue: number = Number(cell.cellValue);
 
     // If not NaN when parsed to number, then it's week count cell
-    if (column.displayValue != '' && !isNaN(+column.displayValue)) {
-      if (column.cellValue > 3) {
+    if (cell.displayValue != '' && !isNaN(+cell.displayValue)) {
+      if (cell.cellValue > 3) {
         return 'calendar-cell-week-green';
       }
 
-      if (column.cellValue < 2) {
+      if (cell.cellValue < 2) {
         return 'calendar-cell-week-red';
       }
 
@@ -165,6 +179,10 @@ export class AppComponent {
     `;
 
     return generatedTooltip;
+  }
+
+  public convertToDate(dateStr: string): Date {
+    return parse(dateStr, "dd.MM", new Date());
   }
 
   private sortTypes(n1: any, n2: any) {
@@ -214,13 +232,13 @@ export class AppComponent {
       );
 
       allColumns.push({
-        columnDef: `w${week}`,
+        columnDef: undefined,
         header: `w${week}`,
       });
       dates.forEach((date) => {
         if (date >= thisWeekMinDate && date < nextWeekMinDate) {
           allColumns.push({
-            columnDef: datepipe.transform(date, 'dd.MM')!,
+            columnDef: date,
             header: datepipe.transform(date, 'dd.MM')!,
           });
         }
@@ -274,7 +292,7 @@ interface GamePredictionDTO {
 }
 
 export interface TableColumn {
-  columnDef: string;
+  columnDef: Date | undefined;
   header: string;
 }
 

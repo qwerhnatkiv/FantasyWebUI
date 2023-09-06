@@ -3,6 +3,11 @@
   font-size: 16px;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 table {
   width: 800px;
   margin-left: 10px;
@@ -64,6 +69,14 @@ td:nth-child(1) {
   border-right: 10px solid white;
 }
 
+.calendar-cell-not-selected {
+  background: white;
+}
+
+.calendar-cell-selected {
+  background: #DFDFDF;
+}
+
 .calendar-cell {
   font-weight: 600;
   width: 70px;
@@ -115,12 +128,24 @@ td:nth-child(1) {
 }
 
 .filtersBlock {
-  height: 40px;
+  height: fit-content;
+  display: flex;
+  margin: 0 0 15px 30px;
+  gap: 10px;
+}
+
+mat-form-field {
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display:  none;
 }
 
 .hideCalendarButton {
   font-weight: 600;
-  line-height: 19px;
+  line-height: 27px;
   letter-spacing: 0em;
   text-align: center;
 
@@ -131,7 +156,7 @@ td:nth-child(1) {
   border-radius: 5px;
 
   position: absolute;
-  top: 26px;
+  top: 67px;
   left: 10px;
 
   z-index: 10;
