@@ -13,7 +13,8 @@
         <input
           matInput
           [matDatepicker]="pickerFrom"
-          (dateChange)="onMinDateChanged($event)"
+          [(ngModel)]="minFilterDate"
+          (dateChange)="minFilterDate = $event.value!"
         />
         <mat-hint class="calendar-hint"></mat-hint>
         <mat-datepicker-toggle
@@ -26,7 +27,8 @@
         <input
           matInput
           [matDatepicker]="pickerTo"
-          (dateChange)="onMaxDateChanged($event)"
+          [(ngModel)]="maxFilterDate"
+          (dateChange)="maxFilterDate = $event.value!"
         />
         <mat-hint class="calendar-hint"></mat-hint>
         <mat-datepicker-toggle

@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { parse } from "date-fns";
+import { parse } from 'date-fns';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +46,6 @@ export class AppComponent {
         },
       });
   }
-  
 
   private setUpDataSourceAndColumns(games: GamePredictionDTO[]) {
     let teams: string[] = games
@@ -100,15 +99,13 @@ export class AppComponent {
           return;
         }
 
-        
         if (column.header.includes('w')) {
-          let gamesForWeekCount: number =
-            games.filter(
-              (game) =>
-                (game.homeTeamName == teamName ||
-                  game.awayTeamName == teamName) &&
-                `w${game.weekNumber}` === column.header
-            ).length;
+          let gamesForWeekCount: number = games.filter(
+            (game) =>
+              (game.homeTeamName == teamName ||
+                game.awayTeamName == teamName) &&
+              `w${game.weekNumber}` === column.header
+          ).length;
 
           teamSpecificRow.push(
             new TableCell(gamesForWeekCount.toString(), gamesForWeekCount)
@@ -182,7 +179,7 @@ export class AppComponent {
   }
 
   public convertToDate(dateStr: string): Date {
-    return parse(dateStr, "dd.MM", new Date());
+    return parse(dateStr, 'dd.MM', new Date());
   }
 
   private sortTypes(n1: any, n2: any) {
@@ -219,10 +216,13 @@ export class AppComponent {
     let minDate: Date = this.getMinDateForGames(games);
     let maxDate: Date = this.getMaxDateForGames(games);
 
+    let today = new Date();
+    this.minFilterDate =
+      minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
+
     let dates: Date[] = this.getDates(minDate, maxDate);
 
     let allColumns: TableColumn[] = [];
-
     weeks.forEach((week) => {
       let thisWeekMinDate: Date = this.getMinDateForGames(
         games.filter((game) => game.weekNumber == week)
@@ -230,6 +230,15 @@ export class AppComponent {
       let nextWeekMinDate: Date = this.getMinDateForGames(
         games.filter((game) => game.weekNumber == week + 1)
       );
+
+      if (
+        thisWeekMinDate.getTime() <= this.minFilterDate?.getTime()! &&
+        nextWeekMinDate.getTime() >= this.minFilterDate?.getTime()!
+      ) {
+        this.maxFilterDate = this.getMaxDateForGames(
+          games.filter((game) => game.weekNumber == week + 1)
+        );
+      }
 
       allColumns.push({
         columnDef: undefined,
@@ -258,9 +267,8 @@ export class AppComponent {
 
   private getMinDateForGames(games: GamePredictionDTO[]): Date {
     if (games === undefined || games.length == 0) {
-      return new Date(3000,1,1);
+      return new Date(3000, 1, 1);
     }
-
     return new Date(
       games.reduce(
         (min, game) => (game.gameDate < min ? game.gameDate : min),
