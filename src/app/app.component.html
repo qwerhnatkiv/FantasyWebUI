@@ -69,15 +69,7 @@
           <td
             mat-cell
             *matCellDef="let element"
-            [ngClass]="
-              minFilterDate != null &&
-              maxFilterDate != null &&
-              column.columnDef != null &&
-              column.columnDef! >= minFilterDate &&
-              column.columnDef! <= maxFilterDate
-                ? 'calendar-cell-selected'
-                : 'calendar-cell-not-selected'
-            "
+            [ngClass]="getCellClass(element[column.header], column)" 
           >
             <div
               class="calendar-cell"

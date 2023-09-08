@@ -127,6 +127,18 @@ td:nth-child(1) {
   margin: 0;
 }
 
+td.strike {
+  position: relative;
+}
+td.strike:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 3px solid #FF7E7E;
+  width: 100%;
+}
+
 .filtersBlock {
   height: fit-content;
   display: flex;

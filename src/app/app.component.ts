@@ -25,6 +25,8 @@ export class AppComponent {
   maxFilterDate: Date | undefined = undefined;
   minFilterDate: Date | undefined = undefined;
 
+  private teamWeeksToStrikethrough: TeamWeek[] = [];
+
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
@@ -58,13 +60,18 @@ export class AppComponent {
       .filter(this.onlyUnique)
       .sort((n1, n2) => n1 - n2);
 
+    this.setTeamWeeksToStrike(games, weeks, teams);
+
     const datepipe: DatePipe = new DatePipe('en-US');
     this.columns = this.generateAllColumns(weeks, games, datepipe);
 
     this.columnsToDisplay = ['team'].concat(
       this.columns.map((x) => x.header).slice()
     );
+
     teams.forEach((teamName) => {
+      let currentWeekName: string = '';
+
       let teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
       this.columns.forEach((column) => {
         let homeGame: GamePredictionDTO | undefined = games.find(
@@ -77,6 +84,10 @@ export class AppComponent {
             new TableCell(
               homeGame.awayTeamAcronym,
               homeGame.homeTeamWinChance,
+              this.teamWeeksToStrikethrough.find(
+                (item) =>
+                  teamName == item.teamName && homeGame?.weekNumber == item.week
+              )?.gamesCount,
               homeGame
             )
           );
@@ -93,6 +104,10 @@ export class AppComponent {
             new TableCell(
               '@' + awayGame.homeTeamAcronym,
               awayGame.awayTeamWinChance,
+              this.teamWeeksToStrikethrough.find(
+                (item) =>
+                  teamName == item.teamName && awayGame?.weekNumber == item.week
+              )?.gamesCount,
               awayGame
             )
           );
@@ -110,9 +125,19 @@ export class AppComponent {
           teamSpecificRow.push(
             new TableCell(gamesForWeekCount.toString(), gamesForWeekCount)
           );
+          currentWeekName = column.header;
           return;
         }
-        teamSpecificRow.push(new TableCell('', -1));
+        teamSpecificRow.push(
+          new TableCell(
+            '',
+            -1,
+            this.teamWeeksToStrikethrough.find(
+              (item) =>
+                teamName == item.teamName && `w${item.week}` === currentWeekName
+            )?.gamesCount
+          )
+        );
       });
       this.dataSourceArray.push(
         Object.fromEntries(
@@ -125,12 +150,51 @@ export class AppComponent {
     });
   }
 
+  private setTeamWeeksToStrike(
+    games: GamePredictionDTO[],
+    weeks: number[],
+    teams: string[]
+  ) {
+    teams.forEach((team) => {
+      weeks.forEach((week) => {
+        let gamesCount = games.filter(
+          (game) =>
+            game.weekNumber === week &&
+            (team == game.homeTeamName || team == game.awayTeamName)
+        ).length;
+
+        if (gamesCount <= 1) {
+          this.teamWeeksToStrikethrough.push(
+            new TeamWeek(team, week, gamesCount)
+          );
+        }
+      });
+    });
+  }
+
   public onMinDateChanged(event: MatDatepickerInputEvent<Date>): void {
     this.minFilterDate = event.value!;
   }
 
   public onMaxDateChanged(event: MatDatepickerInputEvent<Date>): void {
     this.maxFilterDate = event.value!;
+  }
+
+  public getCellClass(cell: TableCell, column: TableColumn) {
+    let classStatement: string =
+      this.minFilterDate != null &&
+      this.maxFilterDate != null &&
+      column.columnDef != null &&
+      column.columnDef! >= this.minFilterDate &&
+      column.columnDef! <= this.maxFilterDate
+        ? 'calendar-cell-selected'
+        : 'calendar-cell-not-selected';
+
+    if (cell.weekGames! <= 1) {
+      classStatement += ' strike';
+    }
+
+    return classStatement;
   }
 
   public getCellTextClass(cell: TableCell) {
@@ -308,14 +372,29 @@ export class TableCell {
   public displayValue: string = '';
   public cellValue: any;
   public game: GamePredictionDTO | undefined;
+  public weekGames: number | undefined;
 
   constructor(
     pDisplayValue: string,
     pCellValue: any,
+    weekGames: number | undefined = undefined,
     pGame: GamePredictionDTO | undefined = undefined
   ) {
     this.displayValue = pDisplayValue;
     this.cellValue = pCellValue;
     this.game = pGame;
+    this.weekGames = weekGames;
+  }
+}
+
+export class TeamWeek {
+  public teamName: string;
+  public week: number;
+  public gamesCount: number;
+
+  constructor(teamName: string, week: number, gamesCount: number) {
+    this.teamName = teamName;
+    this.week = week;
+    this.gamesCount = gamesCount;
   }
 }

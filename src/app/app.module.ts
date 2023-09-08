@@ -13,7 +13,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MatNativeDateModule, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+
+import { MY_FORMATS } from './common/custom-date-format';
 
 @NgModule({
   declarations: [AppComponent, MapKeysPipe],
@@ -30,7 +33,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatNativeDateModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [{provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},{provide: MAT_DATE_FORMATS, useValue: MY_FORMATS}],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
