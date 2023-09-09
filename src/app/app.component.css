@@ -91,8 +91,12 @@ td:nth-child(1) {
   border-radius: 10px;
 }
 
-.calendar-cell-empty .calendar-cell-normal {
+.calendar-cell-not-selected>.calendar-cell-empty,.calendar-cell-not-selected>.calendar-cell-normal {
   background: white;
+}
+
+.calendar-cell-selected>.calendar-cell-empty,.calendar-cell-selected>.calendar-cell-normal {
+  background: #DFDFDF;
 }
 
 .calendar-cell-green {
@@ -101,6 +105,50 @@ td:nth-child(1) {
 
 .calendar-cell-red {
   background: #FF7E7E;
+}
+
+.calendar-cell:hover {
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-not-selected>.calendar-cell-normal:hover {
+  background: linear-gradient(
+    to top,
+    #FEF524 0%,
+    #FEF524 40%,
+    white 40%,
+    white 100%
+  );
+}
+
+.calendar-cell-selected>.calendar-cell-normal:hover {
+  background: linear-gradient(
+    to top,
+    #FEF524 0%,
+    #FEF524 40%,
+    #DFDFDF 40%,
+    #DFDFDF 100%
+  );
+}
+
+.calendar-cell-green:hover {
+  background: linear-gradient(
+    to top,
+    #FEF524 0%,
+    #FEF524 50%,
+    #64FF8F 40%,
+    #64FF8F 100%
+  );
+}
+
+.calendar-cell-red:hover {
+  background: linear-gradient(
+    to top,
+    #FEF524 0%,
+    #FEF524 50%,
+    #FF7E7E 40%,
+    #FF7E7E 100%
+  );
 }
 
 .calendar-cell-week {
