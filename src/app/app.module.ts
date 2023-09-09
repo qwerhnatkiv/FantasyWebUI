@@ -8,16 +8,32 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MapKeysPipe } from './pipes/mapkeys.pipe';
 import { NgxUiLoaderModule } from 'ngx-ui-loader';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import {
+  MatTooltipModule,
+  MAT_TOOLTIP_DEFAULT_OPTIONS,
+  MatTooltipDefaultOptions,
+} from '@angular/material/tooltip';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { DateAdapter, MatNativeDateModule, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import {
+  DateAdapter,
+  MatNativeDateModule,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+} from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 
 import { MY_FORMATS } from './common/custom-date-format';
 import { CalendarTableComponent } from './calendar-table/calendar-table.component';
+
+export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
+  showDelay: 0,
+  hideDelay: 0,
+  touchendHideDelay: 500,
+  disableTooltipInteractivity: true,
+};
 
 @NgModule({
   declarations: [AppComponent, MapKeysPipe, CalendarTableComponent],
@@ -34,7 +50,15 @@ import { CalendarTableComponent } from './calendar-table/calendar-table.componen
     MatNativeDateModule,
     FormsModule,
   ],
-  providers: [{provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},{provide: MAT_DATE_FORMATS, useValue: MY_FORMATS}],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
