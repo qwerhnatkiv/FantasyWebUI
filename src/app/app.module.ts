@@ -17,9 +17,10 @@ import { DateAdapter, MatNativeDateModule, MAT_DATE_FORMATS, MAT_DATE_LOCALE } f
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 
 import { MY_FORMATS } from './common/custom-date-format';
+import { CalendarTableComponent } from './calendar-table/calendar-table.component';
 
 @NgModule({
-  declarations: [AppComponent, MapKeysPipe],
+  declarations: [AppComponent, MapKeysPipe, CalendarTableComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
