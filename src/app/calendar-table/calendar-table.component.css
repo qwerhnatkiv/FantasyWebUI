@@ -75,14 +75,16 @@ td:nth-child(1) {
   border-radius: 10px;
 }
 
-.calendar-cell-not-selected > .calendar-cell-empty,
-.calendar-cell-not-selected > .calendar-cell-normal {
+.calendar-cell-not-selected > .calendar-cell-empty {
   background: white;
 }
 
-.calendar-cell-selected > .calendar-cell-empty,
-.calendar-cell-selected > .calendar-cell-normal {
+.calendar-cell-selected > .calendar-cell-empty {
   background: #dfdfdf;
+}
+
+.calendar-cell-normal {
+  background: white;
 }
 
 .calendar-cell-green {
@@ -93,24 +95,13 @@ td:nth-child(1) {
   background: #ff7e7e;
 }
 
-.calendar-cell-not-selected > .calendar-cell-normal:hover {
+.calendar-cell-normal:hover {
   background: linear-gradient(
     to top,
     #fef524 0%,
     #fef524 40%,
     white 40%,
     white 100%
-  );
-  border-radius: 10px 10px 0 0;
-}
-
-.calendar-cell-selected > .calendar-cell-normal:hover {
-  background: linear-gradient(
-    to top,
-    #fef524 0%,
-    #fef524 40%,
-    #dfdfdf 40%,
-    #dfdfdf 100%
   );
   border-radius: 10px 10px 0 0;
 }
