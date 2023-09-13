@@ -27,6 +27,8 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 
 import { MY_FORMATS } from './common/custom-date-format';
 import { CalendarTableComponent } from './calendar-table/calendar-table.component';
+import { PlayersTableComponent } from './players-table/players-table.component';
+import { ToiPipe } from './pipes/toi.pipe';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -36,7 +38,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 };
 
 @NgModule({
-  declarations: [AppComponent, MapKeysPipe, CalendarTableComponent],
+  declarations: [AppComponent, MapKeysPipe, ToiPipe, CalendarTableComponent, PlayersTableComponent],
   imports: [
     BrowserModule,
     HttpClientModule,

@@ -1,0 +1,249 @@
+<table mat-table [dataSource]="dataSource" class="players-table">
+  <ng-container matColumnDef="firstChoice">
+    <th mat-header-cell *matHeaderCellDef>1</th>
+    <td mat-cell *matCellDef="let element" class="first-choice-cell">
+      <img
+        [src]="
+          getPlayerSelectedIconPath(
+            1,
+            element.firstChoice,
+            element.secondChoice
+          )
+        "
+        width="25"
+        height="25"
+      />
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="secondChoice">
+    <th mat-header-cell *matHeaderCellDef>2</th>
+    <td mat-cell *matCellDef="let element" class="second-choice-cell">
+      <img
+        [src]="
+          getPlayerSelectedIconPath(
+            2,
+            element.firstChoice,
+            element.secondChoice
+          )
+        "
+        width="25"
+        height="25"
+      />
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="playerName">
+    <th mat-header-cell *matHeaderCellDef>Игрок</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      class="left-column"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.playerName }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="team">
+    <th mat-header-cell *matHeaderCellDef>Ком</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.team }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef>Поз</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.position }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="price">
+    <th mat-header-cell *matHeaderCellDef>Цена</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.price }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="gamesCount">
+    <th mat-header-cell *matHeaderCellDef>Игр</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.gamesCount }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="easyGamesCount">
+    <th mat-header-cell *matHeaderCellDef>ЛИ</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.easyGamesCount }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="winPercentage">
+    <th mat-header-cell *matHeaderCellDef>%Поб</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.winPercentage }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="powerPlayTime">
+    <th mat-header-cell *matHeaderCellDef>ВвБ</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.powerPlayTime }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="powerPlayNumber">
+    <th mat-header-cell *matHeaderCellDef>ПП</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.powerPlayNumber }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="toi">
+    <th mat-header-cell *matHeaderCellDef>TOI</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.toi | TOI }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="shotsOnGoal">
+    <th mat-header-cell *matHeaderCellDef>БВ</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.shotsOnGoal }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="iXG">
+    <th mat-header-cell *matHeaderCellDef>ixG</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.iXG }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="iCF">
+    <th mat-header-cell *matHeaderCellDef>iCF</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.iCF }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="iHDCF">
+    <th mat-header-cell *matHeaderCellDef>iHDCF</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.iHDCF }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expectedFantasyPoints">
+    <th mat-header-cell *matHeaderCellDef>ОФО</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      class="bold"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.expectedFantasyPoints }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="fantasyPointsPerGame">
+    <th mat-header-cell *matHeaderCellDef>ФПГ</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      class="right-column"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.fantasyPointsPerGame }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

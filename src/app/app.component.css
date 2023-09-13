@@ -8,10 +8,15 @@ body {
   flex-direction: column;
 }
 
+footer {
+  height: 200px;
+}
+
 .example-container {
   max-width: 100%;
   width: 99%;
   overflow: auto;
+  flex-grow: 10;
 }
 
 .hideCalendarButton {
@@ -38,4 +43,18 @@ body {
   display: flex;
   margin: 0 0 15px 30px;
   gap: 10px;
+}
+
+.players-configuration-section {
+  display: flex;
+  flex-direction: row;
+  margin-top: 30px;
+}
+
+app-players-table {
+  flex-basis: 70%;
+}
+
+.user-team-block {
+  flex-basis: 30%;
 }

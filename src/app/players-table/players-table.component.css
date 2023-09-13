@@ -1,0 +1,42 @@
+.players-table {
+    margin-left: 20px;
+}
+
+.players-table .mat-mdc-header-cell {
+    padding: 3px;
+    border-bottom-style: none;
+}
+
+.mat-mdc-cell {
+    padding: 3px;
+    border-bottom-style: none;
+}
+
+.mat-mdc-row {
+    height: 25px;
+  }
+
+.first-choice-cell,.second-choice-cell{
+    padding: 0px;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.first-choice-selected-cell {
+    background: #DF730080;
+}
+
+.second-choice-selected-cell{
+    background: #2413FF40;
+}
+
+.right-column{
+    padding-right: 5px;
+    border-radius: 0 10px 10px 0;
+}
+
+.left-column{
+    border-radius: 10px 0 0 10px;
+}

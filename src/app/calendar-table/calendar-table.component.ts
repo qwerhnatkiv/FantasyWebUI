@@ -31,8 +31,8 @@ export class CalendarTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      changes['games'].previousValue &&
-      changes['games'].currentValue &&
+      changes['games']?.previousValue &&
+      changes['games']?.currentValue &&
       changes['games'].previousValue.length !=
         changes['games'].currentValue.length
     ) {
