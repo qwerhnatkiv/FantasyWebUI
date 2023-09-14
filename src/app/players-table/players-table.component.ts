@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { keys } from 'ts-transformer-keys';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {MatSort, Sort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 
 export interface PlayerChooseRecord {
   firstChoice: boolean;
@@ -88,9 +90,9 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
 @Component({
   selector: 'app-players-table',
   templateUrl: './players-table.component.html',
-  styleUrls: ['./players-table.component.css']
+  styleUrls: ['./players-table.component.css'],
 })
-export class PlayersTableComponent {
+export class PlayersTableComponent implements AfterViewInit {
   displayedColumns: string[] = [  'firstChoice',
     'secondChoice',
     'playerName',
@@ -109,7 +111,14 @@ export class PlayersTableComponent {
     'iHDCF',
     'expectedFantasyPoints',
     'fantasyPointsPerGame']
-  dataSource = ELEMENT_DATA;
+  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  constructor(private _liveAnnouncer: LiveAnnouncer) {}
+
+  @ViewChild(MatSort) sort: MatSort | undefined;
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort!;
+  }
 
   getPlayerSelectedIconPath(choiceIndex: number, firstChoice: boolean, secondChoice: boolean): string {
     if (!firstChoice && !secondChoice) {
@@ -142,4 +151,13 @@ export class PlayersTableComponent {
 
     return "";
   }
+
+    /** Announce the change in sort state for assistive technology. */
+    announceSortChange(sortState: Sort) {
+      if (sortState.direction) {
+        this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      } else {
+        this._liveAnnouncer.announce('Sorting cleared');
+      }
+    }
 }

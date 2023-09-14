@@ -29,6 +29,7 @@ import { MY_FORMATS } from './common/custom-date-format';
 import { CalendarTableComponent } from './calendar-table/calendar-table.component';
 import { PlayersTableComponent } from './players-table/players-table.component';
 import { ToiPipe } from './pipes/toi.pipe';
+import { MatSortModule } from '@angular/material/sort';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -51,6 +52,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule,
+    MatSortModule
   ],
   providers: [
     {

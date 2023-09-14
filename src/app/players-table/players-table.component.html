@@ -1,6 +1,6 @@
-<table mat-table [dataSource]="dataSource" class="players-table">
+<table mat-table [dataSource]="dataSource" class="players-table" matSort (matSortChange)="announceSortChange($event)">
   <ng-container matColumnDef="firstChoice">
-    <th mat-header-cell *matHeaderCellDef>1</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by firstChoice">1</th>
     <td mat-cell *matCellDef="let element" class="first-choice-cell">
       <img
         [src]="
@@ -17,7 +17,7 @@
   </ng-container>
 
   <ng-container matColumnDef="secondChoice">
-    <th mat-header-cell *matHeaderCellDef>2</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by secondChoice">2</th>
     <td mat-cell *matCellDef="let element" class="second-choice-cell">
       <img
         [src]="
@@ -34,7 +34,7 @@
   </ng-container>
 
   <ng-container matColumnDef="playerName">
-    <th mat-header-cell *matHeaderCellDef>Игрок</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by playerName">Игрок</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -48,7 +48,7 @@
   </ng-container>
 
   <ng-container matColumnDef="team">
-    <th mat-header-cell *matHeaderCellDef>Ком</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by team">Ком</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -61,7 +61,7 @@
   </ng-container>
 
   <ng-container matColumnDef="position">
-    <th mat-header-cell *matHeaderCellDef>Поз</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by position">Поз</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -74,7 +74,7 @@
   </ng-container>
 
   <ng-container matColumnDef="price">
-    <th mat-header-cell *matHeaderCellDef>Цена</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by price">Цена</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -87,7 +87,7 @@
   </ng-container>
 
   <ng-container matColumnDef="gamesCount">
-    <th mat-header-cell *matHeaderCellDef>Игр</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by gamesCount">Игр</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -100,7 +100,7 @@
   </ng-container>
 
   <ng-container matColumnDef="easyGamesCount">
-    <th mat-header-cell *matHeaderCellDef>ЛИ</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by easyGamesCount">ЛИ</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -113,7 +113,7 @@
   </ng-container>
 
   <ng-container matColumnDef="winPercentage">
-    <th mat-header-cell *matHeaderCellDef>%Поб</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by winPercentage">%Поб</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -126,7 +126,7 @@
   </ng-container>
 
   <ng-container matColumnDef="powerPlayTime">
-    <th mat-header-cell *matHeaderCellDef>ВвБ</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by powerPlayTime">ВвБ</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -139,7 +139,7 @@
   </ng-container>
 
   <ng-container matColumnDef="powerPlayNumber">
-    <th mat-header-cell *matHeaderCellDef>ПП</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by powerPlayNumber">ПП</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -152,7 +152,7 @@
   </ng-container>
 
   <ng-container matColumnDef="toi">
-    <th mat-header-cell *matHeaderCellDef>TOI</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by toi">TOI</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -165,7 +165,7 @@
   </ng-container>
 
   <ng-container matColumnDef="shotsOnGoal">
-    <th mat-header-cell *matHeaderCellDef>БВ</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by shotsOnGoal">БВ</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -178,7 +178,7 @@
   </ng-container>
 
   <ng-container matColumnDef="iXG">
-    <th mat-header-cell *matHeaderCellDef>ixG</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by iXG">ixG</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -191,7 +191,7 @@
   </ng-container>
 
   <ng-container matColumnDef="iCF">
-    <th mat-header-cell *matHeaderCellDef>iCF</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by iCF">iCF</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -204,7 +204,7 @@
   </ng-container>
 
   <ng-container matColumnDef="iHDCF">
-    <th mat-header-cell *matHeaderCellDef>iHDCF</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by iHDCF">iHDCF</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -217,7 +217,7 @@
   </ng-container>
 
   <ng-container matColumnDef="expectedFantasyPoints">
-    <th mat-header-cell *matHeaderCellDef>ОФО</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by expectedFantasyPoints">ОФО</th>
     <td
       mat-cell
       *matCellDef="let element"
@@ -231,7 +231,7 @@
   </ng-container>
 
   <ng-container matColumnDef="fantasyPointsPerGame">
-    <th mat-header-cell *matHeaderCellDef>ФПГ</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by fantasyPointsPerGame">ФПГ</th>
     <td
       mat-cell
       *matCellDef="let element"
