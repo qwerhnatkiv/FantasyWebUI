@@ -92,7 +92,7 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     iXG: 2.28,
     iCF: 2,
     iHDCF: 19,
-    expectedFantasyPoints: 123,
+    expectedFantasyPoints: 23,
     fantasyPointsPerGame: 23,
   },
 ];
