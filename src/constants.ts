@@ -8,3 +8,40 @@ export const DEFAULT_PRICES = [
 export const DEFAULT_POSITIONS = [
   'В', 'З', 'Н'
 ]
+
+export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
+
+export const TEAMS = [
+  "Anaheim Ducks",
+  "Arizona Coyotes",
+  "Boston Bruins",
+  "Buffalo Sabres",
+  "Carolina Hurricanes",
+  "Columbus Blue Jackets",
+  "Calgary Flames",
+  "Chicago Blackhawks",
+  "Colorado Avalanche",
+  "Dallas Stars",
+  "Detroit Red Wings",
+  "Edmonton Oilers",
+  "Florida Panthers",
+  "Los Angeles Kings",
+  "Minnesota Wild",
+  "Montreal Canadiens",
+  "New Jersey Devils",
+  "Nashville Predators",
+  "New York Islanders",
+  "New York Rangers",
+  "Ottawa Senators",
+  "Philadelphia Flyers",
+  "Pittsburgh Penguins",
+  "San Jose Sharks",
+  "Seattle Kraken",
+  "St Louis Blues",
+  "Tampa Bay Lightning",
+  "Toronto Maple Leafs",
+  "Vancouver Canucks",
+  "Vegas Golden Knights",
+  "Winnipeg Jets",
+  "Washington Capitals",
+  ]

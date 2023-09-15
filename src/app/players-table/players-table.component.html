@@ -3,6 +3,7 @@
   [dataSource]="dataSource"
   class="players-table"
   matSort
+  matSortStart="desc"
   (matSortChange)="announceSortChange($event)"
 >
   <ng-container matColumnDef="firstChoice">

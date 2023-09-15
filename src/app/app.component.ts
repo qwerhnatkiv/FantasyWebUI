@@ -22,6 +22,8 @@ export class AppComponent {
   lowerBoundPrice: number | undefined = undefined;
   upperBoundPrice: number | undefined = undefined;
   positions: string[] | undefined = [];
+  teams: string[] | undefined = [];
+  powerPlayUnits: string[] | undefined = [];
 
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();

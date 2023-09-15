@@ -23,11 +23,33 @@
     </mat-form-field>
     <div class="vl"></div>
 
-    <label class="filter-label" style="margin-left: 20px">Позиции:</label>
+    <label class="filter-label" style="margin-left: 10px">Команды:</label>
+    <mat-form-field>
+      <mat-label>Teams</mat-label>
+      <mat-select [formControl]="teamsFormControl" multiple (selectionChange)="teamsChanged()">
+        <mat-select-trigger>
+          <span *ngIf="teamsFormControl.value?.length! <= 1">{{teamsFormControl.value?.[0] || ''}}</span>
+          <span *ngIf="teamsFormControl.value?.length! > 1">{{teamsFormControl.value?.length}} шт.</span>
+        </mat-select-trigger>
+        <mat-option *ngFor="let team of selectTeams" [value]="team">{{team}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="vl"></div>
+    <label class="filter-label" style="margin-left: 10px">Позиции:</label>
     <mat-form-field>
       <mat-label>Positions</mat-label>
       <mat-select [formControl]="positionsFormControl" multiple (selectionChange)="positionsChanged()">
         <mat-option *ngFor="let position of selectPositions" [value]="position">{{position}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="vl"></div>
+    <label class="filter-label" style="margin-left: 10px">ПП:</label>
+    <mat-form-field>
+      <mat-label>PP</mat-label>
+      <mat-select [formControl]="powerPlayFormControl" multiple (selectionChange)="powerPlayUnitsChanged()">
+        <mat-option *ngFor="let powerPlay of selectPP" [value]="powerPlay">{{powerPlay}}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>

@@ -3,6 +3,7 @@ export interface PlayerChooseRecord {
     secondChoice: boolean;
     playerName: string;
     team: string;
+    teamFull: string;
     position: string;
     price: number;
     gamesCount: number;

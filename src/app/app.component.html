@@ -51,6 +51,8 @@
   (sendLowerBoundPrice)="lowerBoundPrice = $event"
   (sendUpperBoundPrice)="upperBoundPrice = $event"
   (sendPositions)="positions = $event"
+  (sendTeams)="teams = $event"
+  (sendPowerPlayUnits)="powerPlayUnits = $event"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -58,6 +60,8 @@
     [lowerBoundPrice]="lowerBoundPrice"
     [upperBoundPrice]="upperBoundPrice"
     [positions]="positions"
+    [teams]="teams"
+    [powerPlayUnits]="powerPlayUnits"
   ></app-players-table>
   <div class="user-team-block"></div>
 </section>

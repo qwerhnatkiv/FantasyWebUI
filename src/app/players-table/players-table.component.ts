@@ -20,6 +20,7 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Connor McDavid',
     team: 'EDM',
+    teamFull: 'Edmonton Oilers',
     position: 'Н',
     price: 2345,
     gamesCount: 3,
@@ -40,6 +41,7 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Auston Matthews',
     team: 'TOR',
+    teamFull: 'Toronto Maple Leafs',
     position: 'Н',
     price: 2125,
     gamesCount: 3,
@@ -60,6 +62,7 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: true,
     playerName: 'Elias Pettersen',
     team: 'VAN',
+    teamFull: 'Vancouver Canucks',
     position: 'Н',
     price: 1722,
     gamesCount: 4,
@@ -80,6 +83,7 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Vitalya',
     team: 'SEA',
+    teamFull: 'Seattle Kraken',
     position: 'З',
     price: 1100,
     gamesCount: 3,
@@ -135,6 +139,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Input() lowerBoundPrice: number | undefined;
   @Input() upperBoundPrice: number | undefined;
   @Input() positions: string[] | undefined = [];
+  @Input() teams: string[] | undefined = [];
+  @Input() powerPlayUnits: string[] | undefined = [];
 
   //#region NG overrides
 
@@ -152,7 +158,17 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     this.applyPlayersFilter({
       name: "positions",
       value: this.positions
-    })
+    });
+
+    this.applyPlayersFilter({
+      name: "teams",
+      value: this.teams
+    });
+
+    this.applyPlayersFilter({
+      name: "powerPlayUnits",
+      value: this.powerPlayUnits
+    });
   }
 
   ngAfterViewInit() {
@@ -236,6 +252,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
       if (key == "positions") {
         isMatch = value.includes(record.position);
+      }
+
+      if (key == "teams") {
+        isMatch = value.includes(record.teamFull);
+      }
+
+      if (key == "powerPlayUnits") {
+        isMatch = value.includes(record.powerPlayNumber);
       }
 
       if (!isMatch) {
