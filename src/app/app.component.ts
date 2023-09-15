@@ -24,26 +24,26 @@ export class AppComponent {
   positions: string[] | undefined = [];
 
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
-    // this.ngxLoader.start();
-    // http
-    //   .get<GamePredictionDTO[]>(
-    //     'https://qwerhnatkiv.bsite.net/predictions/games/get'
-    //   )
-    //   .subscribe({
-    //     next: (result) => {
-    //       this.games = result.sort(
-    //         (n1, n2) => n1.weekNumber - n2.weekNumber
-    //       );
+    this.ngxLoader.start();
+    http
+      .get<GamePredictionDTO[]>(
+        'https://qwerhnatkiv.bsite.net/predictions/games/get'
+      )
+      .subscribe({
+        next: (result) => {
+          this.games = result.sort(
+            (n1, n2) => n1.weekNumber - n2.weekNumber
+          );
 
-    //       this.setUpFilters();
+          this.setUpFilters();
 
-    //       this.ngxLoader.stop();
-    //     },
-    //     error: (err) => {
-    //       console.error(err);
-    //       this.ngxLoader.stop();
-    //     },
-    //   });
+          this.ngxLoader.stop();
+        },
+        error: (err) => {
+          console.error(err);
+          this.ngxLoader.stop();
+        },
+      });
   }
 
   private setUpFilters() {
