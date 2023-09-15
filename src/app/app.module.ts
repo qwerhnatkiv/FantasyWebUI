@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -30,6 +30,11 @@ import { CalendarTableComponent } from './calendar-table/calendar-table.componen
 import { PlayersTableComponent } from './players-table/players-table.component';
 import { ToiPipe } from './pipes/toi.pipe';
 import { MatSortModule } from '@angular/material/sort';
+import { PlayersFiltersComponent } from './players-filters/players-filters.component';
+
+import { NgFor } from '@angular/common';
+import { MatSelectModule } from '@angular/material/select';
+import {MatDividerModule} from '@angular/material/divider';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -39,7 +44,14 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 };
 
 @NgModule({
-  declarations: [AppComponent, MapKeysPipe, ToiPipe, CalendarTableComponent, PlayersTableComponent],
+  declarations: [
+    AppComponent,
+    MapKeysPipe,
+    ToiPipe,
+    CalendarTableComponent,
+    PlayersTableComponent,
+    PlayersFiltersComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -52,7 +64,11 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule,
-    MatSortModule
+    MatSortModule,
+    MatSelectModule,
+    NgFor,
+    MatDividerModule,
+    ReactiveFormsModule
   ],
   providers: [
     {

@@ -47,8 +47,18 @@
   ></app-calendar-table>
 </section>
 
+<app-players-filters
+  (sendLowerBoundPrice)="lowerBoundPrice = $event"
+  (sendUpperBoundPrice)="upperBoundPrice = $event"
+  (sendPositions)="positions = $event"
+></app-players-filters>
+
 <section class="players-configuration-section">
-  <app-players-table></app-players-table>
+  <app-players-table
+    [lowerBoundPrice]="lowerBoundPrice"
+    [upperBoundPrice]="upperBoundPrice"
+    [positions]="positions"
+  ></app-players-table>
   <div class="user-team-block"></div>
 </section>
 

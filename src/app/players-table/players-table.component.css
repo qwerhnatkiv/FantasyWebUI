@@ -1,5 +1,7 @@
 .players-table {
     margin-left: 20px;
+    border-collapse: separate!important;
+    border-spacing:0 4px!important;
 }
 
 .players-table .mat-mdc-header-cell {
@@ -10,10 +12,11 @@
 .mat-mdc-cell {
     padding: 3px;
     border-bottom-style: none;
+    height: 20px;
 }
 
 .mat-mdc-row {
-    height: 25px;
+    height: 20px;
   }
 
 .first-choice-cell,.second-choice-cell{

@@ -1,36 +1,26 @@
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {MatSort, Sort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-
-export interface PlayerChooseRecord {
-  firstChoice: boolean;
-  secondChoice: boolean;
-  playerName: string;
-  team: string;
-  position: string;
-  price: number;
-  gamesCount: number;
-  easyGamesCount: number;
-  winPercentage: number;
-  powerPlayTime: string;
-  powerPlayNumber: string;
-  toi: number;
-  shotsOnGoal: number;
-  iXG: number;
-  iCF: number;
-  iHDCF: number;
-  expectedFantasyPoints: number;
-  fantasyPointsPerGame: number;
-}
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { PlayerChooseRecord } from '../interfaces/player-choose-record';
+import { PlayersFilter } from '../interfaces/players-filter';
 
 const ELEMENT_DATA: PlayerChooseRecord[] = [
   {
     firstChoice: true,
     secondChoice: false,
-    playerName: "Connor McDavid",
-    team: "EDM",
-    position: "Н",
+    playerName: 'Connor McDavid',
+    team: 'EDM',
+    position: 'Н',
     price: 2345,
     gamesCount: 3,
     easyGamesCount: 2,
@@ -48,9 +38,9 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
   {
     firstChoice: false,
     secondChoice: false,
-    playerName: "Auston Matthews",
-    team: "TOR",
-    position: "Н",
+    playerName: 'Auston Matthews',
+    team: 'TOR',
+    position: 'Н',
     price: 2125,
     gamesCount: 3,
     easyGamesCount: 2,
@@ -68,9 +58,9 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
   {
     firstChoice: false,
     secondChoice: true,
-    playerName: "Elias Pettersen",
-    team: "VAN",
-    position: "Н",
+    playerName: 'Elias Pettersen',
+    team: 'VAN',
+    position: 'Н',
     price: 1722,
     gamesCount: 4,
     easyGamesCount: 1,
@@ -84,16 +74,38 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     iHDCF: 6,
     expectedFantasyPoints: 49,
     fantasyPointsPerGame: 9.4,
-  }
+  },
+  {
+    firstChoice: true,
+    secondChoice: false,
+    playerName: 'Vitalya',
+    team: 'SEA',
+    position: 'З',
+    price: 1100,
+    gamesCount: 3,
+    easyGamesCount: 3,
+    winPercentage: 100,
+    powerPlayTime: '7:45(1)',
+    powerPlayNumber: 'ПП2',
+    toi: 23.56,
+    shotsOnGoal: 69,
+    iXG: 2.28,
+    iCF: 2,
+    iHDCF: 19,
+    expectedFantasyPoints: 123,
+    fantasyPointsPerGame: 23,
+  },
 ];
 
 @Component({
   selector: 'app-players-table',
   templateUrl: './players-table.component.html',
   styleUrls: ['./players-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayersTableComponent implements AfterViewInit {
-  displayedColumns: string[] = [  'firstChoice',
+export class PlayersTableComponent implements AfterViewInit, OnChanges {
+  displayedColumns: string[] = [
+    'firstChoice',
     'secondChoice',
     'playerName',
     'team',
@@ -110,54 +122,137 @@ export class PlayersTableComponent implements AfterViewInit {
     'iCF',
     'iHDCF',
     'expectedFantasyPoints',
-    'fantasyPointsPerGame']
+    'fantasyPointsPerGame',
+  ];
   dataSource = new MatTableDataSource(ELEMENT_DATA);
-  constructor(private _liveAnnouncer: LiveAnnouncer) {}
+  constructor(private _liveAnnouncer: LiveAnnouncer) {
+    this.dataSource.filterPredicate = this.filter;
+  }
+
+  private filterDictionary: Map<string, any> = new Map<string, any>();
 
   @ViewChild(MatSort) sort: MatSort | undefined;
+  @Input() lowerBoundPrice: number | undefined;
+  @Input() upperBoundPrice: number | undefined;
+  @Input() positions: string[] | undefined = [];
+
+  //#region NG overrides
+
+  ngOnChanges() {
+    this.applyPlayersFilter({
+      name: "lowerBoundPrice",
+      value: this.lowerBoundPrice
+    });
+
+    this.applyPlayersFilter({
+      name: "upperBoundPrice",
+      value: this.upperBoundPrice
+    });
+
+    this.applyPlayersFilter({
+      name: "positions",
+      value: this.positions
+    })
+  }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort!;
   }
 
-  getPlayerSelectedIconPath(choiceIndex: number, firstChoice: boolean, secondChoice: boolean): string {
+  //#endregion NG overrides
+
+  //#region Public Methods
+
+  getPlayerSelectedIconPath(
+    choiceIndex: number,
+    firstChoice: boolean,
+    secondChoice: boolean
+  ): string {
     if (!firstChoice && !secondChoice) {
-      return "/assets/images/player-not-selected.png";
+      return '/assets/images/player-not-selected.png';
     }
 
-    if (choiceIndex == 1 && secondChoice || choiceIndex == 2 && firstChoice) {
-      return "/assets/images/player-selected-not-here.png";
+    if (
+      (choiceIndex == 1 && secondChoice) ||
+      (choiceIndex == 2 && firstChoice)
+    ) {
+      return '/assets/images/player-selected-not-here.png';
     }
 
     if (choiceIndex == 1 && firstChoice) {
-      return "/assets/images/player-selected-first.png";
+      return '/assets/images/player-selected-first.png';
     }
 
     if (choiceIndex == 2 && secondChoice) {
-      return "/assets/images/player-selected-second.png";
+      return '/assets/images/player-selected-second.png';
     }
 
-    return "";
+    return '';
   }
 
   getPlayerSelectedClass(firstChoice: boolean, secondChoice: boolean): string {
     if (firstChoice) {
-      return "first-choice-selected-cell";
+      return 'first-choice-selected-cell';
     }
 
     if (secondChoice) {
-      return "second-choice-selected-cell";
+      return 'second-choice-selected-cell';
     }
 
-    return "";
+    return '';
   }
 
-    /** Announce the change in sort state for assistive technology. */
-    announceSortChange(sortState: Sort) {
-      if (sortState.direction) {
-        this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-      } else {
-        this._liveAnnouncer.announce('Sorting cleared');
+  /** Announce the change in sort state for assistive technology. */
+  announceSortChange(sortState: Sort) {
+    if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
+  }
+
+  //#endregion 
+
+  //#region Private methods
+
+  private filter(record: PlayerChooseRecord, filter: string) {
+    var map = new Map<string, any>(JSON.parse(filter));
+    let isMatch = false;
+
+    for (let [key, value] of map) {
+
+      if (value == null || value.length === 0) {
+        isMatch = true;
+        continue;
+      }
+
+      if (key == "lowerBoundPrice") {
+        isMatch = record.price >= value;
+      }
+      
+      if (key == "upperBoundPrice") {
+        isMatch = record.price <= value;
+      }
+
+      if (key == "positions") {
+        isMatch = value.includes(record.position);
+      }
+
+      if (!isMatch) {
+        return false;
       }
     }
+
+    return isMatch;
+  }
+
+  private applyPlayersFilter(filter: PlayersFilter) {
+    this.filterDictionary.set(filter.name, filter.value);
+    var jsonString = JSON.stringify(
+      Array.from(this.filterDictionary.entries())
+    );
+    this.dataSource.filter = jsonString;
+  }
+
+  //#endregion
 }
