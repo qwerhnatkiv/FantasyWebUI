@@ -20,7 +20,6 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Connor McDavid',
     team: 'EDM',
-    teamFull: 'Edmonton Oilers',
     position: 'Н',
     price: 2345,
     gamesCount: 3,
@@ -41,7 +40,6 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Auston Matthews',
     team: 'TOR',
-    teamFull: 'Toronto Maple Leafs',
     position: 'Н',
     price: 2125,
     gamesCount: 3,
@@ -62,7 +60,6 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: true,
     playerName: 'Elias Pettersen',
     team: 'VAN',
-    teamFull: 'Vancouver Canucks',
     position: 'Н',
     price: 1722,
     gamesCount: 4,
@@ -83,7 +80,6 @@ const ELEMENT_DATA: PlayerChooseRecord[] = [
     secondChoice: false,
     playerName: 'Vitalya',
     team: 'SEA',
-    teamFull: 'Seattle Kraken',
     position: 'З',
     price: 1100,
     gamesCount: 3,
@@ -255,7 +251,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       }
 
       if (key == "teams") {
-        isMatch = value.includes(record.teamFull);
+        isMatch = value.includes(record.team);
       }
 
       if (key == "powerPlayUnits") {

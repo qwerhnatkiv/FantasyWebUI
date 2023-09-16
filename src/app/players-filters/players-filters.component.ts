@@ -8,7 +8,7 @@ import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS } from 'src/
   styleUrls: ['./players-filters.component.css'],
 })
 export class PlayersFiltersComponent {
-  prices: number[] = DEFAULT_PRICES.sort((n1,n2) => n2 - n1);
+  prices: number[] = DEFAULT_PRICES.sort((n1,n2) => n1 - n2);
   selectPositions: string[] = DEFAULT_POSITIONS;
   selectTeams: string[] = TEAMS;
   selectPP: string[] = POWER_PLAY_UNITS;
