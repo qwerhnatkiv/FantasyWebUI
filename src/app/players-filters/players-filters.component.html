@@ -5,7 +5,7 @@
       <mat-label>Price</mat-label>
       <mat-select [(value)]="lowerBoundPrice" (selectionChange)="lowerBoundPriceChanged()">
         <mat-option>None</mat-option>
-        <mat-option *ngFor="let price of prices" [value]="price">{{
+        <mat-option *ngFor="let price of prices" [value]="price" [disabled]="price > upperBoundPrice!">{{
           price
         }}</mat-option>
       </mat-select>
@@ -16,7 +16,7 @@
       <mat-label>Price</mat-label>
       <mat-select [(value)]="upperBoundPrice" (selectionChange)="upperBoundPriceChanged()">
         <mat-option>None</mat-option>
-        <mat-option *ngFor="let price of prices" [value]="price">{{
+        <mat-option *ngFor="let price of prices" [value]="price" [disabled]="price < lowerBoundPrice!">{{
           price
         }}</mat-option>
       </mat-select>
