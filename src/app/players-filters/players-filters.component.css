@@ -6,7 +6,7 @@
 .filters-row {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  gap: 5px;
 }
 
 .player-filters-block ::ng-deep .mat-mdc-form-field {
@@ -23,7 +23,13 @@
 
 .vl {
   border-left: 2px solid black;
-  margin-left: 10px;
   width: 2px;
   height: 55px;
+}
+
+.clear-filter-button {
+  position: relative;
+  left: -1%;
+  top: -15px;
+  margin-right: 0px;
 }

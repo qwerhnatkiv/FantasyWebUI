@@ -35,6 +35,8 @@ import { PlayersFiltersComponent } from './players-filters/players-filters.compo
 import { NgFor } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -68,7 +70,9 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatSelectModule,
     NgFor,
     MatDividerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule
   ],
   providers: [
     {
