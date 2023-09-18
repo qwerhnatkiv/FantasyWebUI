@@ -26,6 +26,10 @@ export class PlayersFiltersComponent {
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   lowerBoundPriceChanged() {
+    if (this.lowerBoundPrice! > this.upperBoundPrice!) {
+      this.upperBoundPrice = undefined;
+    }
+
     this.sendLowerBoundPrice.emit(this.lowerBoundPrice);
   }
 

@@ -33,3 +33,8 @@
   top: -15px;
   margin-right: 0px;
 }
+
+.clear-filter-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}

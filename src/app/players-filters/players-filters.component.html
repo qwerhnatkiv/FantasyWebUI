@@ -11,13 +11,13 @@
         <mat-option
           *ngFor="let price of prices"
           [value]="price"
-          [disabled]="price > upperBoundPrice!"
           >{{ price }}</mat-option
         >
       </mat-select>
     </mat-form-field>
     <button
       (click)="lowerBoundPrice = undefined; lowerBoundPriceChanged()"
+      [hidden]="lowerBoundPrice === undefined"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear lower bound price filter"
@@ -43,6 +43,7 @@
 
     <button
       (click)="upperBoundPrice = undefined; upperBoundPriceChanged()"
+      [hidden]="upperBoundPrice === undefined"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear upper bound price filter"
@@ -77,6 +78,7 @@
 
     <button
       (click)="teamsFormControl.setValue([]); teamsChanged()"
+      [hidden]="teamsFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear teams filter"
@@ -103,6 +105,7 @@
 
     <button
       (click)="positionsFormControl.setValue([]); positionsChanged()"
+      [hidden]="positionsFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear positions filter"
@@ -126,6 +129,7 @@
     </mat-form-field>
     <button
       (click)="powerPlayFormControl.setValue([]); powerPlayUnitsChanged()"
+      [hidden]="powerPlayFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear power play filter"
