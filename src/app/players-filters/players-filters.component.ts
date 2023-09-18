@@ -28,6 +28,7 @@ export class PlayersFiltersComponent {
   lowerBoundPriceChanged() {
     if (this.lowerBoundPrice! > this.upperBoundPrice!) {
       this.upperBoundPrice = undefined;
+      this.upperBoundPriceChanged();
     }
 
     this.sendLowerBoundPrice.emit(this.lowerBoundPrice);
