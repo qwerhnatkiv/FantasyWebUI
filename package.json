@@ -27,8 +27,10 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "ng-table-virtual-scroll": "^1.6.0",
+    "ngx-tippy-wrapper": "^6.2.2",
     "ngx-ui-loader": "^13.0.0",
     "rxjs": "~7.8.0",
+    "tippy.js": "^6.3.7",
     "ts-transformer-keys": "^0.4.4",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"

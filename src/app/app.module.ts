@@ -38,6 +38,8 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
+
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
   hideDelay: 0,
@@ -72,7 +74,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatDividerModule,
     ReactiveFormsModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    NgxTippyModule
   ],
   providers: [
     {

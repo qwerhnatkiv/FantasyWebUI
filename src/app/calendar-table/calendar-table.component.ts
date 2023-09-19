@@ -8,6 +8,7 @@ import { GamesUtils } from '../common/games-utils';
 import { DEFAULT_DATE_FORMAT } from 'src/constants';
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
+import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 
 @Component({
   selector: 'app-calendar-table',
@@ -28,6 +29,7 @@ export class CalendarTableComponent implements OnChanges {
   @Input() maxFilterDate: Date | undefined;
   @Input() isCalendarVisible: boolean = false;
   @Input() games: GamePredictionDTO[] = [];
+  @Input() teamStats: TeamStatsDTO[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -189,19 +191,45 @@ export class CalendarTableComponent implements OnChanges {
     return 'calendar-cell-red';
   }
 
-  public generateCellToolTip(game: GamePredictionDTO): string {
+  public generateCellToolTip(game: GamePredictionDTO): string | null {
     if (game == null) {
-      return '';
+      return null;
     }
 
-    let generatedTooltip: string = `${
+    let homeTeamStats: TeamStatsDTO = this.teamStats.find((x) => x.teamID == game.homeTeamId)!;
+    let awayTeamStats: TeamStatsDTO = this.teamStats.find((x) => x.teamID == game.awayTeamId)!;
+
+    let homeTeamColor: string = this.getTooltipWinChanceSectionClass(game.homeTeamWinChance);
+    let awayTeamColor: string = this.getTooltipWinChanceSectionClass(game.awayTeamWinChance);
+
+    let homeTeamWinChance: string = `<span style="color:${homeTeamColor}">${
       game.homeTeamAcronym
-    }: Победа ${Math.round(game.homeTeamWinChance)}% |
-    ${game.awayTeamAcronym}: Победа ${Math.round(game.awayTeamWinChance)}% |
+    }: Победа ${Math.round(game.homeTeamWinChance)}%</span>`;
+    let awayTeamWinChance: string = `<span style="color:${awayTeamColor}">${
+      game.awayTeamAcronym
+    }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
+
+    let generatedTooltip: string = 
+    `${homeTeamWinChance} | ${homeTeamStats.teamGoalsForm} GF | ${homeTeamStats.teamGoalsAwayForm} GA | ${homeTeamStats.teamForm}<br>
+    ${awayTeamWinChance} | ${awayTeamStats.teamGoalsForm} GF | ${awayTeamStats.teamGoalsAwayForm} GA | ${awayTeamStats.teamForm}<br>
     `;
 
     return generatedTooltip;
   }
+
+  private getTooltipWinChanceSectionClass(winChance: number) {
+
+    if (winChance >= 49) {
+      return '#64ff8f';
+    }
+
+    if (winChance >= 30) {
+      return 'white';
+    }
+
+    return '#ff7e7e';
+  }
+
 
   private generateTableColumns(
     weeks: number[],

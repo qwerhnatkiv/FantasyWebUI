@@ -4,6 +4,8 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
 import { GamesUtils } from './common/games-utils';
 import { Utils } from './common/utils';
+import { GamesDTO } from './interfaces/games-dto';
+import { TeamStatsDTO } from './interfaces/team-stats-dto';
 
 @Component({
   selector: 'app-root',
@@ -18,25 +20,27 @@ export class AppComponent {
   public maxFilterDate: Date | undefined = undefined;
 
   public games: GamePredictionDTO[] = [];
+  public teamStats: TeamStatsDTO[] = [];
 
-  lowerBoundPrice: number | undefined = undefined;
-  upperBoundPrice: number | undefined = undefined;
-  positions: string[] | undefined = [];
-  teams: string[] | undefined = [];
-  powerPlayUnits: string[] | undefined = [];
+  public lowerBoundPrice: number | undefined = undefined;
+  public upperBoundPrice: number | undefined = undefined;
+  public positions: string[] | undefined = [];
+  public teams: string[] | undefined = [];
+  public powerPlayUnits: string[] | undefined = [];
 
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
-      .get<GamePredictionDTO[]>(
+      .get<GamesDTO>(
         'https://qwerhnatkiv.bsite.net/predictions/games/get'
       )
       .subscribe({
         next: (result) => {
-          this.games = result.sort(
+          this.games = result.gamePredictions.sort(
             (n1, n2) => n1.weekNumber - n2.weekNumber
           );
 
+          this.teamStats = result.teamsStats;
           this.setUpFilters();
 
         },

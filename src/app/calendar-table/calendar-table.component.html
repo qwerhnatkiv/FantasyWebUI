@@ -18,10 +18,14 @@
       <div
         class="calendar-cell"
         [ngClass]="getCellTextClass(element[column.header])"
-        [matTooltip]="generateCellToolTip(element[column.header].game)"
-        matTooltipPosition="below"
-        matTooltipClass="cellTooltip"
-        disableTooltipInteractivity="true"
+        [ngxTippy]="generateCellToolTip(element[column.header].game)"
+        tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
+        [tippyProps]="{
+          allowHTML: true,
+          placement: 'bottom',
+          arrow: false,
+          theme: 'material'
+        }"
       >
         {{ element[column.header].displayValue }}
       </div>

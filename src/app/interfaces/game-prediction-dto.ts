@@ -8,4 +8,6 @@ export interface GamePredictionDTO {
   awayTeamWinChance: number;
   drawChance: number;
   weekNumber: number;
+  homeTeamId: number;
+  awayTeamId: number;
 }
