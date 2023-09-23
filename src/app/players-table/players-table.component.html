@@ -3,6 +3,8 @@
   [dataSource]="dataSource"
   class="players-table"
   matSort
+  matSortActive="iXG" 
+  matSortDirection="desc"
   matSortStart="desc"
   (matSortChange)="announceSortChange($event)"
 >
@@ -66,10 +68,18 @@
     <td
       mat-cell
       *matCellDef="let element"
-      class="left-column"
+      class="left-column player-selected"
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [ngxTippy]="generateCellToolTip(element)"
+        tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text tooltip-title"
+        [tippyProps]="{
+          allowHTML: true,
+          placement: 'right',
+          arrow: false,
+          theme: 'material'
+        }"
     >
       {{ element.playerName }}
     </td>

@@ -13,89 +13,9 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { PlayerChooseRecord } from '../interfaces/player-choose-record';
 import { PlayersFilter } from '../interfaces/players-filter';
-
-const ELEMENT_DATA: PlayerChooseRecord[] = [
-  {
-    firstChoice: true,
-    secondChoice: false,
-    playerName: 'Connor McDavid',
-    team: 'EDM',
-    position: 'Н',
-    price: 2345,
-    gamesCount: 3,
-    easyGamesCount: 2,
-    winPercentage: 75,
-    powerPlayTime: '3:20(1)',
-    powerPlayNumber: 'ПП1',
-    toi: 21.02,
-    shotsOnGoal: 7,
-    iXG: 2.1,
-    iCF: 11,
-    iHDCF: 7,
-    expectedFantasyPoints: 61,
-    fantasyPointsPerGame: 12.2,
-  },
-  {
-    firstChoice: false,
-    secondChoice: false,
-    playerName: 'Auston Matthews',
-    team: 'TOR',
-    position: 'Н',
-    price: 2125,
-    gamesCount: 3,
-    easyGamesCount: 2,
-    winPercentage: 60,
-    powerPlayTime: '2:30(2)',
-    powerPlayNumber: 'ПП1',
-    toi: 18.53,
-    shotsOnGoal: 10,
-    iXG: 1.5,
-    iCF: 12,
-    iHDCF: 7,
-    expectedFantasyPoints: 57,
-    fantasyPointsPerGame: 11.2,
-  },
-  {
-    firstChoice: false,
-    secondChoice: true,
-    playerName: 'Elias Pettersen',
-    team: 'VAN',
-    position: 'Н',
-    price: 1722,
-    gamesCount: 4,
-    easyGamesCount: 1,
-    winPercentage: 80,
-    powerPlayTime: '3:45(4)',
-    powerPlayNumber: 'ПП1',
-    toi: 18.12,
-    shotsOnGoal: 7,
-    iXG: 1.7,
-    iCF: 8,
-    iHDCF: 6,
-    expectedFantasyPoints: 49,
-    fantasyPointsPerGame: 9.4,
-  },
-  {
-    firstChoice: true,
-    secondChoice: false,
-    playerName: 'Vitalya',
-    team: 'SEA',
-    position: 'З',
-    price: 1100,
-    gamesCount: 3,
-    easyGamesCount: 3,
-    winPercentage: 100,
-    powerPlayTime: '7:45(1)',
-    powerPlayNumber: 'ПП2',
-    toi: 23.56,
-    shotsOnGoal: 69,
-    iXG: 2.28,
-    iCF: 2,
-    iHDCF: 19,
-    expectedFantasyPoints: 23,
-    fantasyPointsPerGame: 23,
-  },
-];
+import { PlayerStatsDTO } from '../interfaces/player-stats-dto';
+import { TeamStatsDTO } from '../interfaces/team-stats-dto';
+import { PPToiPipe } from '../pipes/pptoi.pipe';
 
 @Component({
   selector: 'app-players-table',
@@ -124,7 +44,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'expectedFantasyPoints',
     'fantasyPointsPerGame',
   ];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
   constructor(private _liveAnnouncer: LiveAnnouncer) {
     this.dataSource.filterPredicate = this.filter;
   }
@@ -136,11 +55,48 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Input() upperBoundPrice: number | undefined;
   @Input() positions: string[] | undefined = [];
   @Input() teams: string[] | undefined = [];
+  @Input() teamIdAcronymMap: Map<number, string> | undefined = undefined;
   @Input() powerPlayUnits: string[] | undefined = [];
+  @Input() playerStats: PlayerStatsDTO[] = [];
+  @Input() teamStats: TeamStatsDTO[] = [];
 
+  private pptoiPipe: PPToiPipe = new PPToiPipe();
+  private players: PlayerChooseRecord[] = [];
+  dataSource = new MatTableDataSource(this.players);
   //#region NG overrides
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+
+    if (
+      changes['playerStats']?.previousValue &&
+      changes['playerStats']?.currentValue &&
+      changes['playerStats'].previousValue.length !=
+        changes['playerStats'].currentValue.length
+    ) {
+      this.playerStats.forEach((x) => this.players.push((
+        {
+          firstChoice: false,
+          secondChoice: false,
+          playerName: x.playerName,
+          team: this.teamStats?.find((team) => team.teamID == x.teamID)?.teamAcronym!,
+          position: x.position,
+          price: x.price,
+          gamesCount: 0,
+          easyGamesCount: 0,
+          winPercentage: 0,
+          powerPlayTime: this.pptoiPipe.transform(x.formPowerPlayTime, x.formPowerPlayTeamPosition),
+          powerPlayNumber: `ПП${x.formPowerPlayNumber}`,
+          toi: x.formTOI,
+          shotsOnGoal: x.formShotsOnGoal,
+          iXG: Math.round(x.formIxG * 100) / 100,
+          iCF: x.formICF,
+          iHDCF: x.formIHDCF,
+          expectedFantasyPoints: 0,
+          fantasyPointsPerGame: 0,
+        }
+      )));
+    }
+
     this.applyPlayersFilter({
       name: "lowerBoundPrice",
       value: this.lowerBoundPrice
@@ -221,6 +177,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  public generateCellToolTip(player: PlayerChooseRecord): string | null {
+    return `<div>
+      <div class="tooltip-title">${player.playerName} (${player.position}, ${player.team})</div>
+    </div>`
   }
 
   //#endregion 

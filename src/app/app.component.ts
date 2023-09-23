@@ -6,6 +6,7 @@ import { GamesUtils } from './common/games-utils';
 import { Utils } from './common/utils';
 import { GamesDTO } from './interfaces/games-dto';
 import { TeamStatsDTO } from './interfaces/team-stats-dto';
+import { PlayerStatsDTO } from './interfaces/player-stats-dto';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,8 @@ export class AppComponent {
   public games: GamePredictionDTO[] = [];
   public teamStats: TeamStatsDTO[] = [];
 
+  public playerStats: PlayerStatsDTO[] = [];
+
   public lowerBoundPrice: number | undefined = undefined;
   public upperBoundPrice: number | undefined = undefined;
   public positions: string[] | undefined = [];
@@ -36,11 +39,13 @@ export class AppComponent {
       )
       .subscribe({
         next: (result) => {
+          console.log(result);
           this.games = result.gamePredictions.sort(
             (n1, n2) => n1.weekNumber - n2.weekNumber
           );
 
           this.teamStats = result.teamsStats;
+          this.playerStats = result.playerStats;
           this.setUpFilters();
 
         },
