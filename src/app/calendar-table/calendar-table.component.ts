@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatTableDataSource } from '@angular/material/table';
 import { TableColumn } from '../interfaces/table-column';
@@ -14,6 +14,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
   selector: 'app-calendar-table',
   templateUrl: './calendar-table.component.html',
   styleUrls: ['./calendar-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarTableComponent implements OnChanges {
   private dataSourceArray: any[] = [];

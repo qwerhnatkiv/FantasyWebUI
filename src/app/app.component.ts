@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
 import { GamesUtils } from './common/games-utils';
@@ -12,6 +12,7 @@ import { PlayerStatsDTO } from './interfaces/player-stats-dto';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   title = 'Fantasy Web';

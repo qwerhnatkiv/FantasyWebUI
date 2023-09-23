@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS } from 'src/constants';
 
@@ -6,6 +6,7 @@ import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS } from 'src/
   selector: 'app-players-filters',
   templateUrl: './players-filters.component.html',
   styleUrls: ['./players-filters.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayersFiltersComponent {
   prices: number[] = DEFAULT_PRICES.sort((n1,n2) => n1 - n2);
