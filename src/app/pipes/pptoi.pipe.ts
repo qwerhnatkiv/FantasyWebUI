@@ -12,9 +12,7 @@ export class PPToiPipe implements PipeTransform {
         minimumIntegerDigits: 2,
         useGrouping: false,
       }) +
-      '(' +
-      ppPosition +
-      ')'
+      (ppPosition ? '(' + ppPosition + ')' : '')
     );
   }
 }

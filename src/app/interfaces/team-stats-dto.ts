@@ -4,4 +4,5 @@ export interface TeamStatsDTO {
   teamGoalsForm: number;
   teamGoalsAwayForm: number;
   teamForm: string;
+  teamFormWinPercentage: number;
 }

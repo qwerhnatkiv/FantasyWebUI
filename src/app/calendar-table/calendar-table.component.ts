@@ -63,11 +63,17 @@ export class CalendarTableComponent implements OnChanges {
       this.columns.map((x) => x.header).slice()
     );
 
-    teams.forEach((teamName) => {
+    for (var i=0, n=teams.length; i < n; ++i) 
+    {
+      let teamName: string = teams[i];
+
       let currentWeekName: string = '';
 
       let teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
-      this.columns.forEach((column) => {
+
+      for (var j=0, k=this.columns.length; j < k; ++j) {
+        let column: TableColumn = this.columns[j];
+
         let homeGame: GamePredictionDTO | undefined = games.find(
           (x) =>
             x.homeTeamName == teamName &&
@@ -85,7 +91,7 @@ export class CalendarTableComponent implements OnChanges {
               homeGame
             )
           );
-          return;
+          continue;
         }
 
         let awayGame: GamePredictionDTO | undefined = games.find(
@@ -105,7 +111,7 @@ export class CalendarTableComponent implements OnChanges {
               awayGame
             )
           );
-          return;
+          continue;
         }
 
         if (column.header.includes('w')) {
@@ -120,7 +126,7 @@ export class CalendarTableComponent implements OnChanges {
             new TableCell(gamesForWeekCount.toString(), gamesForWeekCount)
           );
           currentWeekName = column.header;
-          return;
+          continue;
         }
         teamSpecificRow.push(
           new TableCell(
@@ -132,7 +138,8 @@ export class CalendarTableComponent implements OnChanges {
             )?.gamesCount
           )
         );
-      });
+      } 
+
       this.dataSourceArray.push(
         Object.fromEntries(
           this.columnsToDisplay.map((_, i) => [
@@ -141,7 +148,7 @@ export class CalendarTableComponent implements OnChanges {
           ])
         )
       );
-    });
+    }
   }
 
   public getCellClass(cell: TableCell, column: TableColumn) {

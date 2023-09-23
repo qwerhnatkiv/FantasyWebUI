@@ -73,28 +73,35 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       changes['playerStats'].previousValue.length !=
         changes['playerStats'].currentValue.length
     ) {
-      this.playerStats.forEach((x) => this.players.push((
-        {
-          firstChoice: false,
-          secondChoice: false,
-          playerName: x.playerName,
-          team: this.teamStats?.find((team) => team.teamID == x.teamID)?.teamAcronym!,
-          position: x.position,
-          price: x.price,
-          gamesCount: 0,
-          easyGamesCount: 0,
-          winPercentage: 0,
-          powerPlayTime: this.pptoiPipe.transform(x.formPowerPlayTime, x.formPowerPlayTeamPosition),
-          powerPlayNumber: `ПП${x.formPowerPlayNumber}`,
-          toi: x.formTOI,
-          shotsOnGoal: x.formShotsOnGoal,
-          iXG: Math.round(x.formIxG * 100) / 100,
-          iCF: x.formICF,
-          iHDCF: x.formIHDCF,
-          expectedFantasyPoints: 0,
-          fantasyPointsPerGame: 0,
-        }
-      )));
+
+      for (var i=0, n=this.playerStats.length; i < n; ++i)
+      {
+        let player: PlayerStatsDTO = this.playerStats[i];
+        let matchingTeam: TeamStatsDTO = this.teamStats?.find((team) => team.teamID == player.teamID)!;
+        
+        this.players.push((
+          {
+            firstChoice: false,
+            secondChoice: false,
+            playerName: player.playerName,
+            team: matchingTeam.teamAcronym,
+            position: player.position,
+            price: player.price,
+            gamesCount: 0,
+            easyGamesCount: 0,
+            winPercentage: matchingTeam.teamFormWinPercentage,
+            powerPlayTime: this.pptoiPipe.transform(player.formPowerPlayTime, player.formPowerPlayTeamPosition),
+            powerPlayNumber: player.formPowerPlayNumber > 0 ? `ПП${player.formPowerPlayNumber}` : 'нет',
+            toi: player.formTOI,
+            shotsOnGoal: player.formShotsOnGoal,
+            iXG: Math.round(player.formIxG * 100) / 100,
+            iCF: player.formICF,
+            iHDCF: player.formIHDCF,
+            expectedFantasyPoints: 0,
+            fantasyPointsPerGame: 0,
+          }
+        ))
+      }
     }
 
     this.applyPlayersFilter({
