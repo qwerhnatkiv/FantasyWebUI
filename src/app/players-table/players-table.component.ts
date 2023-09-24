@@ -289,10 +289,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     </table>
     `;
 
-    let teamGoalsForm: string = (
-      (player.teamObject.teamGoalsForm + player.teamObject.teamGoalsAwayForm) /
-      2
-    ).toFixed(1);
     let teamForm: string = `
     <div>Форма команды:<div>
     <table class="tooltip-table">
@@ -305,7 +301,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${player.winPercentage}</td>
-          <td style="text-align: center; vertical-align: middle;">${teamGoalsForm}</td>
+          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm}</td>
         </tr
       </tbody>
     </table>
@@ -318,15 +314,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     let opponentTeam: TeamStatsDTO = this.teamStats.find((x) => x.teamID == teamGame.opponentTeamID)!;
     let opponentAcronym: string = teamGame.isHome ? `@${opponentTeam.teamAcronym}` : `${opponentTeam.teamAcronym}`;
 
-    let opponentGoalsForm: string = (
-      (opponentTeam.teamGoalsForm + opponentTeam.teamGoalsAwayForm) /
-      2
-    ).toFixed(1);
-
     let teamWinColor: string = this.getTooltipWinChanceSectionClass(teamGame.winChance);
 
     let opponentInfo: string = `
-    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${teamGame.winChance.toFixed(1)}%</span><div>
+    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(teamGame.winChance)}%</span><div>
     <table class="tooltip-table">
       <thead>
         <tr>
@@ -338,7 +329,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamFormWinPercentage}</td>
-          <td style="text-align: center; vertical-align: middle;">${opponentGoalsForm}</td>
+          <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamGoalsForm}</td>
           <td style="text-align: center; vertical-align: middle;"> ${player.expectedFantasyPoints}</td>
         </tr
       </tbody>
