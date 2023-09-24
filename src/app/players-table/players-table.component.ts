@@ -312,7 +312,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0]!;
 
     let opponentTeam: TeamStatsDTO = this.teamStats.find((x) => x.teamID == teamGame.opponentTeamID)!;
-    let opponentAcronym: string = teamGame.isHome ? `@${opponentTeam.teamAcronym}` : `${opponentTeam.teamAcronym}`;
+    let opponentAcronym: string = teamGame.isHome ? `${opponentTeam.teamAcronym}` : `@${opponentTeam.teamAcronym}`;
 
     let teamWinColor: string = this.getTooltipWinChanceSectionClass(teamGame.winChance);
 
