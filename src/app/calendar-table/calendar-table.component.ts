@@ -5,7 +5,7 @@ import { TableColumn } from '../interfaces/table-column';
 import { TeamWeek } from '../classes/team-week';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { GamesUtils } from '../common/games-utils';
-import { DEFAULT_DATE_FORMAT } from 'src/constants';
+import { DEFAULT_DATE_FORMAT, GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
@@ -188,11 +188,11 @@ export class CalendarTableComponent implements OnChanges {
       return 'calendar-cell-empty';
     }
 
-    if (numericValue >= 49) {
+    if (numericValue >= GREEN_WIN_LOWER_BOUNDARY) {
       return 'calendar-cell-green';
     }
 
-    if (numericValue >= 30) {
+    if (numericValue >= WHITE_WIN_LOWER_BOUNDARY) {
       return 'calendar-cell-normal';
     }
 
@@ -227,11 +227,11 @@ export class CalendarTableComponent implements OnChanges {
 
   private getTooltipWinChanceSectionClass(winChance: number) {
 
-    if (winChance >= 49) {
+    if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
       return '#64ff8f';
     }
 
-    if (winChance >= 30) {
+    if (winChance >= WHITE_WIN_LOWER_BOUNDARY) {
       return 'white';
     }
 

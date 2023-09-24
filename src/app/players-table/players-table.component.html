@@ -3,7 +3,7 @@
   [dataSource]="dataSource"
   class="players-table"
   matSort
-  matSortActive="iXG" 
+  matSortActive="iXG"
   matSortDirection="desc"
   matSortStart="desc"
   (matSortChange)="announceSortChange($event)"
@@ -73,13 +73,13 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
       [ngxTippy]="generateCellToolTip(element)"
-        tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text tooltip-title"
-        [tippyProps]="{
-          allowHTML: true,
-          placement: 'right',
-          arrow: false,
-          theme: 'material'
-        }"
+      tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text tooltip-title tooltip-table tooltip-general"
+      [tippyProps]="{
+        allowHTML: true,
+        placement: 'right',
+        arrow: false,
+        theme: 'material'
+      }"
     >
       {{ element.playerName }}
     </td>
@@ -387,7 +387,7 @@
     </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
   <!-- Row shown when there is no matching data. -->

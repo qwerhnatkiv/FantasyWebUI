@@ -1,4 +1,6 @@
+import { GREEN_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
+import { TeamGameInformation } from '../interfaces/team-game-information';
 
 export module GamesUtils {
   export function getExtremumDateForGames(
@@ -18,5 +20,14 @@ export module GamesUtils {
         games[0].gameDate
       )
     );
+  }
+
+  export function isEasyGame(winChance: number) {
+
+    if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
+      return true;
+    }
+
+    return false;
   }
 }

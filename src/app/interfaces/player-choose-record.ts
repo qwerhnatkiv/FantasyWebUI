@@ -1,3 +1,6 @@
+import { PlayerStatsDTO } from "./player-stats-dto";
+import { TeamStatsDTO } from "./team-stats-dto";
+
 export interface PlayerChooseRecord {
     firstChoice: boolean;
     secondChoice: boolean;
@@ -17,5 +20,7 @@ export interface PlayerChooseRecord {
     iHDCF: number;
     expectedFantasyPoints: number;
     fantasyPointsPerGame: number;
+    playerObject: PlayerStatsDTO;
+    teamObject: TeamStatsDTO;
   }
   

@@ -7,6 +7,9 @@ import { Utils } from './common/utils';
 import { GamesDTO } from './interfaces/games-dto';
 import { TeamStatsDTO } from './interfaces/team-stats-dto';
 import { PlayerStatsDTO } from './interfaces/player-stats-dto';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { Moment } from 'moment';
+import { TeamGameInformation } from './interfaces/team-game-information';
 
 @Component({
   selector: 'app-root',
@@ -32,12 +35,15 @@ export class AppComponent {
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
 
+  public filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
+    number,
+    TeamGameInformation[]
+  >();
+
   constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
-      .get<GamesDTO>(
-        'https://qwerhnatkiv.bsite.net/predictions/games/get'
-      )
+      .get<GamesDTO>('https://qwerhnatkiv.bsite.net/predictions/games/get')
       .subscribe({
         next: (result) => {
           this.games = result.gamePredictions.sort(
@@ -47,12 +53,11 @@ export class AppComponent {
           this.teamStats = result.teamsStats;
           this.playerStats = result.playerStats;
           this.setUpFilters();
-
         },
         error: (err) => {
           console.error(err);
         },
-        complete: () => this.ngxLoader.stop()
+        complete: () => this.ngxLoader.stop(),
       });
   }
 
@@ -63,33 +68,98 @@ export class AppComponent {
       .sort((n1, n2) => n1 - n2);
 
     this.setFiltersDefaultDates(weeks, this.games);
+    this.updateFilteredTeamsGamesMap();
+  }
+
+  public handleMinimumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
+    this.minFilterDate = event.value?.toDate();
+    this.updateFilteredTeamsGamesMap();
+  }
+
+  public handleMaximumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
+    this.maxFilterDate = event.value?.toDate();
+    this.updateFilteredTeamsGamesMap();
   }
 
   private setFiltersDefaultDates(
     weeks: number[],
-    games: GamePredictionDTO[],
+    games: GamePredictionDTO[]
   ): void {
-
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
     let today = new Date();
     this.minFilterDate =
       minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
 
     weeks.forEach((week) => {
-
-      let weekGames: GamePredictionDTO[] = games.filter((game) => game.weekNumber == week);
-      let thisWeekMinDate: Date = GamesUtils.getExtremumDateForGames(weekGames, false);
-      let thisWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(weekGames, true);
+      let weekGames: GamePredictionDTO[] = games.filter(
+        (game) => game.weekNumber == week
+      );
+      let thisWeekMinDate: Date = GamesUtils.getExtremumDateForGames(
+        weekGames,
+        false
+      );
+      let thisWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
+        weekGames,
+        true
+      );
 
       if (
         thisWeekMinDate.getTime() <= this.minFilterDate?.getTime()! &&
         thisWeekMaxDate.getTime() >= this.minFilterDate?.getTime()!
       ) {
         this.maxFilterDate = GamesUtils.getExtremumDateForGames(
-          games.filter((game) => game.weekNumber == week + 1), true
+          games.filter((game) => game.weekNumber == week + 1),
+          true
         );
       }
-
     });
+  }
+
+  private updateFilteredTeamsGamesMap() {
+    let newMap: Map<number, TeamGameInformation[]> = new Map<
+      number,
+      TeamGameInformation[]
+    >();
+    for (var i = 0, n = this.teamStats?.length!; i < n; ++i) {
+      let teamStats: TeamStatsDTO = this.teamStats![i];
+
+      let gamesByDateRange: GamePredictionDTO[] = this.games.filter(
+        (x) =>
+          new Date(x.gameDate).getTime() <= this.maxFilterDate?.getTime()! &&
+          new Date(x.gameDate).getTime() >= this.minFilterDate?.getTime()! &&
+          (x.awayTeamId == teamStats.teamID || x.homeTeamId == teamStats.teamID)
+      );
+
+      let teamGameInformation: TeamGameInformation[] = [];
+
+      for (var j = 0, k = gamesByDateRange.length!; j < k; ++j) {
+        let game: GamePredictionDTO = gamesByDateRange[j];
+
+        if (game.homeTeamId == teamStats.teamID) {
+          teamGameInformation.push({
+            teamID: game.homeTeamId,
+            opponentTeamID: game.awayTeamId,
+            winChance: game.homeTeamWinChance,
+            isHome: true,
+            gameDate: game.gameDate
+          });
+        } else{
+          teamGameInformation.push({
+            teamID: game.awayTeamId,
+            opponentTeamID: game.homeTeamId,
+            winChance: game.awayTeamWinChance,
+            isHome: false,
+            gameDate: game.gameDate
+          });
+        }
+      }
+
+      newMap.set(
+        teamStats.teamID,
+        teamGameInformation
+      );
+    }
+
+    this.filteredTeamGames = newMap;
   }
 }

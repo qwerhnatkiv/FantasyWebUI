@@ -6,7 +6,7 @@
       matInput
       [matDatepicker]="pickerFrom"
       [(ngModel)]="minFilterDate"
-      (dateChange)="minFilterDate = $event.value!"
+      (dateChange)="handleMinimumDateFilterChange($event)"
     />
     <mat-hint class="calendar-hint"></mat-hint>
     <mat-datepicker-toggle
@@ -22,7 +22,7 @@
       matInput
       [matDatepicker]="pickerTo"
       [(ngModel)]="maxFilterDate"
-      (dateChange)="maxFilterDate = $event.value!"
+      (dateChange)="handleMaximumDateFilterChange($event)"
     />
     <mat-hint class="calendar-hint"></mat-hint>
     <mat-datepicker-toggle
@@ -67,7 +67,8 @@
     [powerPlayUnits]="powerPlayUnits"
     [playerStats]="playerStats"
     [teamStats]="teamStats"
-    style="max-height: 500px; overflow: auto"
+    [filteredTeamGames]="filteredTeamGames"
+    style="max-height: 500px; overflow-y: auto; overflow-x: hidden;"
   ></app-players-table>
   <div class="user-team-block"></div>
 </section>
