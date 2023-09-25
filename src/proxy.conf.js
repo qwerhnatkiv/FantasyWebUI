@@ -1,7 +1,7 @@
 const PROXY_CONFIG = {
   "/api": {
     "target": "https://qwerhnatkiv.bsite.net/",
-    "secure": false
+    "secure": true
   }
 }
 

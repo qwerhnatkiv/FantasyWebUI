@@ -10,4 +10,5 @@ export interface GamePredictionDTO {
   weekNumber: number;
   homeTeamId: number;
   awayTeamId: number;
+  gameId: number;
 }

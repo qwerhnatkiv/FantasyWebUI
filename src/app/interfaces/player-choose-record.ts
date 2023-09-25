@@ -18,8 +18,10 @@ export interface PlayerChooseRecord {
     iXG: number;
     iCF: number;
     iHDCF: number;
-    expectedFantasyPoints: number;
-    fantasyPointsPerGame: number;
+    expectedFantasyPoints: string;
+    fantasyPointsPerGame: string;
+    priceByExpectedFantasyPoints: number;
+    forecastSources: string;
     playerObject: PlayerStatsDTO;
     teamObject: TeamStatsDTO;
   }

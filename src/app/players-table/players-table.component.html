@@ -3,7 +3,7 @@
   [dataSource]="dataSource"
   class="players-table"
   matSort
-  matSortActive="iXG"
+  matSortActive="expectedFantasyPoints"
   matSortDirection="desc"
   matSortStart="desc"
   (matSortChange)="announceSortChange($event)"
@@ -362,7 +362,7 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.expectedFantasyPoints }}
+      {{ element.expectedFantasyPoints}}
     </td>
   </ng-container>
 
@@ -378,12 +378,52 @@
     <td
       mat-cell
       *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.fantasyPointsPerGame}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="priceByExpectedFantasyPoints">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      sortActionDescription="Sort by priceByExpectedFantasyPoints"
+    >
+      Цена/ОФО
+    </th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.priceByExpectedFantasyPoints | number: '1.0-1' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sources">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      sortActionDescription="Sort by sources"
+    >
+      Источники
+    </th>
+    <td
+      mat-cell
+      *matCellDef="let element"
       class="right-column"
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.fantasyPointsPerGame }}
+      {{ element.forecastSources }}
     </td>
   </ng-container>
 

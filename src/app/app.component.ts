@@ -10,6 +10,8 @@ import { PlayerStatsDTO } from './interfaces/player-stats-dto';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { Moment } from 'moment';
 import { TeamGameInformation } from './interfaces/team-game-information';
+import { PlayerExpectedFantasyPointsDTO } from './interfaces/player-expected-fantasy-points-dto';
+import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 
 @Component({
   selector: 'app-root',
@@ -34,13 +36,16 @@ export class AppComponent {
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
+  public playerGamesOfoMap:
+    | Map<number, PlayerExpectedFantasyPointsDTO[]>
+    | undefined;
 
   public filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
     number,
     TeamGameInformation[]
   >();
 
-  constructor(http: HttpClient, private ngxLoader: NgxUiLoaderService) {
+  constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
       .get<GamesDTO>('https://qwerhnatkiv.bsite.net/predictions/games/get')
@@ -69,16 +74,19 @@ export class AppComponent {
 
     this.setFiltersDefaultDates(weeks, this.games);
     this.updateFilteredTeamsGamesMap();
+    this.setOfoDataForPlayers();
   }
 
   public handleMinimumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
     this.minFilterDate = event.value?.toDate();
     this.updateFilteredTeamsGamesMap();
+    this.setOfoDataForPlayers();
   }
 
   public handleMaximumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
     this.maxFilterDate = event.value?.toDate();
     this.updateFilteredTeamsGamesMap();
+    this.setOfoDataForPlayers();
   }
 
   private setFiltersDefaultDates(
@@ -141,25 +149,62 @@ export class AppComponent {
             opponentTeamID: game.awayTeamId,
             winChance: game.homeTeamWinChance,
             isHome: true,
-            gameDate: game.gameDate
+            gameDate: game.gameDate,
           });
-        } else{
+        } else {
           teamGameInformation.push({
             teamID: game.awayTeamId,
             opponentTeamID: game.homeTeamId,
             winChance: game.awayTeamWinChance,
             isHome: false,
-            gameDate: game.gameDate
+            gameDate: game.gameDate,
           });
         }
       }
 
-      newMap.set(
-        teamStats.teamID,
-        teamGameInformation
-      );
+      newMap.set(teamStats.teamID, teamGameInformation);
     }
 
     this.filteredTeamGames = newMap;
+  }
+
+  private setOfoDataForPlayers() {
+    this.ngxLoader.start();
+    let minDate: string = this.minFilterDate?.toISOString().replace(":", "%3A").split('.')[0]!
+    let maxDate: string = this.maxFilterDate?.toISOString().replace(":", "%3A").split('.')[0]!
+
+    this.http
+      .get<{[index: number]: PlayerExpectedFantasyPointsDTO[]}>(
+        `https://qwerhnatkiv.bsite.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}`
+      )
+      .subscribe({
+        next: (result) => {
+          let localOfoMap: Map<number, PlayerExpectedFantasyPointsDTO[]> = new Map<number, PlayerExpectedFantasyPointsDTO[]>();
+
+          let keys: string[] = Object.keys(result);
+          let key: number;
+
+          for (var i = 0, n = keys.length; i < n; ++i) {
+            key = +keys[i];
+            localOfoMap.set(key, result[key])
+          }
+
+          this.playerGamesOfoMap = localOfoMap;
+        },
+        error: (err) => {
+          console.error(err);
+        },
+        complete: () => this.ngxLoader.stop(),
+      });
+  }
+
+  private setTopPlayersForEachTeam() {
+    let topPlayersMap: Map<string, Map<number, PlayerExpectedFantasyPointsInfo>> = 
+      new Map<string, Map<number, PlayerExpectedFantasyPointsInfo>>();
+
+      // mp.forEach((values, keys) => {
+      //   console.log(values, keys)
+      // )
+
   }
 }

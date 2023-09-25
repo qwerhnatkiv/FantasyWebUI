@@ -19,7 +19,12 @@ import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { Utils } from '../common/utils';
-import { GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
+import {
+  GREEN_WIN_LOWER_BOUNDARY,
+  WHITE_WIN_LOWER_BOUNDARY,
+} from 'src/constants';
+import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-players-table',
@@ -47,6 +52,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'iHDCF',
     'expectedFantasyPoints',
     'fantasyPointsPerGame',
+    'priceByExpectedFantasyPoints',
+    'sources'
   ];
   constructor(private _liveAnnouncer: LiveAnnouncer) {
     this.dataSource.filterPredicate = this.filter;
@@ -68,6 +75,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     TeamGameInformation[]
   >();
 
+  @Input() playerGamesOfoMap:
+    | Map<number, PlayerExpectedFantasyPointsDTO[]>
+    | undefined;
+
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
   dataSource = new MatTableDataSource(this.players);
@@ -80,6 +91,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       changes['playerStats'].previousValue.length !=
         changes['playerStats'].currentValue.length
     ) {
+      console.log(this.playerStats);
       for (var i = 0, n = this.playerStats.length; i < n; ++i) {
         let player: PlayerStatsDTO = this.playerStats[i];
         let matchingTeam: TeamStatsDTO = this.teamStats?.find(
@@ -109,8 +121,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           iXG: Math.round(player.formIxG * 100) / 100,
           iCF: player.formICF,
           iHDCF: player.formIHDCF,
-          expectedFantasyPoints: 0,
-          fantasyPointsPerGame: 0,
+          expectedFantasyPoints: '',
+          fantasyPointsPerGame: '',
+          priceByExpectedFantasyPoints: 0,
+          forecastSources: player.forecastSources,
           teamObject: matchingTeam,
           playerObject: player,
         });
@@ -126,6 +140,25 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         player.easyGamesCount = this.filteredTeamGames
           .get(player.teamObject.teamID)
           ?.filter((x) => GamesUtils.isEasyGame(x.winChance))?.length!;
+      }
+    }
+
+    if (changes['playerGamesOfoMap']?.currentValue) {
+
+      const numberPipe: DecimalPipe = new DecimalPipe('en-US');
+      for (var i = 0, n = this.players.length; i < n; ++i) {
+        let player: PlayerChooseRecord = this.players[i];
+
+        let ofo: number = this.playerGamesOfoMap
+          ?.get(player.playerObject.playerID)
+          ?.reduce(
+            (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+            0.0
+          )!;
+        
+        player.expectedFantasyPoints = numberPipe.transform(ofo, '1.0-1')!;
+        player.fantasyPointsPerGame = numberPipe.transform(ofo / player.gamesCount, '1.0-1')!;
+        player.priceByExpectedFantasyPoints = player.price / ofo;
       }
     }
 
@@ -311,13 +344,21 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       .get(player.teamObject.teamID)
       ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0]!;
 
-    let opponentTeam: TeamStatsDTO = this.teamStats.find((x) => x.teamID == teamGame.opponentTeamID)!;
-    let opponentAcronym: string = teamGame.isHome ? `${opponentTeam.teamAcronym}` : `@${opponentTeam.teamAcronym}`;
+    let opponentTeam: TeamStatsDTO = this.teamStats.find(
+      (x) => x.teamID == teamGame.opponentTeamID
+    )!;
+    let opponentAcronym: string = teamGame.isHome
+      ? `${opponentTeam.teamAcronym}`
+      : `@${opponentTeam.teamAcronym}`;
 
-    let teamWinColor: string = this.getTooltipWinChanceSectionClass(teamGame.winChance);
+    let teamWinColor: string = this.getTooltipWinChanceSectionClass(
+      teamGame.winChance
+    );
 
     let opponentInfo: string = `
-    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(teamGame.winChance)}%</span><div>
+    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
+      teamGame.winChance
+    )}%</span><div>
     <table class="tooltip-table">
       <thead>
         <tr>
@@ -328,9 +369,15 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       </thead>
       <tbody>
         <tr>
-          <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamFormWinPercentage}</td>
-          <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamGoalsForm}</td>
-          <td style="text-align: center; vertical-align: middle;"> ${player.expectedFantasyPoints}</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            opponentTeam.teamFormWinPercentage
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            opponentTeam.teamGoalsForm
+          }</td>
+          <td style="text-align: center; vertical-align: middle;"> ${
+            player.expectedFantasyPoints
+          }</td>
         </tr
       </tbody>
     </table>
@@ -403,7 +450,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   private getTooltipWinChanceSectionClass(winChance: number) {
-
     if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
       return '#64ff8f';
     }

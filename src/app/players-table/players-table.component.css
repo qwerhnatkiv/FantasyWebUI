@@ -1,71 +1,71 @@
 .players-table {
-    margin-left: 20px;
-    border-collapse: separate!important;
-    border-spacing:0 4px!important;
+  margin-left: 20px;
+  border-collapse: separate !important;
+  border-spacing: 0 4px !important;
 }
 
 .players-table .mat-mdc-header-cell {
-    padding: 3px;
-    border-bottom-style: none;
+  padding: 3px;
+  border-bottom-style: none;
 }
 
 .mat-mdc-cell {
-    padding: 3px;
-    border-bottom-style: none;
-    height: 20px;
+  padding: 3px;
+  border-bottom-style: none;
+  height: 20px;
 }
 
 .mat-mdc-row {
-    height: 20px;
-  }
+  height: 20px;
+}
 
-.first-choice-cell,.second-choice-cell{
-    padding: 0px;
+.first-choice-cell,
+.second-choice-cell {
+  padding: 0px;
 }
 
 .bold {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .first-choice-selected-cell {
-    background: #DF730080;
+  background: #df730080;
 }
 
-.second-choice-selected-cell{
-    background: #2413FF40;
+.second-choice-selected-cell {
+  background: #2413ff40;
 }
 
-.right-column{
-    padding-right: 5px;
-    border-radius: 0 10px 10px 0;
+.right-column {
+  padding-right: 5px;
+  border-radius: 0 10px 10px 0;
 }
 
-.left-column{
-    border-radius: 10px 0 0 10px;
+.left-column {
+  border-radius: 10px 0 0 10px;
 }
 
 .player-selected:hover {
-    background: #fef524;
-    border-radius: 10px;
-  }
+  background: #fef524;
+  border-radius: 10px;
+}
 
 .tooltip-general {
-    font-family: Inter;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 15px;
-    letter-spacing: 0em;
-    text-align: left;
+  font-family: Inter;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  letter-spacing: 0em;
+  text-align: left;
 }
 
 .tooltip-title {
-    font-size: 16px;
-    line-height: 19px;
-    text-align: center;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
 }
 
-.tooltip-table td 
-{
-    text-align: center; 
-    vertical-align: middle;
+.tooltip-table td {
+  text-align: center;
+  vertical-align: middle;
 }
