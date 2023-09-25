@@ -171,7 +171,8 @@ export class AppComponent {
   private setOfoDataForPlayers() {
     this.ngxLoader.start();
     let minDate: string = this.minFilterDate?.toISOString().replace(":", "%3A").split('.')[0]!
-    let maxDate: string = this.maxFilterDate?.toISOString().replace(":", "%3A").split('.')[0]!
+
+    let maxDate: string = Utils.addDateDays(this.maxFilterDate!, 1).toISOString().replace(":", "%3A").split('.')[0]!
 
     this.http
       .get<{[index: number]: PlayerExpectedFantasyPointsDTO[]}>(

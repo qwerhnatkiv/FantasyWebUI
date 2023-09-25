@@ -35,7 +35,7 @@ export module Utils {
 
   export function addDateDays(date: Date, days: number): Date {
     if (!days) return date;
-    let newDate: Date = date;
+    let newDate: Date = new Date(date.getTime());
     newDate.setDate(newDate.getDate() + days);
 
     return newDate;
