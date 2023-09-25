@@ -327,7 +327,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Поб</th>
+          <th>%Очк</th>
           <th>СрЗаб</th>
         </tr>
       </thead>
@@ -362,7 +362,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Поб</th>
+          <th>%Очк</th>
           <th>СрЗаб</th>
           <th> ОФО Игрока</th>
         </tr>
