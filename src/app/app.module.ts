@@ -41,6 +41,7 @@ import {MatButtonModule} from '@angular/material/button';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 
 import {CdkTableModule} from '@angular/cdk/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -79,6 +80,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatButtonModule,
     NgxTippyModule,
     CdkTableModule,
+    MatPaginatorModule
   ],
   providers: [
     {

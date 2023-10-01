@@ -25,6 +25,7 @@ import {
 } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { DecimalPipe } from '@angular/common';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-players-table',
@@ -62,6 +63,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   private filterDictionary: Map<string, any> = new Map<string, any>();
 
   @ViewChild(MatSort) sort: MatSort | undefined;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   @Input() lowerBoundPrice: number | undefined;
   @Input() upperBoundPrice: number | undefined;
   @Input() positions: string[] | undefined = [];
@@ -189,6 +191,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort!;
+    this.dataSource.paginator = this.paginator!;
   }
 
   //#endregion NG overrides
@@ -436,7 +439,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         return false;
       }
     }
-
     return isMatch;
   }
 
