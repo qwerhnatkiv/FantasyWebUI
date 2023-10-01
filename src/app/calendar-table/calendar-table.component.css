@@ -17,9 +17,9 @@ td:nth-child(1) {
   padding: 0 5px 0 5px;
 }
 
-.mat-mdc-table thead,
-.mat-mdc-header-row,
-.mat-mdc-header-cell {
+.cdk-table thead,
+.cdk-header-row,
+.cdk-header-cell {
   background: #00c2ff;
   font-weight: 600;
   font-size: 18px;
@@ -27,31 +27,28 @@ td:nth-child(1) {
   height: 24px;
 }
 
-.mat-mdc-header-cell {
+.cdk-header-cell {
   width: 96px;
-  border-right: 1px dashed rgba(128, 128, 128, 0.5);
-  -webkit-background-clip: padding-box; /* for Safari */
-  background-clip: padding-box;
+  border-right: 1px dashed rgba(128, 128, 128);
   text-align: center;
 }
 
-.mat-mdc-header-cell:first-child {
+.cdk-column-team {
   background: white;
 }
 
-.mat-mdc-cell,
-.mat-mdc-row {
+.cdk-header-cell:first-child {
+  background: white;
+}
+
+.cdk-cell,
+.cdk-row {
   height: 25px;
-  border: 1px dashed rgba(128, 128, 128, 0.5);
-  -webkit-background-clip: padding-box; /* for Safari */
-  background-clip: padding-box;
+  border: 1px dashed rgba(128, 128, 128);
 
   padding: 0;
 }
 
-.mat-mdc-table-sticky-border-elem-left {
-  border-right: 10px solid white;
-}
 
 .calendar-cell-not-selected {
   background: white;
@@ -171,6 +168,10 @@ mat-form-field {
 
 .filter-form {
   height: 30px;
+}
+
+::ng-deep .cdk-form-field-subscript-wrapper {
+  display: none;
 }
 
 ::ng-deep .mat-mdc-form-field-subscript-wrapper {

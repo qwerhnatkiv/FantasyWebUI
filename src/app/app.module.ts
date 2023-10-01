@@ -40,6 +40,8 @@ import {MatButtonModule} from '@angular/material/button';
 
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 
+import {CdkTableModule} from '@angular/cdk/table';
+
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
   hideDelay: 0,
@@ -75,7 +77,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,
-    NgxTippyModule
+    NgxTippyModule,
+    CdkTableModule,
   ],
   providers: [
     {

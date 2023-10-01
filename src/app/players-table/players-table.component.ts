@@ -91,7 +91,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       changes['playerStats'].previousValue.length !=
         changes['playerStats'].currentValue.length
     ) {
-      console.log(this.playerStats);
       for (var i = 0, n = this.playerStats.length; i < n; ++i) {
         let player: PlayerStatsDTO = this.playerStats[i];
         let matchingTeam: TeamStatsDTO = this.teamStats?.find(
