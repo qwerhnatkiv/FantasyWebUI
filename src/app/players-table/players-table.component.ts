@@ -359,6 +359,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       teamGame.winChance
     );
 
+    let nearestGameOFO: number = this.playerGamesOfoMap
+      ?.get(player.playerObject.playerID)
+      ?.find((x) => x.gameID == teamGame.gameID)?.playerExpectedFantasyPoints!;
+
     let opponentInfo: string = `
     <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
       teamGame.winChance
@@ -380,7 +384,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             opponentTeam.teamGoalsForm
           }</td>
           <td style="text-align: center; vertical-align: middle;"> ${
-            player.expectedFantasyPoints
+            this.numberPipe.transform(nearestGameOFO, '1.0-1')
           }</td>
         </tr
       </tbody>

@@ -4,4 +4,5 @@ export interface TeamGameInformation {
   winChance: number;
   isHome: boolean;
   gameDate: Date;
+  gameID: number;
 }

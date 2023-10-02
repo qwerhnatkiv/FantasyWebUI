@@ -150,6 +150,7 @@ export class AppComponent {
             winChance: game.homeTeamWinChance,
             isHome: true,
             gameDate: game.gameDate,
+            gameID: game.gameId
           });
         } else {
           teamGameInformation.push({
@@ -158,6 +159,7 @@ export class AppComponent {
             winChance: game.awayTeamWinChance,
             isHome: false,
             gameDate: game.gameDate,
+            gameID: game.gameId
           });
         }
       }

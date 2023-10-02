@@ -11,7 +11,7 @@ export const DEFAULT_POSITIONS = [
 
 export const VERY_GREEN_WIN_LOWER_BOUNDARY = 59;
 export const GREEN_WIN_LOWER_BOUNDARY = 49;
-export const WHITE_WIN_LOWER_BOUNDARY = 33;
+export const WHITE_WIN_LOWER_BOUNDARY = 31;
 
 export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
