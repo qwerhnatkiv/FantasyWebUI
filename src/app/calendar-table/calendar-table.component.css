@@ -3,11 +3,15 @@ table {
   margin-left: 10px;
 }
 
-.teamCell {
+.team-cell {
   color: black;
   font-weight: 400;
   background-color: #e1e1e1;
   border-radius: 10px;
+}
+
+.team-cell.replaced-by-player {
+  background: #fef524;
 }
 
 td:nth-child(1) {

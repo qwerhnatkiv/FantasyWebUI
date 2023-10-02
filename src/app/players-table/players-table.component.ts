@@ -3,8 +3,10 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -27,6 +29,7 @@ import {
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
+import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 @Component({
   selector: 'app-players-table',
@@ -55,7 +58,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'expectedFantasyPoints',
     'fantasyPointsPerGame',
     'priceByExpectedFantasyPoints',
-    'sources'
+    'sources',
   ];
   constructor(private _liveAnnouncer: LiveAnnouncer) {
     this.dataSource.filterPredicate = this.filter;
@@ -81,6 +84,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Input() playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
+
+  public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
+    string,
+    SelectedPlayerModel[]
+  >();
+  @Output() sendSelectedPlayers: EventEmitter<
+    Map<string, SelectedPlayerModel[]>
+  > = new EventEmitter<Map<string, SelectedPlayerModel[]>>();
 
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
@@ -148,7 +159,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
 
     if (changes['playerGamesOfoMap']?.currentValue) {
-
       for (var i = 0, n = this.players.length; i < n; ++i) {
         let player: PlayerChooseRecord = this.players[i];
 
@@ -158,9 +168,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
             0.0
           )!;
-        
+
         player.expectedFantasyPoints = this.numberPipe.transform(ofo, '1.0-1')!;
-        player.fantasyPointsPerGame = this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!;
+        player.fantasyPointsPerGame = this.numberPipe.transform(
+          ofo / player.gamesCount,
+          '1.0-1'
+        )!;
         player.priceByExpectedFantasyPoints = player.price / ofo;
       }
     }
@@ -269,19 +282,34 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(player.playerObject.forecastGamesPlayed, '1.0-0') ?? '-'
+            this.numberPipe.transform(
+              player.playerObject.forecastGamesPlayed,
+              '1.0-0'
+            ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(player.playerObject.forecastGoals, '1.0-0') ?? '-'
+            this.numberPipe.transform(
+              player.playerObject.forecastGoals,
+              '1.0-0'
+            ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(player.playerObject.forecastAssists, '1.0-0') ?? '-'
+            this.numberPipe.transform(
+              player.playerObject.forecastAssists,
+              '1.0-0'
+            ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(player.playerObject.forecastPIM, '1.0-0')?? '-'
+            this.numberPipe.transform(
+              player.playerObject.forecastPIM,
+              '1.0-0'
+            ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(player.playerObject.forecastPlusMinus, '1.0-0') ?? '-'
+            this.numberPipe.transform(
+              player.playerObject.forecastPlusMinus,
+              '1.0-0'
+            ) ?? '-'
           }</td>
         </tr
       </tbody>
@@ -383,9 +411,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           <td style="text-align: center; vertical-align: middle;">${
             opponentTeam.teamGoalsForm
           }</td>
-          <td style="text-align: center; vertical-align: middle;"> ${
-            this.numberPipe.transform(nearestGameOFO, '1.0-1')
-          }</td>
+          <td style="text-align: center; vertical-align: middle;"> ${this.numberPipe.transform(
+            nearestGameOFO,
+            '1.0-1'
+          )}</td>
         </tr
       </tbody>
     </table>
@@ -405,6 +434,76 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       ${teamForm} <br>
       ${opponentInfo}
     </div>`;
+  }
+
+  public selectPlayerRow(player: PlayerChooseRecord) {
+    this.selectedPlayers = new Map<string, SelectedPlayerModel[]>(this.selectedPlayers);
+
+    let matchingTeamName: string = this.filteredTeamGames.get(
+      player.teamObject.teamID
+    )![0].teamName;
+    let matchingPlayersInfo: PlayerExpectedFantasyPointsDTO[] | undefined =
+      this.playerGamesOfoMap?.get(player.playerObject.playerID);
+
+    let currentSelectedPlayerForTeam: SelectedPlayerModel[] | undefined =
+      this.selectedPlayers.get(matchingTeamName);
+
+    if (currentSelectedPlayerForTeam != null) {
+      this.selectedPlayers.delete(matchingTeamName);
+
+      if (
+        currentSelectedPlayerForTeam[0].playerID != player.playerObject.playerID
+      ) {
+        let teamGame: TeamGameInformation[] = this.filteredTeamGames.get(
+          player.teamObject.teamID
+        )!;
+
+        this.selectedPlayers.set(
+          matchingTeamName,
+          matchingPlayersInfo?.map((x) => ({
+            playerName: player.playerObject.playerName,
+            playerID: player.playerObject.playerID,
+            playerExpectedFantasyPoints: this.numberPipe.transform(x.playerExpectedFantasyPoints, '1.0-1')!,
+            teamName: matchingTeamName,
+            gameDate: teamGame.find((game) => game.gameID == x.gameID)
+              ?.gameDate!,
+          }))!
+        );
+      }
+    } else {
+      let teamGame: TeamGameInformation[] = this.filteredTeamGames.get(
+        player.teamObject.teamID
+      )!;
+
+      this.selectedPlayers.set(
+        matchingTeamName,
+        matchingPlayersInfo?.map((x) => ({
+          playerName: player.playerObject.playerName,
+          playerID: player.playerObject.playerID,
+          playerExpectedFantasyPoints: this.numberPipe.transform(x.playerExpectedFantasyPoints, '1.0-1')!,
+          teamName: matchingTeamName,
+          gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
+        }))!
+      );
+    }
+
+    this.sendSelectedPlayers.emit(this.selectedPlayers);
+  }
+
+  public isPlayerSelected(player: PlayerChooseRecord) {
+    let matchingTeamName: string = this.filteredTeamGames.get(
+      player.teamObject.teamID
+    )![0].teamName;
+    let currentSelectedPlayerForTeam: SelectedPlayerModel[] | undefined =
+      this.selectedPlayers.get(matchingTeamName);
+
+    if (currentSelectedPlayerForTeam == null) {
+      return false;
+    }
+
+    return (
+      currentSelectedPlayerForTeam[0].playerID == player.playerObject.playerID
+    );
   }
 
   //#endregion

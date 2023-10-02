@@ -362,7 +362,7 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.expectedFantasyPoints}}
+      {{ element.expectedFantasyPoints }}
     </td>
   </ng-container>
 
@@ -382,7 +382,7 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.fantasyPointsPerGame}}
+      {{ element.fantasyPointsPerGame }}
     </td>
   </ng-container>
 
@@ -402,7 +402,7 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.priceByExpectedFantasyPoints | number: '1.0-1' }}
+      {{ element.priceByExpectedFantasyPoints | number : "1.0-1" }}
     </td>
   </ng-container>
 
@@ -428,7 +428,12 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <tr
+    mat-row
+    (click)="selectPlayerRow(row)"
+    [class.player-is-selected]="isPlayerSelected(row)"
+    *matRowDef="let row; columns: displayedColumns"
+  ></tr>
 
   <!-- Row shown when there is no matching data. -->
   <tr class="mat-row" *matNoDataRow>
@@ -436,6 +441,5 @@
   </tr>
 </table>
 
-<mat-paginator [pageSizeOptions]="[50, 150, 500]"
-showFirstLastButtons>
+<mat-paginator [pageSizeOptions]="[50, 150, 500]" showFirstLastButtons>
 </mat-paginator>

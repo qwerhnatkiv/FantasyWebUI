@@ -12,6 +12,7 @@ import { Moment } from 'moment';
 import { TeamGameInformation } from './interfaces/team-game-information';
 import { PlayerExpectedFantasyPointsDTO } from './interfaces/player-expected-fantasy-points-dto';
 import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
+import { SelectedPlayerModel } from './interfaces/selected-player-model';
 
 @Component({
   selector: 'app-root',
@@ -39,6 +40,9 @@ export class AppComponent {
   public playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
+
+  public selectedPlayers: Map<string, SelectedPlayerModel[]> = 
+    new Map<string, SelectedPlayerModel[]>();
 
   public filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
     number,
@@ -146,6 +150,7 @@ export class AppComponent {
         if (game.homeTeamId == teamStats.teamID) {
           teamGameInformation.push({
             teamID: game.homeTeamId,
+            teamName: game.homeTeamName,
             opponentTeamID: game.awayTeamId,
             winChance: game.homeTeamWinChance,
             isHome: true,
@@ -155,6 +160,7 @@ export class AppComponent {
         } else {
           teamGameInformation.push({
             teamID: game.awayTeamId,
+            teamName: game.awayTeamName,
             opponentTeamID: game.homeTeamId,
             winChance: game.awayTeamWinChance,
             isHome: false,

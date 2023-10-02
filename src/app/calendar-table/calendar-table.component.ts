@@ -9,6 +9,10 @@ import { DEFAULT_DATE_FORMAT, GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOU
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
+import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
+import { SelectedPlayerModel } from '../interfaces/selected-player-model';
+
+import {cloneDeep} from 'lodash';
 
 @Component({
   selector: 'app-calendar-table',
@@ -19,6 +23,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 export class CalendarTableComponent implements OnChanges {
   private dataSourceArray: any[] = [];
   private teamWeeksToStrikethrough: TeamWeek[] = [];
+  private datepipe: DatePipe = new DatePipe('en-US');
 
   public columns: Array<TableColumn> = [];
   public columnsToDisplay: string[] = this.columns.map((x) => x.header).slice();
@@ -32,6 +37,11 @@ export class CalendarTableComponent implements OnChanges {
   @Input() games: GamePredictionDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
 
+  @Input() selectedPlayers: Map<string, SelectedPlayerModel[]> = 
+    new Map<string, SelectedPlayerModel[]>();
+
+  private savedCalendarRows: Map<string, any> = new Map<string, any>;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['games']?.previousValue &&
@@ -40,6 +50,38 @@ export class CalendarTableComponent implements OnChanges {
         changes['games'].currentValue.length
     ) {
       this.setUpDataSourceAndColumns(this.games);
+    }
+
+    if (
+      changes['selectedPlayers']?.currentValue
+    ) {
+      for (let [key, valueRow] of this.savedCalendarRows) {
+        if (this.selectedPlayers.has(valueRow.team.displayValue)) {
+          continue;
+        }
+
+        var index = this.dataSourceArray.findIndex((x) => x.team.cellValue == valueRow.team.cellValue);
+        let concreteRow: any = this.dataSourceArray[index];
+
+        for (const key in valueRow)
+        {
+          concreteRow[key].displayValue = valueRow[key].displayValue;
+        }
+      }
+
+      for (let [key, value] of this.selectedPlayers) {
+        let rowToReplace: any = this.dataSourceArray.find((x) => x.team.cellValue == key);
+
+        if (!this.savedCalendarRows.has(key)) {
+          this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
+        } 
+
+        rowToReplace.team.displayValue = value[0].playerName + ' (ОФО)';
+        for (let game of value) {
+          let gameDateStr: string = this.datepipe.transform(game.gameDate, DEFAULT_DATE_FORMAT)!;
+          rowToReplace[gameDateStr].displayValue = game.playerExpectedFantasyPoints;
+        }
+      }
     }
   }
 
@@ -56,8 +98,7 @@ export class CalendarTableComponent implements OnChanges {
 
     this.setTeamWeeksToStrike(games, weeks, teams);
 
-    const datepipe: DatePipe = new DatePipe('en-US');
-    this.columns = this.generateTableColumns(weeks, games, datepipe);
+    this.columns = this.generateTableColumns(weeks, games);
 
     this.columnsToDisplay = ['team'].concat(
       this.columns.map((x) => x.header).slice()
@@ -77,7 +118,7 @@ export class CalendarTableComponent implements OnChanges {
         let homeGame: GamePredictionDTO | undefined = games.find(
           (x) =>
             x.homeTeamName == teamName &&
-            datepipe.transform(x.gameDate, 'dd.MM')! == column.header
+            this.datepipe.transform(x.gameDate, 'dd.MM')! == column.header
         );
         if (homeGame != null) {
           teamSpecificRow.push(
@@ -97,7 +138,7 @@ export class CalendarTableComponent implements OnChanges {
         let awayGame: GamePredictionDTO | undefined = games.find(
           (x) =>
             x.awayTeamName == teamName &&
-            datepipe.transform(x.gameDate, 'dd.MM')! == column.header
+            this.datepipe.transform(x.gameDate, 'dd.MM')! == column.header
         );
         if (awayGame != null) {
           teamSpecificRow.push(
@@ -172,7 +213,7 @@ export class CalendarTableComponent implements OnChanges {
     let numericValue: number = Number(cell.cellValue);
 
     // If not NaN when parsed to number, then it's week count cell
-    if (cell.displayValue != '' && !isNaN(+cell.displayValue)) {
+    if (cell.displayValue != '' && !isNaN(+cell.displayValue) && cell.game == null) {
       if (cell.cellValue > 3) {
         return 'calendar-cell-week-green';
       }
@@ -248,8 +289,7 @@ export class CalendarTableComponent implements OnChanges {
 
   private generateTableColumns(
     weeks: number[],
-    games: GamePredictionDTO[],
-    datepipe: DatePipe
+    games: GamePredictionDTO[]
   ): TableColumn[] {
     let allColumns: TableColumn[] = [];
 
@@ -279,7 +319,7 @@ export class CalendarTableComponent implements OnChanges {
       weekDates.forEach((date) => {
         allColumns.push({
           columnDef: date,
-          header: datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
+          header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
         });
       });
     });

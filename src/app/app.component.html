@@ -47,6 +47,7 @@
     [isCalendarVisible]="isCalendarVisible"
     [games]="games"
     [teamStats]="teamStats"
+    [selectedPlayers]="selectedPlayers"
   ></app-calendar-table>
 </section>
 
@@ -69,6 +70,7 @@
     [teamStats]="teamStats"
     [filteredTeamGames]="filteredTeamGames"
     [playerGamesOfoMap]="playerGamesOfoMap"
+    (sendSelectedPlayers)="selectedPlayers = $event"
   ></app-players-table>
   <div class="user-team-block"></div>
 </section>
