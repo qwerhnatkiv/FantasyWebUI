@@ -44,7 +44,8 @@ td:nth-child(1) {
 .cdk-cell,
 .cdk-row {
   height: 25px;
-  border: 1px dashed rgba(128, 128, 128);
+  border-right: 1px dashed rgba(128, 128, 128);
+  border-bottom: 1px dashed rgba(128, 128, 128);
 
   padding: 0;
 }
