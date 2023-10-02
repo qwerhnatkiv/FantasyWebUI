@@ -198,14 +198,4 @@ export class AppComponent {
         complete: () => this.ngxLoader.stop(),
       });
   }
-
-  private setTopPlayersForEachTeam() {
-    let topPlayersMap: Map<string, Map<number, PlayerExpectedFantasyPointsInfo>> = 
-      new Map<string, Map<number, PlayerExpectedFantasyPointsInfo>>();
-
-      // mp.forEach((values, keys) => {
-      //   console.log(values, keys)
-      // )
-
-  }
 }

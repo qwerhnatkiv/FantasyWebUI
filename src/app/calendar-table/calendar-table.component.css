@@ -88,6 +88,10 @@ td:nth-child(1) {
   background: #64ff8f;
 }
 
+.calendar-cell-very-green {
+  background: #00AA30;
+}
+
 .calendar-cell-red {
   background: #ff7e7e;
 }
@@ -110,6 +114,17 @@ td:nth-child(1) {
     #fef524 40%,
     #64ff8f 40%,
     #64ff8f 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-very-green:hover {
+  background: linear-gradient(
+    to top,
+    #fef524 0%,
+    #fef524 40%,
+    #00AA30 40%,
+    #00AA30 100%
   );
   border-radius: 10px 10px 0 0;
 }

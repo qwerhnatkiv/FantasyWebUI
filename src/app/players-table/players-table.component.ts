@@ -21,6 +21,7 @@ import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { Utils } from '../common/utils';
 import {
   GREEN_WIN_LOWER_BOUNDARY,
+  VERY_GREEN_WIN_LOWER_BOUNDARY,
   WHITE_WIN_LOWER_BOUNDARY,
 } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
@@ -84,6 +85,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
   dataSource = new MatTableDataSource(this.players);
+
+  private numberPipe: DecimalPipe = new DecimalPipe('en-US');
   //#region NG overrides
 
   ngOnChanges(changes: SimpleChanges) {
@@ -146,7 +149,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
     if (changes['playerGamesOfoMap']?.currentValue) {
 
-      const numberPipe: DecimalPipe = new DecimalPipe('en-US');
       for (var i = 0, n = this.players.length; i < n; ++i) {
         let player: PlayerChooseRecord = this.players[i];
 
@@ -157,8 +159,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             0.0
           )!;
         
-        player.expectedFantasyPoints = numberPipe.transform(ofo, '1.0-1')!;
-        player.fantasyPointsPerGame = numberPipe.transform(ofo / player.gamesCount, '1.0-1')!;
+        player.expectedFantasyPoints = this.numberPipe.transform(ofo, '1.0-1')!;
+        player.fantasyPointsPerGame = this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!;
         player.priceByExpectedFantasyPoints = player.price / ofo;
       }
     }
@@ -267,19 +269,19 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.forecastGamesPlayed ?? '-'
+            this.numberPipe.transform(player.playerObject.forecastGamesPlayed, '1.0-0') ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.forecastGoals ?? '-'
+            this.numberPipe.transform(player.playerObject.forecastGoals, '1.0-0') ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.forecastAssists ?? '-'
+            this.numberPipe.transform(player.playerObject.forecastAssists, '1.0-0') ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.forecastPIM ?? '-'
+            this.numberPipe.transform(player.playerObject.forecastPIM, '1.0-0')?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.forecastPlusMinus ?? '-'
+            this.numberPipe.transform(player.playerObject.forecastPlusMinus, '1.0-0') ?? '-'
           }</td>
         </tr
       </tbody>
@@ -451,6 +453,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   private getTooltipWinChanceSectionClass(winChance: number) {
+    if (winChance >= VERY_GREEN_WIN_LOWER_BOUNDARY) {
+      return '#00AA30';
+    }
+
     if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
       return '#64ff8f';
     }
