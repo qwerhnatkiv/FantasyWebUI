@@ -5,11 +5,10 @@ import { TableColumn } from '../interfaces/table-column';
 import { TeamWeek } from '../classes/team-week';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { GamesUtils } from '../common/games-utils';
-import { DEFAULT_DATE_FORMAT, GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
+import { DEFAULT_DATE_FORMAT, GREEN_WIN_LOWER_BOUNDARY, TEAM_NAME_LOGO_PATH_MAP, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
-import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import {cloneDeep} from 'lodash';
@@ -30,6 +29,8 @@ export class CalendarTableComponent implements OnChanges {
   public dataSource: MatTableDataSource<any> = new MatTableDataSource(
     this.dataSourceArray
   );
+
+  public teamNameLogoPathMap: any = TEAM_NAME_LOGO_PATH_MAP;
 
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
@@ -242,6 +243,21 @@ export class CalendarTableComponent implements OnChanges {
     }
 
     return 'calendar-cell-red';
+  }
+
+  public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
+    return element['team'].displayValue.includes('ОФО') && cell.game != null && !isNaN(+cell.displayValue);
+  }
+
+  public getSelectedPlayerCellOpponentName(element: any, cell: TableCell): string {
+    let playersTeamName: string = element['team'].cellValue;
+
+    if (playersTeamName == cell.game?.homeTeamName) {
+      return cell.game?.awayTeamName!;
+    }
+    else{
+      return cell.game?.homeTeamName!;
+    }
   }
 
   public generateCellToolTip(game: GamePredictionDTO): string | null {

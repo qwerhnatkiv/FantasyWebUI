@@ -8,6 +8,11 @@ table {
   font-weight: 400;
   background-color: #e1e1e1;
   border-radius: 10px;
+  height:25px;
+
+  display:flex;
+  gap: 13px;
+  line-height: 25px;
 }
 
 .team-cell.replaced-by-player {
@@ -75,6 +80,10 @@ td:nth-child(1) {
   margin: 0 16px 0 16px;
 
   border-radius: 10px;
+
+  display:flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .calendar-cell-not-selected > .calendar-cell-empty {
@@ -208,4 +217,9 @@ mat-form-field {
 
 .tooltip-red-text {
   color: #ff7e7e;
+}
+
+.team-logo {
+  width: 27px;
+  height: 27px;
 }

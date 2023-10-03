@@ -8,7 +8,16 @@
           element['team'].displayValue.includes('ОФО')
         "
       >
-        {{ element["team"].displayValue }}
+        <img
+          [src]="
+            '/assets/images/logo/' +
+            teamNameLogoPathMap[element['team'].cellValue]
+          "
+          class="team-logo"
+        />
+        <span>
+          {{ element["team"].displayValue }}
+        </span>
       </div>
     </td>
   </ng-container>
@@ -34,7 +43,19 @@
           theme: 'material'
         }"
       >
-        {{ element[column.header].displayValue }}
+        <img
+          *ngIf="isPlayerSelectedCell(element, element[column.header])"
+          [src]="
+            '/assets/images/logo/' +
+            teamNameLogoPathMap[
+              getSelectedPlayerCellOpponentName(element, element[column.header])
+            ]
+          "
+          class="team-logo"
+        />
+        <span>
+          {{ element[column.header].displayValue }}
+        </span>
       </div>
     </td>
   </ng-container>
