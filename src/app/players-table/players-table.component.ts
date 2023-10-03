@@ -140,7 +140,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           expectedFantasyPoints: '',
           fantasyPointsPerGame: '',
           priceByExpectedFantasyPoints: 0,
-          forecastSources: player.forecastSources,
+          forecastSources: player.forecastSources.length > 0 ? player.forecastSources : '0 ист.',
           teamObject: matchingTeam,
           playerObject: player,
         });
@@ -170,12 +170,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             0.0
           )!;
 
-        player.expectedFantasyPoints = this.numberPipe.transform(ofo, '1.0-1')!;
-        player.fantasyPointsPerGame = this.numberPipe.transform(
+        player.expectedFantasyPoints = ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
+        player.fantasyPointsPerGame = ofo > 0 ? this.numberPipe.transform(
           ofo / player.gamesCount,
           '1.0-1'
-        )!;
-        player.priceByExpectedFantasyPoints = player.price / ofo;
+        )! : '0';
+        player.priceByExpectedFantasyPoints = ofo > 0 && player.price > 0 ? player.price / ofo : 0;
       }
     }
 
