@@ -38,6 +38,13 @@ footer {
   z-index: 10;
 }
 
+.header-controls {
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .calendar-filters {
   height: fit-content;
   display: flex;
@@ -57,4 +64,8 @@ app-players-table {
 
 .user-team-block {
   flex-basis: 30%;
+}
+
+#knowledge-base-link {
+  margin-right: 10%;
 }

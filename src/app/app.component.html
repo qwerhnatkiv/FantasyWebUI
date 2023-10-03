@@ -1,36 +1,46 @@
 <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet" />
-<div class="calendar-filters">
-  <mat-form-field>
-    <mat-label>С: </mat-label>
-    <input
-      matInput
-      [matDatepicker]="pickerFrom"
-      [(ngModel)]="minFilterDate"
-      (dateChange)="handleMinimumDateFilterChange($event)"
-    />
-    <mat-hint class="calendar-hint"></mat-hint>
-    <mat-datepicker-toggle
-      matIconSuffix
-      [for]="pickerFrom"
-    ></mat-datepicker-toggle>
-    <mat-datepicker #pickerFrom></mat-datepicker>
-  </mat-form-field>
+<div class="header-controls">
+  <div class="calendar-filters">
+    <mat-form-field>
+      <mat-label>С: </mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerFrom"
+        [(ngModel)]="minFilterDate"
+        (dateChange)="handleMinimumDateFilterChange($event)"
+      />
+      <mat-hint class="calendar-hint"></mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="pickerFrom"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerFrom></mat-datepicker>
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>По: </mat-label>
-    <input
-      matInput
-      [matDatepicker]="pickerTo"
-      [(ngModel)]="maxFilterDate"
-      (dateChange)="handleMaximumDateFilterChange($event)"
-    />
-    <mat-hint class="calendar-hint"></mat-hint>
-    <mat-datepicker-toggle
-      matIconSuffix
-      [for]="pickerTo"
-    ></mat-datepicker-toggle>
-    <mat-datepicker #pickerTo></mat-datepicker>
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>По: </mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerTo"
+        [(ngModel)]="maxFilterDate"
+        (dateChange)="handleMaximumDateFilterChange($event)"
+      />
+      <mat-hint class="calendar-hint"></mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="pickerTo"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerTo></mat-datepicker>
+    </mat-form-field>
+  </div>
+  <a
+    id="knowledge-base-link"
+    mat-raised-button 
+    color="primary"
+    href="https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit"
+    target="_blank"
+    >База знаний</a
+  >
 </div>
 
 <div
