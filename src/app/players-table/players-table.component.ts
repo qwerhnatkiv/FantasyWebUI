@@ -23,6 +23,7 @@ import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { Utils } from '../common/utils';
 import {
   GREEN_WIN_LOWER_BOUNDARY,
+  RED_PIM_LOWER_BOUNDARY,
   VERY_GREEN_WIN_LOWER_BOUNDARY,
   WHITE_WIN_LOWER_BOUNDARY,
 } from 'src/constants';
@@ -267,6 +268,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         ${player.playerName} (${player.position}, ${player.team})
       </div>`;
 
+    let forecastPimColor: string = player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY ? 'white' : '#ff7e7e'
     let forecast: string = `
     <div>Прогноз на сезон:<div>
     <table class="tooltip-table">
@@ -275,7 +277,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           <th>GP</th>
           <th>G</th>
           <th>A</th>
-          <th>PIM</th>
+          <th style="color:${forecastPimColor}">PIM</th>
           <th>+-</th>
         </tr>
       </thead>
@@ -299,7 +301,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
               '1.0-0'
             ) ?? '-'
           }</td>
-          <td style="text-align: center; vertical-align: middle;">${
+          <td style="text-align: center; vertical-align: middle; color:${forecastPimColor}">${
             this.numberPipe.transform(
               player.playerObject.forecastPIM,
               '1.0-0'
