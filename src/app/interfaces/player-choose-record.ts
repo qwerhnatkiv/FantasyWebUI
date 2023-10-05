@@ -21,6 +21,7 @@ export interface PlayerChooseRecord {
     expectedFantasyPoints: string;
     fantasyPointsPerGame: string;
     priceByExpectedFantasyPoints: number;
+    priceByExpectedFantasyPointsPerGame: number;
     forecastSources: string;
     playerObject: PlayerStatsDTO;
     teamObject: TeamStatsDTO;

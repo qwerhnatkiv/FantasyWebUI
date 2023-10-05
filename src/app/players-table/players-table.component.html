@@ -405,6 +405,26 @@
       {{ element.priceByExpectedFantasyPoints | number : "1.0-1" }}
     </td>
   </ng-container>
+  
+  <ng-container matColumnDef="priceByExpectedFantasyPointsPerGame">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      sortActionDescription="Sort by priceByExpectedFantasyPointsPerGame"
+    >
+      Ц/ФПГ
+    </th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="
+        getPlayerSelectedClass(element.firstChoice, element.secondChoice)
+      "
+    >
+      {{ element.priceByExpectedFantasyPointsPerGame | number : "1.0-1" }}
+    </td>
+  </ng-container>
 
   <ng-container matColumnDef="sources">
     <th
