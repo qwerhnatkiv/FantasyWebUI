@@ -23,6 +23,7 @@ import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { Utils } from '../common/utils';
 import {
   GREEN_WIN_LOWER_BOUNDARY,
+  RED_GP_UPPER_BOUNDARY,
   RED_PIM_LOWER_BOUNDARY,
   VERY_GREEN_WIN_LOWER_BOUNDARY,
   WHITE_WIN_LOWER_BOUNDARY,
@@ -42,6 +43,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   displayedColumns: string[] = [
     'firstChoice',
     'secondChoice',
+    '№',
     'playerName',
     'team',
     'position',
@@ -278,13 +280,15 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         ${player.playerName} (${player.position}, ${player.team})
       </div>`;
 
-    let forecastPimColor: string = player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY ? 'white' : '#ff7e7e'
+    let forecastPimColor: string = player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY ? 'white' : '#ff7e7e';
+    let forecastGPColor: string = player.playerObject.forecastGamesPlayed! >= RED_GP_UPPER_BOUNDARY ? 'white' : '#ff7e7e';
+
     let forecast: string = `
     <div>Прогноз на сезон:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>GP</th>
+          <th style="color:${forecastGPColor}">GP</th>
           <th>G</th>
           <th>A</th>
           <th style="color:${forecastPimColor}">PIM</th>
@@ -293,7 +297,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       </thead>
       <tbody>
         <tr>
-          <td style="text-align: center; vertical-align: middle;">${
+          <td style="text-align: center; vertical-align: middle; color:${forecastGPColor}">${
             this.numberPipe.transform(
               player.playerObject.forecastGamesPlayed,
               '1.0-0'

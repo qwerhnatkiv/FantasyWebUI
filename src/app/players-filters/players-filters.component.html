@@ -70,6 +70,8 @@
             >{{ teamsFormControl.value?.length }} шт.</span
           >
         </mat-select-trigger>
+        <mat-option (click)="selectAllTeams()">Select all</mat-option>
+        <mat-option (click)="deselectAllTeams()">Deselect all</mat-option>
         <mat-option *ngFor="let team of selectTeams" [value]="team">{{
           team
         }}</mat-option>
@@ -77,7 +79,7 @@
     </mat-form-field>
 
     <button
-      (click)="teamsFormControl.setValue([]); teamsChanged()"
+      (click)="deselectAllTeams()"
       [hidden]="teamsFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
@@ -104,7 +106,7 @@
     </mat-form-field>
 
     <button
-      (click)="setDefaultPositions(); positionsChanged()"
+      (click)="setDefaultPositions()"
       [hidden]="positionsFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
