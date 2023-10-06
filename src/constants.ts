@@ -20,7 +20,10 @@ export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["RaisingTheBar", 534753],
-  ["A-N-O N-I-M", 534946]
+  ["A-N-O N-I-M", 534946],
+  ["AntonovAC", 535080],
+  ["Александр_Ронни", 534791],
+  ["Regys", 536129]
 ]);
 
 export const TEAMS = [
