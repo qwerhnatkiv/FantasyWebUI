@@ -9,7 +9,9 @@ export interface PlayerChooseRecord {
     position: string;
     price: number;
     gamesCount: number;
+    b2bGamesCount: number;
     easyGamesCount: number;
+    b2bEasyGamesCount: number;
     winPercentage: number;
     powerPlayTime: string;
     powerPlayNumber: string;

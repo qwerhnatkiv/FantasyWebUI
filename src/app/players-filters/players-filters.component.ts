@@ -26,6 +26,10 @@ export class PlayersFiltersComponent {
   @Output() sendTeams: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
 
+  constructor(){
+    this.setDefaultPositions();
+  }
+
   lowerBoundPriceChanged() {
     if (this.lowerBoundPrice! > this.upperBoundPrice!) {
       this.upperBoundPrice = undefined;
@@ -49,5 +53,14 @@ export class PlayersFiltersComponent {
 
   powerPlayUnitsChanged() {
     this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value!);
+  }
+
+  public setDefaultPositions() {
+    const defaultPositions: any[] = [
+      DEFAULT_POSITIONS[1],
+      DEFAULT_POSITIONS[2]
+    ]
+
+    this.positionsFormControl.setValue(defaultPositions);
   }
 }

@@ -46,6 +46,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'team',
     'position',
     'price',
+    'expectedFantasyPoints',
+    'priceByExpectedFantasyPoints',
     'gamesCount',
     'easyGamesCount',
     'winPercentage',
@@ -56,9 +58,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'iXG',
     'iCF',
     'iHDCF',
-    'expectedFantasyPoints',
     'fantasyPointsPerGame',
-    'priceByExpectedFantasyPoints',
     'priceByExpectedFantasyPointsPerGame',
     'sources',
   ];
@@ -123,7 +123,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           position: player.position,
           price: player.price,
           gamesCount: this.filteredTeamGames.get(player.teamID)?.length!,
+          b2bGamesCount: 0,
           easyGamesCount: this.filteredTeamGames.get(player.teamID)?.length!,
+          b2bEasyGamesCount: 0,
           winPercentage: matchingTeam.teamFormWinPercentage,
           powerPlayTime: this.pptoiPipe.transform(
             player.formPowerPlayTime,
@@ -152,12 +154,17 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     if (changes['filteredTeamGames']?.currentValue) {
       for (var i = 0, n = this.players.length; i < n; ++i) {
         let player: PlayerChooseRecord = this.players[i];
-        player.gamesCount = this.filteredTeamGames.get(
+        let teamGames: TeamGameInformation[] | undefined = this.filteredTeamGames.get(
           player.teamObject.teamID
-        )?.length!;
-        player.easyGamesCount = this.filteredTeamGames
-          .get(player.teamObject.teamID)
-          ?.filter((x) => GamesUtils.isEasyGame(x.winChance))?.length!;
+        );
+
+        player.gamesCount = teamGames?.length!;
+
+        player.b2bGamesCount = GamesUtils.getB2BGamesCount(teamGames!);
+
+        player.easyGamesCount = teamGames?.filter((x) => GamesUtils.isEasyGame(x.winChance))?.length!;
+
+        player.b2bEasyGamesCount = GamesUtils.getB2BEasyGamesCount(teamGames!);
       }
     }
 
@@ -509,6 +516,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     return (
       currentSelectedPlayerForTeam[0].playerID == player.playerObject.playerID
     );
+  }
+
+  public isSelectedOnlyGoalies() {
+    return this.positions?.length === 1 && this.positions[0] == 'В';
   }
 
   //#endregion

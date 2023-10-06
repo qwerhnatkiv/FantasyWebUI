@@ -152,7 +152,7 @@
       mat-sort-header
       sortActionDescription="Sort by gamesCount"
     >
-      Игр
+      {{ isSelectedOnlyGoalies() ? "Игр (Б2Б)" : "Игр" }}
     </th>
     <td
       mat-cell
@@ -161,7 +161,11 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.gamesCount }}
+      {{
+        isSelectedOnlyGoalies()
+          ? element.gamesCount + "(" + element.b2bGamesCount + ")"
+          : element.gamesCount
+      }}
     </td>
   </ng-container>
 
@@ -172,7 +176,7 @@
       mat-sort-header
       sortActionDescription="Sort by easyGamesCount"
     >
-      ЛИ
+      {{ isSelectedOnlyGoalies() ? "ЛИ (Б2Б)" : "ЛИ" }}
     </th>
     <td
       mat-cell
@@ -181,7 +185,11 @@
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
     >
-      {{ element.easyGamesCount }}
+      {{
+        isSelectedOnlyGoalies()
+          ? element.easyGamesCount + "(" + element.b2bEasyGamesCount + ")"
+          : element.easyGamesCount
+      }}
     </td>
   </ng-container>
 
@@ -211,6 +219,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by powerPlayTime"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       ВвБ
     </th>
@@ -220,6 +229,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.powerPlayTime }}
     </td>
@@ -231,6 +241,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by powerPlayNumber"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       ПП
     </th>
@@ -240,6 +251,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.powerPlayNumber }}
     </td>
@@ -251,6 +263,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by toi"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       TOI
     </th>
@@ -260,6 +273,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.toi | TOI }}
     </td>
@@ -271,6 +285,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by shotsOnGoal"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       БВ
     </th>
@@ -280,6 +295,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.shotsOnGoal }}
     </td>
@@ -291,6 +307,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by iXG"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       ixG
     </th>
@@ -300,6 +317,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.iXG }}
     </td>
@@ -311,6 +329,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by iCF"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       iCF
     </th>
@@ -320,6 +339,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.iCF }}
     </td>
@@ -331,6 +351,7 @@
       *matHeaderCellDef
       mat-sort-header
       sortActionDescription="Sort by iHDCF"
+      [hidden]="isSelectedOnlyGoalies()"
     >
       iHDCF
     </th>
@@ -340,6 +361,7 @@
       [ngClass]="
         getPlayerSelectedClass(element.firstChoice, element.secondChoice)
       "
+      [hidden]="isSelectedOnlyGoalies()"
     >
       {{ element.iHDCF }}
     </td>
@@ -405,7 +427,7 @@
       {{ element.priceByExpectedFantasyPoints | number : "1.0-1" }}
     </td>
   </ng-container>
-  
+
   <ng-container matColumnDef="priceByExpectedFantasyPointsPerGame">
     <th
       mat-header-cell
