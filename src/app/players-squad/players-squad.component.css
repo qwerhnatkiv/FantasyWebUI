@@ -1,0 +1,9 @@
+.mat-mdc-cell {
+    padding: 3px;
+    border-bottom-style: none;
+    height: 20px;
+  }
+  
+  .mat-mdc-row {
+    height: 20px;
+  }

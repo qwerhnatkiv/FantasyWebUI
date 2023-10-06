@@ -67,6 +67,7 @@
   (sendPositions)="positions = $event"
   (sendTeams)="teams = $event"
   (sendPowerPlayUnits)="powerPlayUnits = $event"
+  (sendSelectedUser)="selectedUser = $event"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -82,7 +83,9 @@
     [playerGamesOfoMap]="playerGamesOfoMap"
     (sendSelectedPlayers)="selectedPlayers = $event"
   ></app-players-table>
-  <div class="user-team-block"></div>
+  <div class="user-team-block">
+    <app-players-squad [squadPlayers]="squadPlayers"></app-players-squad>
+  </div>
 </section>
 
 <ngx-ui-loader></ngx-ui-loader>

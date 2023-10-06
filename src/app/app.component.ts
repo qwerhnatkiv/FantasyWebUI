@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
 import { GamesUtils } from './common/games-utils';
@@ -13,6 +13,9 @@ import { TeamGameInformation } from './interfaces/team-game-information';
 import { PlayerExpectedFantasyPointsDTO } from './interfaces/player-expected-fantasy-points-dto';
 import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 import { SelectedPlayerModel } from './interfaces/selected-player-model';
+import { SportsSquadDTO } from './interfaces/sports-squad-dto';
+import { PlayerSquadRecord } from './interfaces/player-squad-record';
+import { USER_ID_NAME } from 'src/constants';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +23,7 @@ import { SelectedPlayerModel } from './interfaces/selected-player-model';
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements OnChanges{
   title = 'Fantasy Web';
 
   public isCalendarVisible = true;
@@ -31,12 +34,19 @@ export class AppComponent {
   public teamStats: TeamStatsDTO[] = [];
 
   public playerStats: PlayerStatsDTO[] = [];
+  public squadPlayers: PlayerSquadRecord[] = [];
 
   public lowerBoundPrice: number | undefined = undefined;
   public upperBoundPrice: number | undefined = undefined;
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
+  public _selectedUser: string | undefined = undefined;
+  set selectedUser(value: string | undefined) {
+    this._selectedUser = value;
+    this.getUserSquad();
+  } 
+
   public playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
@@ -48,6 +58,8 @@ export class AppComponent {
     number,
     TeamGameInformation[]
   >();
+
+
 
   constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
@@ -69,6 +81,12 @@ export class AppComponent {
         complete: () => this.ngxLoader.stop(),
       });
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedUser']?.currentValue) {
+        this.getUserSquad();
+      }
+    }
 
   private setUpFilters() {
     let weeks: number[] = this.games
@@ -199,6 +217,47 @@ export class AppComponent {
           }
 
           this.playerGamesOfoMap = localOfoMap;
+          this.getUserSquad();
+        },
+        error: (err) => {
+          console.error(err);
+        },
+        complete: () => this.ngxLoader.stop(),
+      });
+  }
+
+  private getUserSquad() {
+    if (this._selectedUser == null) {
+      return;
+    }
+
+    this.ngxLoader.start();
+    this.http
+      .get<SportsSquadDTO>(
+        `https://qwerhnatkiv.bsite.net/sportsSquad?accountId=${USER_ID_NAME.get(this._selectedUser)}`
+      )
+      .subscribe({
+        next: (result) => {
+          this.squadPlayers = []
+
+          for (var i = 0, n = result.players.length; i < n; ++i) {
+            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find((x) => x.playerIdSports == result.players[i].id)!;
+
+            let ofo: number = this.playerGamesOfoMap
+              ?.get(matchingPlayerInfo.playerID)
+              ?.reduce(
+                (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+                0.0
+              )!;
+
+            this.squadPlayers.push({
+              playerId: matchingPlayerInfo.playerID,
+              playerName: matchingPlayerInfo.playerName,
+              position: matchingPlayerInfo.position,
+              price: matchingPlayerInfo.price,
+              expectedFantasyPoints: ofo
+            })
+          }
         },
         error: (err) => {
           console.error(err);

@@ -18,6 +18,11 @@ export const WHITE_WIN_LOWER_BOUNDARY = 32;
 
 export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
+export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
+  ["RaisingTheBar", 534753],
+  ["A-N-O N-I-M", 534946]
+]);
+
 export const TEAMS = [
   'ANA',
   'ARI',

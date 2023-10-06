@@ -42,6 +42,7 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 
 import {CdkTableModule} from '@angular/cdk/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import { PlayersSquadComponent } from './players-squad/players-squad.component';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -58,6 +59,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CalendarTableComponent,
     PlayersTableComponent,
     PlayersFiltersComponent,
+    PlayersSquadComponent,
   ],
   imports: [
     BrowserModule,

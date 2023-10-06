@@ -138,6 +138,21 @@
     >
       <mat-icon>cancel</mat-icon>
     </button>
+
+    <label class="filter-label" style="margin-left: 30px">УЗ:</label>
+    <mat-form-field class="filter-form">
+      <mat-label>User</mat-label>
+      <mat-select
+        [(value)]="selectedUser"
+        (selectionChange)="selectedUserChanged()"
+      >
+        <mat-option
+          *ngFor="let user of selectUsers"
+          [value]="user"
+          >{{ user }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
   </div>
   <div class="availableByPrice"></div>
   <div class="first-choice-row"></div>

@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS } from 'src/constants';
+import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME } from 'src/constants';
 
 @Component({
   selector: 'app-players-filters',
@@ -13,18 +13,21 @@ export class PlayersFiltersComponent implements AfterViewInit {
   selectPositions: string[] = DEFAULT_POSITIONS;
   selectTeams: string[] = TEAMS;
   selectPP: string[] = POWER_PLAY_UNITS;
+  selectUsers: string[] = Array.from( USER_ID_NAME.keys() );
 
   lowerBoundPrice: number | undefined = undefined;
   upperBoundPrice: number | undefined = undefined;
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
   powerPlayFormControl = new FormControl<string[]>([]);
+  selectedUser: string | undefined = undefined;
 
   @Output() sendLowerBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendUpperBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendPositions: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendTeams: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
+  @Output() sendSelectedUser: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
   ngAfterViewInit() {
     this.setDefaultPositions();
@@ -45,6 +48,10 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   positionsChanged() {
     this.sendPositions.emit(this.positionsFormControl.value!);
+  }
+
+  selectedUserChanged() {
+    this.sendSelectedUser.emit(this.selectedUser!);
   }
 
   teamsChanged() {
