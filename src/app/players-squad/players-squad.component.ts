@@ -21,7 +21,7 @@ export class PlayersSquadComponent {
       return 0;
     }
 
-    return this.squadPlayers.map(t => t.expectedFantasyPoints).reduce((acc, value) => acc + value, 0);
+    return this.squadPlayers.map(t => t.expectedFantasyPoints).reduce((acc, value) => acc + value == null ? 0 : value, 0);
   }
 
   getTotalPrice() {
