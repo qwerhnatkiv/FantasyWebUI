@@ -117,9 +117,9 @@ export class AppComponent implements OnChanges{
   ): void {
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
     let today = new Date();
-    this.minFilterDate =
-      minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
-
+    this.minFilterDate = new Date(minDate.getTime());
+      // minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
+    
     weeks.forEach((week) => {
       let weekGames: GamePredictionDTO[] = games.filter(
         (game) => game.weekNumber == week
