@@ -11,6 +11,7 @@ export class PlayersSquadComponent {
     'position',
     'playerName',
     'price',
+    'games',
     'expectedFantasyPoints'
   ];
 
@@ -30,5 +31,13 @@ export class PlayersSquadComponent {
     }
 
     return this.squadPlayers.map(t => t.price).reduce((acc, value) => acc + value, 0);
+  }
+
+  getTotalGames() {
+    if (this.squadPlayers == null) {
+      return 0;
+    }
+
+    return this.squadPlayers.map(t => t.games).reduce((acc, value) => acc + value, 0);
   }
 }

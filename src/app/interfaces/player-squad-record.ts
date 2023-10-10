@@ -3,6 +3,7 @@ export interface PlayerSquadRecord {
     playerName: string;
     position: string;
     price: number;
+    games: number;
     expectedFantasyPoints: number;
 }
   
