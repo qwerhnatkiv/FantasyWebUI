@@ -1,6 +1,6 @@
 const PROXY_CONFIG = {
   "/api": {
-    "target": "https://qwerhnatkiv.bsite.net/",
+    "target": "http://qwerhnatkiv-001-site1.etempurl.com/",
     "secure": true
   }
 }
