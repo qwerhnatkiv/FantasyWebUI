@@ -1,6 +1,6 @@
 const PROXY_CONFIG = {
   "/api": {
-    "target": "http://qwerhnatkiv-001-site1.etempurl.com/",
+    "target": "https://qwerhnatkiv-backend.azurewebsites.net/",
     "secure": true
   }
 }

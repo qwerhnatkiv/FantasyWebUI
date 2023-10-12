@@ -64,7 +64,7 @@ export class AppComponent implements OnChanges{
   constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
     this.ngxLoader.start();
     http
-      .get<GamesDTO>('http://qwerhnatkiv-001-site1.etempurl.com/predictions/games/get')
+      .get<GamesDTO>('https://qwerhnatkiv-backend.azurewebsites.net/predictions/games/get')
       .subscribe({
         next: (result) => {
           this.games = result.gamePredictions.sort(
@@ -202,7 +202,7 @@ export class AppComponent implements OnChanges{
 
     this.http
       .get<{[index: number]: PlayerExpectedFantasyPointsDTO[]}>(
-        `http://qwerhnatkiv-001-site1.etempurl.com/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}`
+        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}`
       )
       .subscribe({
         next: (result) => {
@@ -234,7 +234,7 @@ export class AppComponent implements OnChanges{
     this.ngxLoader.start();
     this.http
       .get<SportsSquadDTO>(
-        `http://qwerhnatkiv-001-site1.etempurl.com/sportsSquad?accountId=${USER_ID_NAME.get(this._selectedUser)}`
+        `https://qwerhnatkiv-backend.azurewebsites.net/sportsSquad?accountId=${USER_ID_NAME.get(this._selectedUser)}`
       )
       .subscribe({
         next: (result) => {
