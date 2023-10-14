@@ -32,6 +32,7 @@ import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fa
 import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
+import { OfoVariant } from '../interfaces/ofo-variant';
 
 @Component({
   selector: 'app-players-table',
@@ -96,6 +97,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Output() sendSelectedPlayers: EventEmitter<
     Map<string, SelectedPlayerModel[]>
   > = new EventEmitter<Map<string, SelectedPlayerModel[]>>();
+
+  @Output() sendFirstChoiceOfo: EventEmitter<OfoVariant> = new EventEmitter<OfoVariant>();
+  @Output() sendSecondChoiceOfo: EventEmitter<OfoVariant> = new EventEmitter<OfoVariant>();
 
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
@@ -225,6 +229,32 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   //#endregion NG overrides
 
   //#region Public Methods
+
+  ofoPlayersFirstChoiceChanged() {
+    let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter((x) => x.firstChoice);
+
+    let ofoFirstChoice: OfoVariant = {
+      priceSum: playersWithFirstChoice.reduce((n, {price}) => n + price, 0),
+      expectedFantasyPointsSum: playersWithFirstChoice.reduce((n, {expectedFantasyPoints}) => n + +expectedFantasyPoints, 0),
+      priceByExpectedFantasyPointsSum: playersWithFirstChoice.reduce((n, {priceByExpectedFantasyPoints}) => n + priceByExpectedFantasyPoints, 0),
+      playersCount: playersWithFirstChoice.length
+    }
+
+    this.sendFirstChoiceOfo.emit(ofoFirstChoice);
+  }
+
+  ofoPlayersSecondChoiceChanged() {
+    let playersWithSecondChoice: PlayerChooseRecord[] = this.players.filter((x) => x.secondChoice);
+
+    let ofoSecondChoice: OfoVariant = {
+      priceSum: playersWithSecondChoice.reduce((n, {price}) => n + price, 0),
+      expectedFantasyPointsSum: playersWithSecondChoice.reduce((n, {expectedFantasyPoints}) => n + +expectedFantasyPoints, 0),
+      priceByExpectedFantasyPointsSum: playersWithSecondChoice.reduce((n, {priceByExpectedFantasyPoints}) => n + priceByExpectedFantasyPoints, 0),
+      playersCount: playersWithSecondChoice.length
+    }
+
+    this.sendSecondChoiceOfo.emit(ofoSecondChoice);
+  }
 
   getPlayerSelectedIconPath(
     choiceIndex: number,

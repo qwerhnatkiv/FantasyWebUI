@@ -72,12 +72,5 @@
 
 .player-is-selected {
   background: #fef524;
-}
-
-.player-is-selected .first-choice-cell{
-  background: white;
-}
-
-.player-is-selected .second-choice-cell{
-  background: white;
+  border-radius: 0px;
 }

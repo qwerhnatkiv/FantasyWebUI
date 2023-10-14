@@ -38,3 +38,17 @@
   visibility: hidden;
   display: block !important;
 }
+
+.choice-row {
+  display:flex;
+  align-items: center;
+}
+
+.selectedChoiceIcon {
+  width: 54px;
+  height: 54px;
+}
+
+.choice-table {
+  border-spacing: 20px;
+}

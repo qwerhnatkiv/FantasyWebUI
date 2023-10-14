@@ -16,6 +16,7 @@ import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import { USER_ID_NAME } from 'src/constants';
+import { OfoVariant } from './interfaces/ofo-variant';
 
 @Component({
   selector: 'app-root',
@@ -46,6 +47,21 @@ export class AppComponent implements OnChanges{
     this._selectedUser = value;
     this.getUserSquad();
   } 
+
+  
+  public firstChoiceOfo: OfoVariant = {
+    priceByExpectedFantasyPointsSum:0,
+    priceSum:0,
+    expectedFantasyPointsSum:0,
+    playersCount: 0
+  };
+
+  public secondChoiceOfo: OfoVariant = {
+    priceByExpectedFantasyPointsSum:0,
+    priceSum:0,
+    expectedFantasyPointsSum:0,
+    playersCount: 0
+  };
 
   public playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>

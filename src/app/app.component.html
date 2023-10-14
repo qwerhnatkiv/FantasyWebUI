@@ -68,6 +68,8 @@
   (sendTeams)="teams = $event"
   (sendPowerPlayUnits)="powerPlayUnits = $event"
   (sendSelectedUser)="selectedUser = $event"
+  [firstChoiceOfo]="firstChoiceOfo"
+  [secondChoiceOfo]="secondChoiceOfo"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -82,6 +84,8 @@
     [filteredTeamGames]="filteredTeamGames"
     [playerGamesOfoMap]="playerGamesOfoMap"
     (sendSelectedPlayers)="selectedPlayers = $event"
+    (sendFirstChoiceOfo)="firstChoiceOfo = $event"
+    (sendSecondChoiceOfo)="secondChoiceOfo = $event"
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad [squadPlayers]="squadPlayers"></app-players-squad>

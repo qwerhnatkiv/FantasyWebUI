@@ -1,6 +1,7 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME } from 'src/constants';
+import { OfoVariant } from '../interfaces/ofo-variant';
 
 @Component({
   selector: 'app-players-filters',
@@ -28,6 +29,20 @@ export class PlayersFiltersComponent implements AfterViewInit {
   @Output() sendTeams: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendSelectedUser: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
+
+  @Input() firstChoiceOfo: OfoVariant = {
+    priceByExpectedFantasyPointsSum:0,
+    priceSum:0,
+    expectedFantasyPointsSum:0,
+    playersCount: 0
+  };
+
+  @Input() secondChoiceOfo: OfoVariant = {
+    priceByExpectedFantasyPointsSum:0,
+    priceSum:0,
+    expectedFantasyPointsSum: 0,
+    playersCount: 0
+  };
 
   ngAfterViewInit() {
     this.setDefaultPositions();

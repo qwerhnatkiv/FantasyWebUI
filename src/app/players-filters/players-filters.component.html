@@ -8,11 +8,9 @@
         (selectionChange)="lowerBoundPriceChanged()"
       >
         <mat-option>None</mat-option>
-        <mat-option
-          *ngFor="let price of prices"
-          [value]="price"
-          >{{ price }}</mat-option
-        >
+        <mat-option *ngFor="let price of prices" [value]="price">{{
+          price
+        }}</mat-option>
       </mat-select>
     </mat-form-field>
     <button
@@ -146,15 +144,73 @@
         [(value)]="selectedUser"
         (selectionChange)="selectedUserChanged()"
       >
-        <mat-option
-          *ngFor="let user of selectUsers"
-          [value]="user"
-          >{{ user }}</mat-option
-        >
+        <mat-option *ngFor="let user of selectUsers" [value]="user">{{
+          user
+        }}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
   <div class="availableByPrice"></div>
-  <div class="first-choice-row"></div>
-  <div class="second-choice-row"></div>
+  <div class="choice-row">
+    <img src="/assets/images/player-selected-first.png" class="selectedChoiceIcon" />
+    <table class="choice-table">
+      <thead>
+        <tr>
+          <th>Вариант 1:</th>
+          <th>Цена</th>
+          <th>ОФО</th>
+          <th>Ц/ОФО</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle">
+            {{ firstChoiceOfo.playersCount }} игр.
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{ firstChoiceOfo.priceSum | number : "1.0-0" }}
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{ firstChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{
+              firstChoiceOfo.priceByExpectedFantasyPointsSum | number : "1.0-1"
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="choice-row">
+    <img src="/assets/images/player-selected-second.png" class="selectedChoiceIcon" />
+    <table class="choice-table">
+      <thead>
+        <tr>
+          <th>Вариант 1:</th>
+          <th>Цена</th>
+          <th>ОФО</th>
+          <th>Ц/ОФО</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle">
+            {{ secondChoiceOfo.playersCount }} игр.
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{ secondChoiceOfo.priceSum | number : "1.0-0" }}
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{ secondChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
+          </td>
+          <td style="text-align: center; vertical-align: middle">
+            {{
+              secondChoiceOfo.priceByExpectedFantasyPointsSum | number : "1.0-1"
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
