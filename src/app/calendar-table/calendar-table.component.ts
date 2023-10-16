@@ -279,8 +279,8 @@ export class CalendarTableComponent implements OnChanges {
     }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
 
     let generatedTooltip: string = 
-    `${homeTeamWinChance} | ${homeTeamStats.teamGoalsForm} GF | ${homeTeamStats.teamGoalsAwayForm} GA | ${homeTeamStats.teamForm}<br>
-    ${awayTeamWinChance} | ${awayTeamStats.teamGoalsForm} GF | ${awayTeamStats.teamGoalsAwayForm} GA | ${awayTeamStats.teamForm}<br>
+    `${homeTeamWinChance} | ${homeTeamStats.teamGoalsForm.toFixed(1)} GF | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${homeTeamStats.teamForm}<br>
+    ${awayTeamWinChance} | ${awayTeamStats.teamGoalsForm.toFixed(1)} GF | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${awayTeamStats.teamForm}<br>
     `;
 
     return generatedTooltip;
