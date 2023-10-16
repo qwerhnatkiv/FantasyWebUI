@@ -455,7 +455,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             opponentTeam.teamFormWinPercentage
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            opponentTeam.teamGoalsForm
+            opponentTeam.teamGoalsForm.toFixed(1)
           }</td>
           <td style="text-align: center; vertical-align: middle;"> ${this.numberPipe.transform(
             nearestGameOFO,
