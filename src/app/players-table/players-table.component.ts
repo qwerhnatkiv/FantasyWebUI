@@ -412,7 +412,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${player.winPercentage}</td>
-          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm}</td>
+          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm.toFixed(1)}</td>
         </tr
       </tbody>
     </table>
