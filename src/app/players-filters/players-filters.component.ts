@@ -23,12 +23,15 @@ export class PlayersFiltersComponent implements AfterViewInit {
   powerPlayFormControl = new FormControl<string[]>([]);
   selectedUser: string | undefined = undefined;
 
+  playersAreNotPlayedDisabled: boolean = true;
+
   @Output() sendLowerBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendUpperBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendPositions: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendTeams: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendSelectedUser: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
+  @Output() sendPlayersAreNotPlayedDisabled: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum:0,

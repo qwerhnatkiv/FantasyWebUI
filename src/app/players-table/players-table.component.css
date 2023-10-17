@@ -50,6 +50,11 @@
   border-radius: 10px;
 }
 
+.first-choice-selected-cell.player-selected:hover,.second-choice-selected-cell.player-selected:hover{
+  background: #fef524;
+  border-radius: 0px;
+}
+
 .tooltip-general {
   font-family: Inter;
   font-size: 12px;

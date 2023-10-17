@@ -33,6 +33,7 @@ import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { OfoVariant } from '../interfaces/ofo-variant';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-players-table',
@@ -85,6 +86,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     number,
     TeamGameInformation[]
   >();
+
+  @Input() playersAreNotPlayedDisabled: boolean = true;
 
   @Input() playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
@@ -201,6 +204,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     });
 
     this.applyPlayersFilter({
+      name: 'playersAreNotPlayedDisabled',
+      value: this.playersAreNotPlayedDisabled,
+    });
+
+    this.applyPlayersFilter({
       name: 'upperBoundPrice',
       value: this.upperBoundPrice,
     });
@@ -219,6 +227,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       name: 'powerPlayUnits',
       value: this.powerPlayUnits,
     });
+
   }
 
   ngAfterViewInit() {
@@ -230,7 +239,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
   //#region Public Methods
 
-  ofoPlayersFirstChoiceChanged() {
+  ofoPlayersFirstChoiceChanged(player: PlayerChooseRecord) {
     let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter((x) => x.firstChoice);
 
     let ofoFirstChoice: OfoVariant = {
@@ -241,9 +250,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
 
     this.sendFirstChoiceOfo.emit(ofoFirstChoice);
+
+    if (player.firstChoice) {
+      player.secondChoice = false;
+      this.ofoPlayersSecondChoiceChanged(player);
+    }
   }
 
-  ofoPlayersSecondChoiceChanged() {
+  ofoPlayersSecondChoiceChanged(player: PlayerChooseRecord) {
     let playersWithSecondChoice: PlayerChooseRecord[] = this.players.filter((x) => x.secondChoice);
 
     let ofoSecondChoice: OfoVariant = {
@@ -254,6 +268,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
 
     this.sendSecondChoiceOfo.emit(ofoSecondChoice);
+
+    if (player.secondChoice) {
+      player.firstChoice = false;
+      this.ofoPlayersFirstChoiceChanged(player);
+    }
   }
 
   getPlayerSelectedIconPath(

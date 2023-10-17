@@ -42,6 +42,8 @@ export class AppComponent implements OnChanges{
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
+  public playersAreNotPlayedDisabled: boolean = true;
+
   public _selectedUser: string | undefined = undefined;
   set selectedUser(value: string | undefined) {
     this._selectedUser = value;

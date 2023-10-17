@@ -150,7 +150,10 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <div class="availableByPrice"></div>
+  <mat-checkbox
+        [(ngModel)]="playersAreNotPlayedDisabled"
+      >Скрыть игроков с малым числом GP
+  </mat-checkbox>
   <div class="choice-row">
     <img src="/assets/images/player-selected-first.png" class="selectedChoiceIcon" />
     <table class="choice-table">

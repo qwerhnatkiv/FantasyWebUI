@@ -20,7 +20,7 @@
     <td mat-cell *matCellDef="let element" class="first-choice-cell">
       <mat-checkbox
         [(ngModel)]="element.firstChoice"
-        (change)="ofoPlayersFirstChoiceChanged()"
+        (change)="ofoPlayersFirstChoiceChanged(element)"
       ></mat-checkbox>
     </td>
   </ng-container>
@@ -37,7 +37,7 @@
     <td mat-cell *matCellDef="let element" class="second-choice-cell">
       <mat-checkbox
         [(ngModel)]="element.secondChoice"
-        (change)="ofoPlayersSecondChoiceChanged()"
+        (change)="ofoPlayersSecondChoiceChanged(element)"
       ></mat-checkbox>
     </td>
   </ng-container>

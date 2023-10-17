@@ -70,6 +70,7 @@
   (sendSelectedUser)="selectedUser = $event"
   [firstChoiceOfo]="firstChoiceOfo"
   [secondChoiceOfo]="secondChoiceOfo"
+  (sendPlayersAreNotPlayedDisabled)="playersAreNotPlayedDisabled = $event"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -86,6 +87,7 @@
     (sendSelectedPlayers)="selectedPlayers = $event"
     (sendFirstChoiceOfo)="firstChoiceOfo = $event"
     (sendSecondChoiceOfo)="secondChoiceOfo = $event"
+    [playersAreNotPlayedDisabled]="playersAreNotPlayedDisabled"
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad [squadPlayers]="squadPlayers"></app-players-squad>
