@@ -24,6 +24,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   selectedUser: string | undefined = undefined;
 
   playersAreNotPlayedDisabled: boolean = true;
+  hideLowGPPlayersEnabled: boolean = false;
 
   @Output() sendLowerBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendUpperBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
@@ -32,6 +33,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   @Output() sendPowerPlayUnits: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Output() sendSelectedUser: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
   @Output() sendPlayersAreNotPlayedDisabled: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() sendHideLowGPPlayersEnabled: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum:0,
@@ -62,6 +64,14 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   upperBoundPriceChanged() {
     this.sendUpperBoundPrice.emit(this.upperBoundPrice);
+  }
+
+  playersAreNotPlayedDisabledChanged() {
+    this.sendPlayersAreNotPlayedDisabled.emit(this.playersAreNotPlayedDisabled);
+  }
+
+  hideLowGPPlayersEnabledChanged() {
+    this.sendHideLowGPPlayersEnabled.emit(this.hideLowGPPlayersEnabled);
   }
 
   positionsChanged() {

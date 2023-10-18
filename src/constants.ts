@@ -9,6 +9,8 @@ export const DEFAULT_POSITIONS = [
   'В', 'З', 'Н'
 ]
 
+export const DEFAULT_FORM_LENGTH = 5;
+
 export const RED_PIM_LOWER_BOUNDARY = 40;
 export const RED_GP_UPPER_BOUNDARY = 60;
 

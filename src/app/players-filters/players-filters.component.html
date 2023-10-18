@@ -151,11 +151,21 @@
     </mat-form-field>
   </div>
   <mat-checkbox
-        [(ngModel)]="playersAreNotPlayedDisabled"
-      >Скрыть игроков с малым числом GP
+    [(ngModel)]="playersAreNotPlayedDisabled"
+    (change)="playersAreNotPlayedDisabledChanged()"
+    >Скрыть игроков без игр в 5 последних матчах
+  </mat-checkbox>
+  <br>
+  <mat-checkbox
+    [(ngModel)]="hideLowGPPlayersEnabled"
+    (change)="hideLowGPPlayersEnabledChanged()"
+    >Скрыть игроков с малым кол-вом GP
   </mat-checkbox>
   <div class="choice-row">
-    <img src="/assets/images/player-selected-first.png" class="selectedChoiceIcon" />
+    <img
+      src="/assets/images/player-selected-first.png"
+      class="selectedChoiceIcon"
+    />
     <table class="choice-table">
       <thead>
         <tr>
@@ -186,7 +196,10 @@
     </table>
   </div>
   <div class="choice-row">
-    <img src="/assets/images/player-selected-second.png" class="selectedChoiceIcon" />
+    <img
+      src="/assets/images/player-selected-second.png"
+      class="selectedChoiceIcon"
+    />
     <table class="choice-table">
       <thead>
         <tr>

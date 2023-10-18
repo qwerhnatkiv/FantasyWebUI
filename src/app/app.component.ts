@@ -1,5 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
 import { GamesUtils } from './common/games-utils';
@@ -15,7 +20,7 @@ import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
-import { USER_ID_NAME } from 'src/constants';
+import { DEFAULT_FORM_LENGTH, USER_ID_NAME } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
 
 @Component({
@@ -24,7 +29,7 @@ import { OfoVariant } from './interfaces/ofo-variant';
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnChanges{
+export class AppComponent implements OnChanges {
   title = 'Fantasy Web';
 
   public isCalendarVisible = true;
@@ -43,46 +48,65 @@ export class AppComponent implements OnChanges{
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
   public playersAreNotPlayedDisabled: boolean = true;
+  public hideLowGPPlayersEnabled: boolean = true;
+
+  public formLength: number = DEFAULT_FORM_LENGTH;
 
   public _selectedUser: string | undefined = undefined;
   set selectedUser(value: string | undefined) {
     this._selectedUser = value;
     this.getUserSquad();
-  } 
+  }
 
-  
   public firstChoiceOfo: OfoVariant = {
-    priceByExpectedFantasyPointsSum:0,
-    priceSum:0,
-    expectedFantasyPointsSum:0,
-    playersCount: 0
+    priceByExpectedFantasyPointsSum: 0,
+    priceSum: 0,
+    expectedFantasyPointsSum: 0,
+    playersCount: 0,
   };
 
   public secondChoiceOfo: OfoVariant = {
-    priceByExpectedFantasyPointsSum:0,
-    priceSum:0,
-    expectedFantasyPointsSum:0,
-    playersCount: 0
+    priceByExpectedFantasyPointsSum: 0,
+    priceSum: 0,
+    expectedFantasyPointsSum: 0,
+    playersCount: 0,
   };
 
   public playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
 
-  public selectedPlayers: Map<string, SelectedPlayerModel[]> = 
-    new Map<string, SelectedPlayerModel[]>();
+  public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
+    string,
+    SelectedPlayerModel[]
+  >();
 
   public filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
     number,
     TeamGameInformation[]
   >();
 
-
-
   constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
+    this.getCalendarData();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedUser']?.currentValue) {
+      this.getUserSquad();
+    }
+  }
+
+  public formLengthChanged(event: any) {
+    this.formLength = event;
+    this.getCalendarData();
+  }
+
+  private getCalendarData() {
     this.ngxLoader.start();
-    http
-      .get<GamesDTO>('https://qwerhnatkiv-backend.azurewebsites.net/predictions/games/get')
+    this.http
+      .get<GamesDTO>(
+        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/games/get?formLength=${this.formLength}`
+      )
       .subscribe({
         next: (result) => {
           this.games = result.gamePredictions.sort(
@@ -99,12 +123,6 @@ export class AppComponent implements OnChanges{
         complete: () => this.ngxLoader.stop(),
       });
   }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser']?.currentValue) {
-        this.getUserSquad();
-      }
-    }
 
   private setUpFilters() {
     let weeks: number[] = this.games
@@ -136,8 +154,8 @@ export class AppComponent implements OnChanges{
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
     let today = new Date();
     this.minFilterDate = new Date(minDate.getTime());
-      // minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
-    
+    // minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
+
     weeks.forEach((week) => {
       let weekGames: GamePredictionDTO[] = games.filter(
         (game) => game.weekNumber == week
@@ -191,7 +209,7 @@ export class AppComponent implements OnChanges{
             winChance: game.homeTeamWinChance,
             isHome: true,
             gameDate: game.gameDate,
-            gameID: game.gameId
+            gameID: game.gameId,
           });
         } else {
           teamGameInformation.push({
@@ -201,7 +219,7 @@ export class AppComponent implements OnChanges{
             winChance: game.awayTeamWinChance,
             isHome: false,
             gameDate: game.gameDate,
-            gameID: game.gameId
+            gameID: game.gameId,
           });
         }
       }
@@ -214,24 +232,31 @@ export class AppComponent implements OnChanges{
 
   private setOfoDataForPlayers() {
     this.ngxLoader.start();
-    let minDate: string = this.minFilterDate?.toISOString().replace(":", "%3A").split('.')[0]!
+    let minDate: string = this.minFilterDate
+      ?.toISOString()
+      .replace(':', '%3A')
+      .split('.')[0]!;
 
-    let maxDate: string = Utils.addDateDays(this.maxFilterDate!, 1).toISOString().replace(":", "%3A").split('.')[0]!
+    let maxDate: string = Utils.addDateDays(this.maxFilterDate!, 1)
+      .toISOString()
+      .replace(':', '%3A')
+      .split('.')[0]!;
 
     this.http
-      .get<{[index: number]: PlayerExpectedFantasyPointsDTO[]}>(
-        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}`
+      .get<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }>(
+        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${this.formLength}`
       )
       .subscribe({
         next: (result) => {
-          let localOfoMap: Map<number, PlayerExpectedFantasyPointsDTO[]> = new Map<number, PlayerExpectedFantasyPointsDTO[]>();
+          let localOfoMap: Map<number, PlayerExpectedFantasyPointsDTO[]> =
+            new Map<number, PlayerExpectedFantasyPointsDTO[]>();
 
           let keys: string[] = Object.keys(result);
           let key: number;
 
           for (var i = 0, n = keys.length; i < n; ++i) {
             key = +keys[i];
-            localOfoMap.set(key, result[key])
+            localOfoMap.set(key, result[key]);
           }
 
           this.playerGamesOfoMap = localOfoMap;
@@ -252,14 +277,18 @@ export class AppComponent implements OnChanges{
     this.ngxLoader.start();
     this.http
       .get<SportsSquadDTO>(
-        `https://qwerhnatkiv-backend.azurewebsites.net/sportsSquad?accountId=${USER_ID_NAME.get(this._selectedUser)}`
+        `https://qwerhnatkiv-backend.azurewebsites.net/sportsSquad?accountId=${USER_ID_NAME.get(
+          this._selectedUser
+        )}`
       )
       .subscribe({
         next: (result) => {
-          this.squadPlayers = []
+          this.squadPlayers = [];
 
           for (var i = 0, n = result.players.length; i < n; ++i) {
-            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find((x) => x.playerIdSports == result.players[i].id)!;
+            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
+              (x) => x.playerIdSports == result.players[i].id
+            )!;
 
             let ofo: number = this.playerGamesOfoMap
               ?.get(matchingPlayerInfo.playerID)
@@ -268,7 +297,9 @@ export class AppComponent implements OnChanges{
                 0.0
               )!;
 
-            let gamesCount: number = this.playerGamesOfoMap?.get(matchingPlayerInfo.playerID)?.length!;
+            let gamesCount: number = this.playerGamesOfoMap?.get(
+              matchingPlayerInfo.playerID
+            )?.length!;
 
             this.squadPlayers.push({
               playerId: matchingPlayerInfo.playerID,
@@ -276,8 +307,8 @@ export class AppComponent implements OnChanges{
               position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
               games: gamesCount,
-              expectedFantasyPoints: ofo
-            })
+              expectedFantasyPoints: ofo,
+            });
           }
         },
         error: (err) => {

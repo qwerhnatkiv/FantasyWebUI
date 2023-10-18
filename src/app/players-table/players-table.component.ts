@@ -88,6 +88,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   >();
 
   @Input() playersAreNotPlayedDisabled: boolean = true;
+  @Input() hideLowGPPlayersEnabled: boolean = true;
 
   @Input() playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
@@ -115,10 +116,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     if (
       changes['playerStats']?.previousValue &&
       changes['playerStats']?.currentValue &&
-      changes['playerStats'].previousValue.length !=
-        changes['playerStats'].currentValue.length
+      changes['playerStats']?.currentValue?.length! > 0
     ) {
+      this.players.length = 0;
       for (var i = 0, n = this.playerStats.length; i < n; ++i) {
+
         let player: PlayerStatsDTO = this.playerStats[i];
         let matchingTeam: TeamStatsDTO = this.teamStats?.find(
           (team) => team.teamID == player.teamID
@@ -199,13 +201,18 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
 
     this.applyPlayersFilter({
-      name: 'lowerBoundPrice',
-      value: this.lowerBoundPrice,
+      name: 'playersAreNotPlayedDisabled',
+      value: this.playersAreNotPlayedDisabled,
     });
 
     this.applyPlayersFilter({
-      name: 'playersAreNotPlayedDisabled',
-      value: this.playersAreNotPlayedDisabled,
+      name: 'hideLowGPPlayersEnabled',
+      value: this.hideLowGPPlayersEnabled
+    });
+
+    this.applyPlayersFilter({
+      name: 'lowerBoundPrice',
+      value: this.lowerBoundPrice,
     });
 
     this.applyPlayersFilter({
@@ -607,6 +614,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
       if (key == 'powerPlayUnits') {
         isMatch = value.includes(record.powerPlayNumber);
+      }
+
+      if (key == 'playersAreNotPlayedDisabled') {
+        isMatch = !value || record.toi > 0;
+      }
+
+      if (key == 'hideLowGPPlayersEnabled') {
+        isMatch = !value || record.playerObject?.forecastGamesPlayed! > RED_GP_UPPER_BOUNDARY
       }
 
       if (!isMatch) {

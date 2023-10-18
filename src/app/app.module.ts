@@ -87,7 +87,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CdkTableModule,
     MatPaginatorModule,
     MatRadioModule,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   providers: [
     {
