@@ -26,7 +26,8 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["AntonovAC", 535080],
   ["Александр_Ронни", 534791],
   ["Regys", 536129],
-  ["Wolski", 534799]
+  ["Wolski", 534799],
+  ['graf_007', 535451]
 ]);
 
 export const TEAMS = [
