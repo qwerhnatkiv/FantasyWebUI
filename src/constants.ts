@@ -10,6 +10,7 @@ export const DEFAULT_POSITIONS = [
 ]
 
 export const DEFAULT_FORM_LENGTH = 5;
+export const DEFAULT_FORM_LENGTH_COUNT = 12;
 
 export const RED_PIM_LOWER_BOUNDARY = 40;
 export const RED_GP_UPPER_BOUNDARY = 60;

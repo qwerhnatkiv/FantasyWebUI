@@ -50,7 +50,7 @@ export class AppComponent implements OnChanges {
   public playersAreNotPlayedDisabled: boolean = true;
   public hideLowGPPlayersEnabled: boolean = true;
 
-  public formLength: number = DEFAULT_FORM_LENGTH;
+  private formLength: number = DEFAULT_FORM_LENGTH;
 
   public _selectedUser: string | undefined = undefined;
   set selectedUser(value: string | undefined) {

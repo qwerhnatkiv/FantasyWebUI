@@ -1,7 +1,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME } from 'src/constants';
+import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT } from 'src/constants';
 import { OfoVariant } from '../interfaces/ofo-variant';
+import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-players-filters',
@@ -25,6 +26,8 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   playersAreNotPlayedDisabled: boolean = true;
   hideLowGPPlayersEnabled: boolean = false;
+  public formLength: number = DEFAULT_FORM_LENGTH;
+  public formLengthCount: Array<number> = new Array(DEFAULT_FORM_LENGTH_COUNT);
 
   @Output() sendLowerBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
   @Output() sendUpperBoundPrice: EventEmitter<number | undefined> = new EventEmitter<number | undefined>();
@@ -34,6 +37,8 @@ export class PlayersFiltersComponent implements AfterViewInit {
   @Output() sendSelectedUser: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
   @Output() sendPlayersAreNotPlayedDisabled: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sendHideLowGPPlayersEnabled: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output() sendFormLength: EventEmitter<number> = new EventEmitter<number>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum:0,
@@ -76,6 +81,10 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   positionsChanged() {
     this.sendPositions.emit(this.positionsFormControl.value!);
+  }
+
+  formLengthChanged(event: MatSelectChange) {
+    this.sendFormLength.emit(event.value);
   }
 
   selectedUserChanged() {

@@ -52,3 +52,11 @@
 .choice-table {
   border-spacing: 20px;
 }
+
+.filter-form {
+  width: 100px;
+}
+
+.wider-filter-form {
+  width: 150px;
+}

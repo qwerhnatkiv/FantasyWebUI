@@ -22,7 +22,7 @@
     >
       <mat-icon>cancel</mat-icon>
     </button>
-    <label class="filter-label" style="margin-left: 10px">до:</label>
+    <label class="filter-label" style="margin-left: 5px">до:</label>
     <mat-form-field class="filter-form">
       <mat-label>Price</mat-label>
       <mat-select
@@ -52,7 +52,7 @@
     <div class="vl"></div>
 
     <label class="filter-label" style="margin-left: 10px">Команды:</label>
-    <mat-form-field>
+    <mat-form-field class="wider-filter-form">
       <mat-label>Teams</mat-label>
       <mat-select
         [formControl]="teamsFormControl"
@@ -88,7 +88,7 @@
 
     <div class="vl"></div>
     <label class="filter-label" style="margin-left: 10px">Позиции:</label>
-    <mat-form-field>
+    <mat-form-field class="filter-form">
       <mat-label>Positions</mat-label>
       <mat-select
         [formControl]="positionsFormControl"
@@ -115,7 +115,7 @@
 
     <div class="vl"></div>
     <label class="filter-label" style="margin-left: 10px">ПП:</label>
-    <mat-form-field>
+    <mat-form-field class="filter-form">
       <mat-label>PP</mat-label>
       <mat-select
         [formControl]="powerPlayFormControl"
@@ -137,8 +137,22 @@
       <mat-icon>cancel</mat-icon>
     </button>
 
-    <label class="filter-label" style="margin-left: 30px">УЗ:</label>
+    <div class="vl"></div>
+    <label class="filter-label">Длина формы:</label>
     <mat-form-field class="filter-form">
+      <mat-label>Форма: </mat-label>
+      <mat-select
+        [(value)]="formLength"
+        (selectionChange)="formLengthChanged($event)"
+      >
+        <mat-option *ngFor="let item of formLengthCount; let index = index;" [value]="index + 1">{{
+          index + 1
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <label class="filter-label" style="margin-left: 20px">УЗ:</label>
+    <mat-form-field class="wider-filter-form">
       <mat-label>User</mat-label>
       <mat-select
         [(value)]="selectedUser"
@@ -155,7 +169,7 @@
     (change)="playersAreNotPlayedDisabledChanged()"
     >Скрыть игроков без игр в 5 последних матчах
   </mat-checkbox>
-  <br>
+  <br />
   <mat-checkbox
     [(ngModel)]="hideLowGPPlayersEnabled"
     (change)="hideLowGPPlayersEnabledChanged()"
