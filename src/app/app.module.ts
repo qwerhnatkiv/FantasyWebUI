@@ -23,7 +23,6 @@ import {
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
 } from '@angular/material/core';
-import { MomentDateAdapter } from '@angular/material-moment-adapter';
 
 import { MY_FORMATS } from './common/custom-date-format';
 import { CalendarTableComponent } from './calendar-table/calendar-table.component';
@@ -46,6 +45,7 @@ import { PlayersSquadComponent } from './players-squad/players-squad.component';
 import {MatRadioModule} from '@angular/material/radio';
 
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { CustomDateAdapter } from './common/custom-date-adapter';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -92,7 +92,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   providers: [
     {
       provide: DateAdapter,
-      useClass: MomentDateAdapter,
+      useClass: CustomDateAdapter,
       deps: [MAT_DATE_LOCALE],
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },

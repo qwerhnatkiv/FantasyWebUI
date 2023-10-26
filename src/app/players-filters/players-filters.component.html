@@ -68,8 +68,8 @@
             >{{ teamsFormControl.value?.length }} шт.</span
           >
         </mat-select-trigger>
-        <mat-option (click)="selectAllTeams()">Select all</mat-option>
-        <mat-option (click)="deselectAllTeams()">Deselect all</mat-option>
+        <mat-option (click)="selectAllTeams()" style="font-weight: 800">All</mat-option>
+        <mat-divider></mat-divider>
         <mat-option *ngFor="let team of selectTeams" [value]="team">{{
           team
         }}</mat-option>
@@ -145,9 +145,11 @@
         [(value)]="formLength"
         (selectionChange)="formLengthChanged($event)"
       >
-        <mat-option *ngFor="let item of formLengthCount; let index = index;" [value]="index + 1">{{
-          index + 1
-        }}</mat-option>
+        <mat-option
+          *ngFor="let item of formLengthCount; let index = index"
+          [value]="index + 1"
+          >{{ index + 1 }}</mat-option
+        >
       </mat-select>
     </mat-form-field>
 
@@ -164,83 +166,93 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <mat-checkbox
-    [(ngModel)]="playersAreNotPlayedDisabled"
-    (change)="playersAreNotPlayedDisabledChanged()"
-    >Скрыть игроков без игр в 5 последних матчах
-  </mat-checkbox>
-  <br />
-  <mat-checkbox
-    [(ngModel)]="hideLowGPPlayersEnabled"
-    (change)="hideLowGPPlayersEnabledChanged()"
-    >Скрыть игроков с малым кол-вом GP
-  </mat-checkbox>
-  <div class="choice-row">
-    <img
-      src="/assets/images/player-selected-first.png"
-      class="selectedChoiceIcon"
-    />
-    <table class="choice-table">
-      <thead>
-        <tr>
-          <th>Вариант 1:</th>
-          <th>Цена</th>
-          <th>ОФО</th>
-          <th>Ц/ОФО</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle">
-            {{ firstChoiceOfo.playersCount }} игр.
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{ firstChoiceOfo.priceSum | number : "1.0-0" }}
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{ firstChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{
-              firstChoiceOfo.priceByExpectedFantasyPointsSum | number : "1.0-1"
-            }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="choice-row">
-    <img
-      src="/assets/images/player-selected-second.png"
-      class="selectedChoiceIcon"
-    />
-    <table class="choice-table">
-      <thead>
-        <tr>
-          <th>Вариант 2:</th>
-          <th>Цена</th>
-          <th>ОФО</th>
-          <th>Ц/ОФО</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle">
-            {{ secondChoiceOfo.playersCount }} игр.
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{ secondChoiceOfo.priceSum | number : "1.0-0" }}
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{ secondChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
-          </td>
-          <td style="text-align: center; vertical-align: middle">
-            {{
-              secondChoiceOfo.priceByExpectedFantasyPointsSum | number : "1.0-1"
-            }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div style="display: flex">
+    <div>
+      <div class="choice-row">
+        <img
+          src="/assets/images/player-selected-first.png"
+          class="selectedChoiceIcon"
+        />
+        <table class="choice-table">
+          <thead>
+            <tr>
+              <th>Вариант 1:</th>
+              <th>Цена</th>
+              <th>ОФО</th>
+              <th>Ц/ОФО</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center; vertical-align: middle">
+                {{ firstChoiceOfo.playersCount }} игр.
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ firstChoiceOfo.priceSum | number : "1.0-0" }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ firstChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{
+                  firstChoiceOfo.priceByExpectedFantasyPointsSum
+                    | number : "1.0-1"
+                }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="choice-row">
+        <img
+          src="/assets/images/player-selected-second.png"
+          class="selectedChoiceIcon"
+        />
+        <table class="choice-table">
+          <thead>
+            <tr>
+              <th>Вариант 2:</th>
+              <th>Цена</th>
+              <th>ОФО</th>
+              <th>Ц/ОФО</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center; vertical-align: middle">
+                {{ secondChoiceOfo.playersCount }} игр.
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ secondChoiceOfo.priceSum | number : "1.0-0" }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{
+                  secondChoiceOfo.expectedFantasyPointsSum | number : "1.0-0"
+                }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{
+                  secondChoiceOfo.priceByExpectedFantasyPointsSum
+                    | number : "1.0-1"
+                }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="margin-left: 35px; margin-top: 10px;">
+      <mat-checkbox
+        [(ngModel)]="playersAreNotPlayedDisabled"
+        (change)="playersAreNotPlayedDisabledChanged()"
+        >Скрыть игроков без игр в {{formLength}} последних матчах
+      </mat-checkbox>
+      <br />
+      <mat-checkbox
+        [(ngModel)]="hideLowGPPlayersEnabled"
+        (change)="hideLowGPPlayersEnabledChanged()"
+        >Скрыть игроков с малым кол-вом GP
+      </mat-checkbox>
+    </div>
   </div>
 </div>

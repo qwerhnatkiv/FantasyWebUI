@@ -87,7 +87,7 @@ export class AppComponent implements OnChanges {
   >();
 
   constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
-    this.getCalendarData();
+    this.getCalendarData(true);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -98,10 +98,10 @@ export class AppComponent implements OnChanges {
 
   public formLengthChanged(event: any) {
     this.formLength = event;
-    this.getCalendarData();
+    this.getCalendarData(false);
   }
 
-  private getCalendarData() {
+  private getCalendarData(setDefaultDates: boolean) {
     this.ngxLoader.start();
     this.http
       .get<GamesDTO>(
@@ -115,7 +115,7 @@ export class AppComponent implements OnChanges {
 
           this.teamStats = result.teamsStats;
           this.playerStats = result.playerStats;
-          this.setUpFilters();
+          this.setUpFilters(setDefaultDates);
         },
         error: (err) => {
           console.error(err);
@@ -124,13 +124,15 @@ export class AppComponent implements OnChanges {
       });
   }
 
-  private setUpFilters() {
+  private setUpFilters(setDefaultDates: boolean) {
     let weeks: number[] = this.games
       ?.map((x) => x.weekNumber)
       .filter(Utils.onlyUnique)
       .sort((n1, n2) => n1 - n2);
 
-    this.setFiltersDefaultDates(weeks, this.games);
+    if (setDefaultDates) {
+      this.setFiltersDefaultDates(weeks, this.games);
+    }
     this.updateFilteredTeamsGamesMap();
     this.setOfoDataForPlayers();
   }
