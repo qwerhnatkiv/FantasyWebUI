@@ -4,6 +4,7 @@ import {
   Component,
   OnChanges,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
@@ -22,6 +23,7 @@ import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import { DEFAULT_FORM_LENGTH, USER_ID_NAME } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
+import { PlayersTableComponent } from './players-table/players-table.component';
 
 @Component({
   selector: 'app-root',
@@ -49,6 +51,7 @@ export class AppComponent implements OnChanges {
   public powerPlayUnits: string[] | undefined = [];
   public playersAreNotPlayedDisabled: boolean = true;
   public hideLowGPPlayersEnabled: boolean = true;
+  public shouldDeselectAllSelectedPlayers: boolean = false;
 
   private formLength: number = DEFAULT_FORM_LENGTH;
 
@@ -99,6 +102,10 @@ export class AppComponent implements OnChanges {
   public formLengthChanged(event: any) {
     this.formLength = event;
     this.getCalendarData(false);
+  }
+
+  public deselectAllSelectedPlayers() {
+    this.shouldDeselectAllSelectedPlayers = !this.shouldDeselectAllSelectedPlayers;
   }
 
   private getCalendarData(setDefaultDates: boolean) {

@@ -79,3 +79,9 @@
   background: #fef524;
   border-radius: 0px;
 }
+
+.clear-table-calendar-button {
+  background: #fef524;
+  align-self: flex-end;
+  margin-right: 40px;
+}

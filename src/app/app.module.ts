@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MapKeysPipe } from './pipes/mapkeys.pipe';
+import { PlayersLabelByCountPipe } from './pipes/players-label-by-count.pipe';
 import { NgxUiLoaderModule } from 'ngx-ui-loader';
 import {
   MatTooltipModule,
@@ -58,6 +59,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   declarations: [
     AppComponent,
     MapKeysPipe,
+    PlayersLabelByCountPipe,
     ToiPipe,
     CalendarTableComponent,
     PlayersTableComponent,

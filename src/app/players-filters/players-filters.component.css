@@ -34,6 +34,13 @@
   margin-right: 0px;
 }
 
+.clear-selected-players-button {
+  position: relative;
+  left: -15%;
+  top: -10px;
+  margin-right: 0px;
+}
+
 .clear-filter-button[hidden] {
   visibility: hidden;
   display: block !important;

@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT } from 'src/constants';
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { MatSelectChange } from '@angular/material/select';
+import { RED_GP_UPPER_BOUNDARY } from '../../constants'
 
 @Component({
   selector: 'app-players-filters',
@@ -16,7 +17,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   selectTeams: string[] = TEAMS;
   selectPP: string[] = POWER_PLAY_UNITS;
   selectUsers: string[] = Array.from( USER_ID_NAME.keys() );
-
+  RED_GP_UPPER_BOUNDARY: number = RED_GP_UPPER_BOUNDARY;
   lowerBoundPrice: number | undefined = undefined;
   upperBoundPrice: number | undefined = undefined;
   positionsFormControl = new FormControl<string[]>([]);
@@ -39,6 +40,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   @Output() sendHideLowGPPlayersEnabled: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output() sendFormLength: EventEmitter<number> = new EventEmitter<number>();
+  @Output() sendClearAllPlayerSelections: EventEmitter<void> = new EventEmitter<void>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum:0,

@@ -73,6 +73,7 @@
   (sendPlayersAreNotPlayedDisabled)="playersAreNotPlayedDisabled = $event"
   (sendHideLowGPPlayersEnabled)="hideLowGPPlayersEnabled = $event"
   (sendFormLength)="formLengthChanged($event)"
+  (sendClearAllPlayerSelections)="deselectAllSelectedPlayers()"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -91,6 +92,7 @@
     (sendSecondChoiceOfo)="secondChoiceOfo = $event"
     [playersAreNotPlayedDisabled]="playersAreNotPlayedDisabled"
     [hideLowGPPlayersEnabled]="hideLowGPPlayersEnabled"
+    [shouldDeselectAllSelectedPlayers]="shouldDeselectAllSelectedPlayers"
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad [squadPlayers]="squadPlayers"></app-players-squad>

@@ -90,6 +90,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Input() playersAreNotPlayedDisabled: boolean = true;
   @Input() hideLowGPPlayersEnabled: boolean = true;
 
+  private _shouldDeselectAllSelectedPlayers: boolean = false;
+  @Input() set shouldDeselectAllSelectedPlayers(value: boolean) {
+      this._shouldDeselectAllSelectedPlayers = value;
+      this.deselectAllPlayersInComparison();
+  }
+
   @Input() playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
@@ -245,6 +251,28 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   //#endregion NG overrides
 
   //#region Public Methods
+
+  public deselectAllPlayersInCalendar() {
+    this.selectedPlayers = new Map<string, SelectedPlayerModel[]>();
+    this.sendSelectedPlayers.emit(this.selectedPlayers);
+  }
+
+  public deselectAllPlayersInComparison() {
+    this.players.forEach((x) => {
+      x.firstChoice = false;
+      x.secondChoice = false;
+    });
+
+    let ofoChoice: OfoVariant = {
+      priceSum: 0,
+      expectedFantasyPointsSum: 0,
+      priceByExpectedFantasyPointsSum: 0,
+      playersCount: 0
+    }
+
+    this.sendFirstChoiceOfo.emit(ofoChoice);
+    this.sendSecondChoiceOfo.emit(ofoChoice);
+  }
 
   ofoPlayersFirstChoiceChanged(player: PlayerChooseRecord) {
     let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter((x) => x.firstChoice);

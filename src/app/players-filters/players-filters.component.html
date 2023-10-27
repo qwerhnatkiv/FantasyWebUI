@@ -68,7 +68,9 @@
             >{{ teamsFormControl.value?.length }} шт.</span
           >
         </mat-select-trigger>
-        <mat-option (click)="selectAllTeams()" style="font-weight: 800">All</mat-option>
+        <mat-option (click)="selectAllTeams()" style="font-weight: 800"
+          >All</mat-option
+        >
         <mat-divider></mat-divider>
         <mat-option *ngFor="let team of selectTeams" [value]="team">{{
           team
@@ -185,7 +187,8 @@
           <tbody>
             <tr>
               <td style="text-align: center; vertical-align: middle">
-                {{ firstChoiceOfo.playersCount }} игр.
+                {{ firstChoiceOfo.playersCount }}
+                {{ firstChoiceOfo.playersCount | playersLabelByCount }}
               </td>
               <td style="text-align: center; vertical-align: middle">
                 {{ firstChoiceOfo.priceSum | number : "1.0-0" }}
@@ -220,7 +223,8 @@
           <tbody>
             <tr>
               <td style="text-align: center; vertical-align: middle">
-                {{ secondChoiceOfo.playersCount }} игр.
+                {{ secondChoiceOfo.playersCount! }}
+                {{ secondChoiceOfo.playersCount! | playersLabelByCount }}
               </td>
               <td style="text-align: center; vertical-align: middle">
                 {{ secondChoiceOfo.priceSum | number : "1.0-0" }}
@@ -241,17 +245,27 @@
         </table>
       </div>
     </div>
-    <div style="margin-left: 35px; margin-top: 10px;">
+    <div style="margin-left: 35px; margin-top: 10px">
+      <button
+        class="clear-selected-players-button"
+        mat-icon-button
+        [disabled]="firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0"
+        (click)="sendClearAllPlayerSelections.emit()"
+      >
+        <mat-icon>cancel</mat-icon>
+      </button>
+      <br />
       <mat-checkbox
         [(ngModel)]="playersAreNotPlayedDisabled"
         (change)="playersAreNotPlayedDisabledChanged()"
-        >Скрыть игроков без игр в {{formLength}} последних матчах
+        >Скрыть игроков без игр в {{ formLength }}
+        {{ formLength != 1 ? "последних матчах" : "последнем матче" }}
       </mat-checkbox>
       <br />
       <mat-checkbox
         [(ngModel)]="hideLowGPPlayersEnabled"
         (change)="hideLowGPPlayersEnabledChanged()"
-        >Скрыть игроков с малым кол-вом GP
+        >Скрыть игроков с менее {{ RED_GP_UPPER_BOUNDARY }} прогнозных GP
       </mat-checkbox>
     </div>
   </div>
