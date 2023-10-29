@@ -34,13 +34,12 @@
       <div
         class="calendar-cell"
         [ngClass]="getCellTextClass(element[column.header])"
-        [ngxTippy]="generateCellToolTip(element[column.header].game)"
+        [ngxTippy]="generateCellToolTip(element[column.header].game, element[column.header].displayValue)"
         tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
         [tippyProps]="{
           allowHTML: true,
           placement: 'bottom',
           arrow: false,
-          theme: 'material'
         }"
       >
         <img

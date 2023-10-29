@@ -53,6 +53,8 @@ export class AppComponent implements OnChanges {
   public hideLowGPPlayersEnabled: boolean = true;
   public shouldDeselectAllSelectedPlayers: boolean = false;
 
+  public teamPlayerExpectedOfoMap: Map<number, PlayerExpectedFantasyPointsInfo[]> = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
+
   private formLength: number = DEFAULT_FORM_LENGTH;
 
   public _selectedUser: string | undefined = undefined;
@@ -263,9 +265,17 @@ export class AppComponent implements OnChanges {
           let keys: string[] = Object.keys(result);
           let key: number;
 
+          this.teamPlayerExpectedOfoMap = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
+
           for (var i = 0, n = keys.length; i < n; ++i) {
             key = +keys[i];
             localOfoMap.set(key, result[key]);
+            this.setTop3PlayersForEachTeam(key, result[key]);
+          }
+
+          for (let [key, value] of this.teamPlayerExpectedOfoMap) {
+            value = value.sort((n1, n2) => n2.playerExpectedFantasyPoints - n1.playerExpectedFantasyPoints);
+            this.teamPlayerExpectedOfoMap.set(key, value.splice(0, 3));
           }
 
           this.playerGamesOfoMap = localOfoMap;
@@ -326,5 +336,46 @@ export class AppComponent implements OnChanges {
         },
         complete: () => this.ngxLoader.stop(),
       });
+  }
+
+  private setTop3PlayersForEachTeam(key: number, value: PlayerExpectedFantasyPointsDTO[]) {
+    if (value.length == 0) {
+      return;
+    }
+
+    let teamID: number = value[0].teamID;
+    let playerOfoSum = value.reduce((sum, current) => sum + current.playerExpectedFantasyPoints, 0);
+    let playerStat: PlayerStatsDTO = this.playerStats.find((y) => key == y.playerID)!;
+
+    if (playerStat == null) {
+      return;
+    }
+
+    let powerPlayInfo: string = playerStat.formPowerPlayNumber > 0
+          ? `ПП${playerStat.formPowerPlayNumber}`
+          : 'нет'
+
+    if (this.teamPlayerExpectedOfoMap.has(teamID)) {
+      let modelInfo: PlayerExpectedFantasyPointsInfo = {
+        playerName: playerStat.playerName,
+        playerExpectedFantasyPoints: playerOfoSum,
+        price: playerStat.price,
+        powerPlayNumber: powerPlayInfo,
+        isFire: false
+      };
+
+      this.teamPlayerExpectedOfoMap.get(teamID)?.push(modelInfo);
+    }
+    else {
+      let modelInfo: PlayerExpectedFantasyPointsInfo = {
+        playerName: playerStat.playerName,
+        playerExpectedFantasyPoints: playerOfoSum,
+        price: playerStat.price,
+        powerPlayNumber: powerPlayInfo,
+        isFire: false
+      };
+
+      this.teamPlayerExpectedOfoMap.set(teamID, [modelInfo]);
+    }
   }
 }

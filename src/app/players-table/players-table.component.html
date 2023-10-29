@@ -86,12 +86,11 @@
         *matCellDef="let element"
         [ngxTippy]="generateCellToolTip(element)"
         [class.player-is-selected]="isPlayerSelected(element)"
-        tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text tooltip-title tooltip-table tooltip-general"
+        tippyClassName="tooltip-general"
         [tippyProps]="{
           allowHTML: true,
           placement: 'right',
-          arrow: false,
-          theme: 'material'
+          arrow: false
         }"
       >
         {{ element.playerName }}

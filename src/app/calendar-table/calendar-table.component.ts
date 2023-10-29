@@ -12,6 +12,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import {cloneDeep} from 'lodash';
+import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
 
 @Component({
   selector: 'app-calendar-table',
@@ -37,6 +38,8 @@ export class CalendarTableComponent implements OnChanges {
   @Input() isCalendarVisible: boolean = false;
   @Input() games: GamePredictionDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
+
+  @Input() teamPlayerExpectedOfoMap: Map<number, PlayerExpectedFantasyPointsInfo[]> = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
 
   @Input() selectedPlayers: Map<string, SelectedPlayerModel[]> = 
     new Map<string, SelectedPlayerModel[]>();
@@ -260,13 +263,15 @@ export class CalendarTableComponent implements OnChanges {
     }
   }
 
-  public generateCellToolTip(game: GamePredictionDTO): string | null {
+  public generateCellToolTip(game: GamePredictionDTO, opponentTeamAcronym: string): string | null {
     if (game == null) {
       return null;
     }
 
     let homeTeamStats: TeamStatsDTO = this.teamStats.find((x) => x.teamID == game.homeTeamId)!;
     let awayTeamStats: TeamStatsDTO = this.teamStats.find((x) => x.teamID == game.awayTeamId)!;
+
+    let currentTeam: TeamStatsDTO = opponentTeamAcronym.endsWith(homeTeamStats.teamAcronym) ? awayTeamStats : homeTeamStats;
 
     let homeTeamColor: string = this.getTooltipWinChanceSectionClass(game.homeTeamWinChance);
     let awayTeamColor: string = this.getTooltipWinChanceSectionClass(game.awayTeamWinChance);
@@ -278,9 +283,19 @@ export class CalendarTableComponent implements OnChanges {
       game.awayTeamAcronym
     }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
 
+    let playersMap: PlayerExpectedFantasyPointsInfo[] = this.teamPlayerExpectedOfoMap.get(currentTeam.teamID)!;
+    let playersToolTip: string = '<br>Лучшие пики: <br>';
+
+    if (playersMap != null && playersMap.length > 0) {
+      playersMap.forEach((x) => {
+        playersToolTip += `${x.playerName} (${x.price}), ${x.powerPlayNumber}, ${x.playerExpectedFantasyPoints.toFixed(0)} ОФО <br>`;
+      })
+    };
+
     let generatedTooltip: string = 
-    `${homeTeamWinChance} | ${homeTeamStats.teamGoalsForm.toFixed(1)} GF | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${homeTeamStats.teamForm}<br>
-    ${awayTeamWinChance} | ${awayTeamStats.teamGoalsForm.toFixed(1)} GF | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${awayTeamStats.teamForm}<br>
+    `<b>${homeTeamWinChance}</b> | ${homeTeamStats.teamGoalsForm.toFixed(1)} GF | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${homeTeamStats.teamForm}<br>
+    <b>${awayTeamWinChance}</b> | ${awayTeamStats.teamGoalsForm.toFixed(1)} GF | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${awayTeamStats.teamForm}<br>
+    ${playersToolTip}
     `;
 
     return generatedTooltip;
