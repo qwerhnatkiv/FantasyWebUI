@@ -14,7 +14,7 @@
       </mat-select>
     </mat-form-field>
     <button
-      (click)="lowerBoundPrice = undefined; lowerBoundPriceChanged()"
+      (click)="resetLowerBoundPriceFilter()"
       [hidden]="lowerBoundPrice === undefined"
       class="clear-filter-button"
       mat-icon-button
@@ -40,7 +40,7 @@
     </mat-form-field>
 
     <button
-      (click)="upperBoundPrice = undefined; upperBoundPriceChanged()"
+      (click)="resetUpperBoundPriceFilter()"
       [hidden]="upperBoundPrice === undefined"
       class="clear-filter-button"
       mat-icon-button
@@ -130,7 +130,7 @@
       </mat-select>
     </mat-form-field>
     <button
-      (click)="powerPlayFormControl.setValue([]); powerPlayUnitsChanged()"
+      (click)="resetPowerPlayFilter()"
       [hidden]="powerPlayFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
@@ -155,8 +155,8 @@
       </mat-select>
     </mat-form-field>
 
-    <label class="filter-label" style="margin-left: 20px">УЗ:</label>
-    <mat-form-field class="wider-filter-form">
+    <label class="filter-label" style="margin-left: 50px">УЗ:</label>
+    <mat-form-field class="the-widest-filter-form">
       <mat-label>User</mat-label>
       <mat-select
         [(value)]="selectedUser"
@@ -167,6 +167,10 @@
         }}</mat-option>
       </mat-select>
     </mat-form-field>
+
+    <button class="button" mat-icon-button (click)="resetAllFilters()">
+      <mat-icon>filter_alt_off</mat-icon>
+    </button>
   </div>
   <div style="display: flex">
     <div>

@@ -114,6 +114,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
   dataSource = new MatTableDataSource(this.players);
+  private clickedOnCheckbox: boolean = false;
 
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
   //#region NG overrides
@@ -275,6 +276,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   ofoPlayersFirstChoiceChanged(player: PlayerChooseRecord) {
+    this.clickedOnCheckbox = true;
     let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter((x) => x.firstChoice);
 
     let ofoFirstChoice: OfoVariant = {
@@ -293,6 +295,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   ofoPlayersSecondChoiceChanged(player: PlayerChooseRecord) {
+    this.clickedOnCheckbox = true;
     let playersWithSecondChoice: PlayerChooseRecord[] = this.players.filter((x) => x.secondChoice);
 
     let ofoSecondChoice: OfoVariant = {
@@ -344,6 +347,22 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
     if (secondChoice) {
       return 'second-choice-selected-cell';
+    }
+
+    return '';
+  }
+
+  getPlayerSelectedClassByRow(row: PlayerChooseRecord): string {
+    if (row.firstChoice) {
+      return 'first-choice-selected-cell';
+    }
+
+    if (row.secondChoice) {
+      return 'second-choice-selected-cell';
+    }
+
+    if (this.isPlayerSelected(row)) {
+      return 'player-is-selected';
     }
 
     return '';
@@ -537,6 +556,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   public selectPlayerRow(player: PlayerChooseRecord) {
+    if (this.clickedOnCheckbox) {
+      this.clickedOnCheckbox = false;
+      return;
+    }
     this.selectedPlayers = new Map<string, SelectedPlayerModel[]>(this.selectedPlayers);
 
     let matchingTeamName: string = this.filteredTeamGames.get(

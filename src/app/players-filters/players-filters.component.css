@@ -67,3 +67,12 @@
 .wider-filter-form {
   width: 150px;
 }
+
+.the-widest-filter-form {
+  width: 200px;
+}
+
+.button {
+  background: #fef524;
+  margin-left: 40px;
+}

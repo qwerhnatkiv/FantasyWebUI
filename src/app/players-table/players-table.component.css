@@ -80,8 +80,12 @@
   border-radius: 0px;
 }
 
+.first-choice-cell,.second-choice-cell {
+  background: white;
+}
+
 .clear-table-calendar-button {
   background: #fef524;
   align-self: flex-end;
-  margin-right: 40px;
+  margin-right: 25px;
 }

@@ -279,7 +279,8 @@ export class AppComponent implements OnChanges {
   }
 
   private getUserSquad() {
-    if (this._selectedUser == null) {
+    if (this._selectedUser == null || this._selectedUser == "") {
+      this.squadPlayers = [];
       return;
     }
 
