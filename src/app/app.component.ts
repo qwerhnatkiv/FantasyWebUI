@@ -53,7 +53,7 @@ export class AppComponent implements OnChanges {
   public hideLowGPPlayersEnabled: boolean = true;
   public shouldDeselectAllSelectedPlayers: boolean = false;
 
-  public teamPlayerExpectedOfoMap: Map<number, PlayerExpectedFantasyPointsInfo[]> = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
+  public teamPlayerExpectedOfoMap: Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>> = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
   private formLength: number = DEFAULT_FORM_LENGTH;
 
@@ -265,17 +265,20 @@ export class AppComponent implements OnChanges {
           let keys: string[] = Object.keys(result);
           let key: number;
 
-          this.teamPlayerExpectedOfoMap = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
+          this.teamPlayerExpectedOfoMap = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
           for (var i = 0, n = keys.length; i < n; ++i) {
             key = +keys[i];
             localOfoMap.set(key, result[key]);
+
             this.setTop3PlayersForEachTeam(key, result[key]);
           }
 
-          for (let [key, value] of this.teamPlayerExpectedOfoMap) {
-            value = value.sort((n1, n2) => n2.playerExpectedFantasyPoints - n1.playerExpectedFantasyPoints);
-            this.teamPlayerExpectedOfoMap.set(key, value.splice(0, 3));
+          for (let [_, gameOfoMap] of this.teamPlayerExpectedOfoMap) {
+            for (let [dateKey, value] of gameOfoMap) {
+              value = value.sort((n1, n2) => n2.playerExpectedFantasyPoints - n1.playerExpectedFantasyPoints);
+              gameOfoMap.set(dateKey, value.splice(0, 3));
+            }
           }
 
           this.playerGamesOfoMap = localOfoMap;
@@ -338,24 +341,36 @@ export class AppComponent implements OnChanges {
       });
   }
 
-  private setTop3PlayersForEachTeam(key: number, value: PlayerExpectedFantasyPointsDTO[]) {
-    if (value.length == 0) {
+  private setTop3PlayersForEachTeam(playerId: number, playersOfoDataArray: PlayerExpectedFantasyPointsDTO[]) {
+    if (playersOfoDataArray.length == 0) {
       return;
     }
 
-    let teamID: number = value[0].teamID;
-    let playerOfoSum = value.reduce((sum, current) => sum + current.playerExpectedFantasyPoints, 0);
-    let playerStat: PlayerStatsDTO = this.playerStats.find((y) => key == y.playerID)!;
+    let teamID: number = playersOfoDataArray[0].teamID;
 
+    if (!this.teamPlayerExpectedOfoMap.has(teamID)) {
+      this.teamPlayerExpectedOfoMap.set(teamID, new Map<Date, PlayerExpectedFantasyPointsInfo[]>());
+    }
+
+    let playerStat: PlayerStatsDTO = this.playerStats.find((y) => playerId == y.playerID)!;
+  
     if (playerStat == null) {
       return;
     }
 
-    let powerPlayInfo: string = playerStat.formPowerPlayNumber > 0
-          ? `ПП${playerStat.formPowerPlayNumber}`
-          : 'нет'
+    playersOfoDataArray.forEach((x) => {
+      let playerOfoSum = x.playerExpectedFantasyPoints;
+      let game: GamePredictionDTO = this.games.find((y) => y.gameId == x.gameID)!;
 
-    if (this.teamPlayerExpectedOfoMap.has(teamID)) {
+      let gameOfoMap: Map<Date, PlayerExpectedFantasyPointsInfo[]> = this.teamPlayerExpectedOfoMap.get(teamID)!;
+      if (!gameOfoMap.has(game.gameDate)) {
+        gameOfoMap.set(game.gameDate, []);
+      }
+  
+      let powerPlayInfo: string = playerStat.formPowerPlayNumber > 0
+            ? `ПП${playerStat.formPowerPlayNumber}`
+            : 'нет'
+  
       let modelInfo: PlayerExpectedFantasyPointsInfo = {
         playerName: playerStat.playerName,
         playerExpectedFantasyPoints: playerOfoSum,
@@ -364,18 +379,7 @@ export class AppComponent implements OnChanges {
         isFire: false
       };
 
-      this.teamPlayerExpectedOfoMap.get(teamID)?.push(modelInfo);
-    }
-    else {
-      let modelInfo: PlayerExpectedFantasyPointsInfo = {
-        playerName: playerStat.playerName,
-        playerExpectedFantasyPoints: playerOfoSum,
-        price: playerStat.price,
-        powerPlayNumber: powerPlayInfo,
-        isFire: false
-      };
-
-      this.teamPlayerExpectedOfoMap.set(teamID, [modelInfo]);
-    }
+      gameOfoMap.get(game.gameDate)?.push(modelInfo);
+    });
   }
 }

@@ -39,7 +39,7 @@ export class CalendarTableComponent implements OnChanges {
   @Input() games: GamePredictionDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
 
-  @Input() teamPlayerExpectedOfoMap: Map<number, PlayerExpectedFantasyPointsInfo[]> = new Map<number, PlayerExpectedFantasyPointsInfo[]>();
+  @Input() teamPlayerExpectedOfoMap: Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>> = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
   @Input() selectedPlayers: Map<string, SelectedPlayerModel[]> = 
     new Map<string, SelectedPlayerModel[]>();
@@ -283,10 +283,12 @@ export class CalendarTableComponent implements OnChanges {
       game.awayTeamAcronym
     }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
 
-    let playersMap: PlayerExpectedFantasyPointsInfo[] = this.teamPlayerExpectedOfoMap.get(currentTeam.teamID)!;
-    let playersToolTip: string = '<br>Лучшие пики: <br>';
+    let playersMap: PlayerExpectedFantasyPointsInfo[] = 
+      this.teamPlayerExpectedOfoMap.get(currentTeam.teamID)?.get(game.gameDate)!;
+    let playersToolTip: string = '';
 
     if (playersMap != null && playersMap.length > 0) {
+      playersToolTip += '<br>Лучшие пики: <br>'
       playersMap.forEach((x) => {
         playersToolTip += `${x.playerName} (${x.price}), ${x.powerPlayNumber}, ${x.playerExpectedFantasyPoints.toFixed(0)} ОФО <br>`;
       })
