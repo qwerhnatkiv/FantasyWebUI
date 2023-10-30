@@ -75,8 +75,22 @@
   background: white;
 }
 
+.players-table-section-headers {
+  display: flex;
+}
+
 .clear-table-calendar-button {
   background: #fef524;
   align-self: flex-end;
   margin-right: 25px;
+  margin-left: auto;
+}
+
+.date-filter-labels {
+  align-self: center;
+  display: flex;
+  position: relative;
+  left: 50%;
+  font-weight: 700;
+  font-size: 16px;
 }

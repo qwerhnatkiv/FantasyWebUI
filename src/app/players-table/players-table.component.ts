@@ -100,6 +100,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
 
+  @Input() minFilterDate: Date | undefined;
+  @Input() maxFilterDate: Date | undefined;
+
   public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
     string,
     SelectedPlayerModel[]
