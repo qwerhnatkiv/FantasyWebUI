@@ -90,7 +90,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   >();
 
   @Input() playersAreNotPlayedDisabled: boolean = true;
-  @Input() hideLowGPPlayersEnabled: boolean = true;
+  @Input() hideLowGPPlayersEnabled: boolean = false;
 
   private _shouldDeselectAllSelectedPlayers: boolean = false;
   @Input() set shouldDeselectAllSelectedPlayers(value: boolean) {

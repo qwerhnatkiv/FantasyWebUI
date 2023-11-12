@@ -28,7 +28,9 @@ td:nth-child(1) {
 
 .cdk-table thead,
 .cdk-header-row,
-.cdk-header-cell {
+.cdk-header-cell,
+.cdk-footer-row,
+.cdk-footer-cell {
   background: #00c2ff;
   font-weight: 600;
   font-size: 18px;
@@ -36,7 +38,7 @@ td:nth-child(1) {
   height: 24px;
 }
 
-.cdk-header-cell {
+.cdk-header-cell,.cdk-footer-cell {
   width: 96px;
   border-right: 1px dashed rgba(128, 128, 128);
   text-align: center;
@@ -46,7 +48,7 @@ td:nth-child(1) {
   background: white;
 }
 
-.cdk-header-cell:first-child {
+.cdk-header-cell:first-child,.cdk-footer-cell:first-child {
   background: white;
 }
 

@@ -65,7 +65,7 @@ export class AppComponent implements OnChanges {
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
   public playersAreNotPlayedDisabled: boolean = true;
-  public hideLowGPPlayersEnabled: boolean = true;
+  public hideLowGPPlayersEnabled: boolean = false;
   public shouldDeselectAllSelectedPlayers: boolean = false;
 
   public teamPlayerExpectedOfoMap: Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>> = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();

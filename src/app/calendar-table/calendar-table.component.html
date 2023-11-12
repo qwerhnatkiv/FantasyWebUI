@@ -20,6 +20,8 @@
         </span>
       </div>
     </td>
+    <td cdk-footer-cell *cdkFooterCellDef>
+    </td>
   </ng-container>
 
   <ng-container *ngFor="let column of columns" [cdkColumnDef]="column.header">
@@ -57,10 +59,14 @@
         </span>
       </div>
     </td>
+    <td cdk-footer-cell *cdkFooterCellDef>
+      {{ column.header }}
+    </td>
   </ng-container>
 
   <tr cdk-header-row *cdkHeaderRowDef="columnsToDisplay"></tr>
   <tr cdk-row *cdkRowDef="let row; columns: columnsToDisplay"></tr>
+  <tr cdk-footer-row *cdkFooterRowDef="columnsToDisplay"></tr>
 
   <!-- Row shown when there is no matching data. -->
   <tr class="cdk-row" *cdkNoDataRow>
