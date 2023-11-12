@@ -21,9 +21,10 @@ import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
-import { DEFAULT_FORM_LENGTH, USER_ID_NAME } from 'src/constants';
+import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PlayersTableComponent } from './players-table/players-table.component';
+import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 
 @Component({
   selector: 'app-root',
@@ -43,6 +44,20 @@ export class AppComponent implements OnChanges {
 
   public playerStats: PlayerStatsDTO[] = [];
   public squadPlayers: PlayerSquadRecord[] = [];
+  public balanceValue: number = 0;
+  public squadAvailableSlots: PositionsAvailableToPick | undefined;
+
+  set addedToSquadPlayer(value: PlayerSquadRecord) {
+    if (this.squadPlayers.length <= 0) {
+      return;
+    }
+
+    this.squadPlayers.push(value);
+    this.squadPlayers.sort((a, b) => 
+      DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price);
+
+    this.squadPlayers  = Object.assign([], this.squadPlayers);
+  }
 
   public lowerBoundPrice: number | undefined = undefined;
   public upperBoundPrice: number | undefined = undefined;
@@ -114,7 +129,7 @@ export class AppComponent implements OnChanges {
     this.ngxLoader.start();
     this.http
       .get<GamesDTO>(
-        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/games/get?formLength=${this.formLength}`
+        `https://qwerhnatkiv.bsite.net/predictions/games/get?formLength=${this.formLength}`
       )
       .subscribe({
         next: (result) => {
@@ -255,7 +270,7 @@ export class AppComponent implements OnChanges {
 
     this.http
       .get<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }>(
-        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${this.formLength}`
+        `https://qwerhnatkiv.bsite.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${this.formLength}`
       )
       .subscribe({
         next: (result) => {
@@ -300,7 +315,7 @@ export class AppComponent implements OnChanges {
     this.ngxLoader.start();
     this.http
       .get<SportsSquadDTO>(
-        `https://qwerhnatkiv-backend.azurewebsites.net/sportsSquad?accountId=${USER_ID_NAME.get(
+        `https://qwerhnatkiv.bsite.net/sportsSquad?accountId=${USER_ID_NAME.get(
           this._selectedUser
         )}`
       )
@@ -308,6 +323,7 @@ export class AppComponent implements OnChanges {
         next: (result) => {
           this.squadPlayers = [];
 
+          this.balanceValue = result.balance;
           for (var i = 0, n = result.players.length; i < n; ++i) {
             let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
               (x) => x.playerIdSports == result.players[i].id
@@ -331,6 +347,8 @@ export class AppComponent implements OnChanges {
               price: matchingPlayerInfo.price,
               games: gamesCount,
               expectedFantasyPoints: ofo,
+              isRemoved: false,
+              isNew: false
             });
           }
         },

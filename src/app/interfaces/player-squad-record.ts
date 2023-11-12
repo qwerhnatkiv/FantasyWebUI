@@ -5,5 +5,7 @@ export interface PlayerSquadRecord {
     price: number;
     games: number;
     expectedFantasyPoints: number;
+    isRemoved: boolean;
+    isNew: boolean;
 }
   

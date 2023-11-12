@@ -9,6 +9,14 @@ export const DEFAULT_POSITIONS = [
   'В', 'З', 'Н'
 ]
 
+export const DEFAULT_SUBSTITUTION_VALUE = 5;
+
+export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string>([
+  ['З', 'DF'],
+  ['В', 'GK'],
+  ['Н', 'FW']
+]);
+
 export const DEFAULT_FORM_LENGTH = 5;
 export const DEFAULT_FORM_LENGTH_COUNT = 12;
 

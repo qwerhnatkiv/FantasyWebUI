@@ -1,42 +1,99 @@
-<table mat-table [dataSource]="squadPlayers" class="players-squad-table">
-  <ng-container matColumnDef="position">
+<table mat-table [dataSource]="dataSource" class="players-squad-table">
+  <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
-      {{ element.position }}
+      <button
+        class="player-action-button"
+        mat-icon-button
+        (click)="removeRestoreRow(element)"
+      >
+        <mat-icon class="player-action-icon"
+          >{{ !element.isRemoved ? "delete" : "undo" }}</mat-icon
+        >
+      </button>
     </td>
-    <td mat-footer-cell *matFooterCellDef> </td>
+    <td mat-footer-cell *matFooterCellDef></td>
+  </ng-container>
+
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element" class="left-column" [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'">
+      <span class="position-span">
+        {{ element.position | positionsMap }}
+      </span>
+    </td>
+    <td mat-footer-cell *matFooterCellDef></td>
   </ng-container>
 
   <ng-container matColumnDef="playerName">
-    <th mat-header-cell *matHeaderCellDef>Игрок</th>
-    <td mat-cell *matCellDef="let element">
+    <th mat-header-cell *matHeaderCellDef class="left-align">Игрок</th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      class="left-align" 
+      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [class.removed-cell]="element.isRemoved"
+    >
       {{ element.playerName }}
     </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700;"> Баланс </td>
+    <td
+      mat-footer-cell
+      *matFooterCellDef
+      class="left-align"
+      style="font-weight: 700"
+    >
+    <span>Баланс:</span>
+    <br/>
+    <span>Замен:</span>
+  </td>
   </ng-container>
 
   <ng-container matColumnDef="price">
     <th mat-header-cell *matHeaderCellDef>Цена</th>
-    <td mat-cell *matCellDef="let element">
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [class.removed-cell]="element.isRemoved"
+      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+    >
       {{ element.price }}
     </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700;"> {{getTotalPrice() | number : "1.0-1"}} </td>
+    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+      <span>{{ getTotalBalance() | number : "1.0-1" }}</span>
+      <br/>
+      <span> {{ substitutionsLeft }} </span>
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="games">
     <th mat-header-cell *matHeaderCellDef>Игр</th>
-    <td mat-cell *matCellDef="let element">
+    <td
+      mat-cell
+      *matCellDef="let element"
+      class="right-column"
+      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [class.removed-cell]="element.isRemoved"
+    >
       {{ element.games }}
     </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700;"> {{getTotalGames() | number : "1.0-0"}} </td>
+    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+      {{ getTotalGames() | number : "1.0-0" }}
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="expectedFantasyPoints">
     <th mat-header-cell *matHeaderCellDef>ОФО</th>
-    <td mat-cell *matCellDef="let element" style="font-weight: 700;">
+    <td
+      mat-cell
+      *matCellDef="let element"
+      style="font-weight: 700"
+      [class.removed-cell]="element.isRemoved"
+    >
       {{ element.expectedFantasyPoints | number : "1.0-1" }}
     </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700;"> {{getTotalOFO() | number : "1.0-1"}} </td>
+    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+      {{ getTotalOFO() | number : "1.0-1" }}
+    </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>

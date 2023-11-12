@@ -71,7 +71,7 @@
   border-radius: 0px;
 }
 
-.first-choice-cell,.second-choice-cell {
+.first-choice-cell,.second-choice-cell,.add-player-to-squad {
   background: white;
 }
 
@@ -93,4 +93,24 @@
   left: 50%;
   font-weight: 700;
   font-size: 16px;
+}
+
+.add-player-to-squad-button {
+  height: 26px;
+  width: 26px;
+  padding: 3px 0px 3px 0px;
+}
+
+.add-player-to-squad-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}
+
+.add-player-to-squad-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 26px;
+
+  background: #fef524;
+  border-radius: 26px;
 }

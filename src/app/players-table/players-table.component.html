@@ -371,6 +371,20 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="addPlayerToSquad">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element" class="add-player-to-squad">
+        <button
+          class="add-player-to-squad-button"
+          mat-icon-button
+          (click)="addPlayerToSquad(element)"
+          [hidden]="isAddPlayerToSquadButtonHidden(element)"
+        >
+          <mat-icon class="add-player-to-squad-icon">add_circle</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr
       class="player-selected"

@@ -1,9 +1,70 @@
-.mat-mdc-cell {
-    padding: 3px;
-    border-bottom-style: none;
-    height: 20px;
-  }
-  
-  .mat-mdc-row {
-    height: 20px;
-  }
+.players-squad-table {
+  border-spacing: 0 4px !important;
+}
+
+.mat-mdc-cell,
+.mat-mdc-header-cell,
+.mat-mdc-footer-cell {
+  padding: 0px;
+  border-bottom-style: none;
+  height: 20px;
+  justify-content: center;
+  text-align: center;
+}
+
+.mat-mdc-row {
+  height: 20px;
+}
+
+.right-column {
+  padding-right: 5px;
+  border-radius: 0 26px 26px 0;
+}
+
+.left-column {
+  border-radius: 26px 0 0 26px;
+}
+
+.left-align {
+  text-align: left;
+}
+
+.silver-cell {
+  background: #e1e1e1;
+}
+
+.green-cell {
+  background: #64ff8f;
+}
+
+.removed-cell {
+  text-decoration: line-through;
+  color: #878787;
+}
+
+.player-action-button {
+  height: 26px;
+  width: 26px;
+  padding: 3px 0px 3px 0px;
+}
+
+.player-action-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 26px;
+
+  background: #fef524;
+  border-radius: 26px;
+}
+
+.position-span {
+  display: inline-block;
+  border-radius: 25px;
+  text-align: center;
+  line-height: 27px;
+  width: 25px;
+  height: 25px;
+  background: #878787;
+  color: #FFFFFF;
+}
+

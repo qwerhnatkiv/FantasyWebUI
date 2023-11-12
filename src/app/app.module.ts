@@ -47,6 +47,7 @@ import {MatRadioModule} from '@angular/material/radio';
 
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CustomDateAdapter } from './common/custom-date-adapter';
+import { PositionsMapPipe } from './pipes/positions-map.pipe';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -60,6 +61,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     AppComponent,
     MapKeysPipe,
     PlayersLabelByCountPipe,
+    PositionsMapPipe,
     ToiPipe,
     CalendarTableComponent,
     PlayersTableComponent,

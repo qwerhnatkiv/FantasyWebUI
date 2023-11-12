@@ -33,7 +33,8 @@ import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { OfoVariant } from '../interfaces/ofo-variant';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
+import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 
 @Component({
   selector: 'app-players-table',
@@ -65,6 +66,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'fantasyPointsPerGame',
     'priceByExpectedFantasyPointsPerGame',
     'sources',
+    'addPlayerToSquad',
   ];
   constructor(private _liveAnnouncer: LiveAnnouncer) {
     this.dataSource.filterPredicate = this.filter;
@@ -92,8 +94,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
   private _shouldDeselectAllSelectedPlayers: boolean = false;
   @Input() set shouldDeselectAllSelectedPlayers(value: boolean) {
-      this._shouldDeselectAllSelectedPlayers = value;
-      this.deselectAllPlayersInComparison();
+    this._shouldDeselectAllSelectedPlayers = value;
+    this.deselectAllPlayersInComparison();
   }
 
   @Input() playerGamesOfoMap:
@@ -103,6 +105,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
 
+  private _positionsInSquadAvailable: PositionsAvailableToPick | undefined;
+  get positionsInSquadAvailable(): PositionsAvailableToPick {
+    return this._positionsInSquadAvailable!;
+  }
+  @Input() set positionsInSquadAvailable(value: PositionsAvailableToPick) {
+    this._positionsInSquadAvailable = value;
+  }
+
   public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
     string,
     SelectedPlayerModel[]
@@ -111,13 +121,17 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     Map<string, SelectedPlayerModel[]>
   > = new EventEmitter<Map<string, SelectedPlayerModel[]>>();
 
-  @Output() sendFirstChoiceOfo: EventEmitter<OfoVariant> = new EventEmitter<OfoVariant>();
-  @Output() sendSecondChoiceOfo: EventEmitter<OfoVariant> = new EventEmitter<OfoVariant>();
+  @Output() sendFirstChoiceOfo: EventEmitter<OfoVariant> =
+    new EventEmitter<OfoVariant>();
+  @Output() sendSecondChoiceOfo: EventEmitter<OfoVariant> =
+    new EventEmitter<OfoVariant>();
+  @Output() sendAddedToSquadPlayer: EventEmitter<PlayerSquadRecord> =
+    new EventEmitter<PlayerSquadRecord>();
 
   private pptoiPipe: PPToiPipe = new PPToiPipe();
   private players: PlayerChooseRecord[] = [];
   dataSource = new MatTableDataSource(this.players);
-  private clickedOnCheckbox: boolean = false;
+  private clickedOnCheckboxOrButton: boolean = false;
 
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
   //#region NG overrides
@@ -130,7 +144,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     ) {
       this.players.length = 0;
       for (var i = 0, n = this.playerStats.length; i < n; ++i) {
-
         let player: PlayerStatsDTO = this.playerStats[i];
         let matchingTeam: TeamStatsDTO = this.teamStats?.find(
           (team) => team.teamID == player.teamID
@@ -164,8 +177,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           expectedFantasyPoints: '',
           fantasyPointsPerGame: '',
           priceByExpectedFantasyPoints: 0,
-          priceByExpectedFantasyPointsPerGame: 0, 
-          forecastSources: player.forecastSources.length > 0 ? player.forecastSources : 'NONE',
+          priceByExpectedFantasyPointsPerGame: 0,
+          forecastSources:
+            player.forecastSources.length > 0 ? player.forecastSources : 'NONE',
           teamObject: matchingTeam,
           playerObject: player,
         });
@@ -175,15 +189,16 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     if (changes['filteredTeamGames']?.currentValue) {
       for (var i = 0, n = this.players.length; i < n; ++i) {
         let player: PlayerChooseRecord = this.players[i];
-        let teamGames: TeamGameInformation[] | undefined = this.filteredTeamGames.get(
-          player.teamObject.teamID
-        );
+        let teamGames: TeamGameInformation[] | undefined =
+          this.filteredTeamGames.get(player.teamObject.teamID);
 
         player.gamesCount = teamGames?.length!;
 
         player.b2bGamesCount = GamesUtils.getB2BGamesCount(teamGames!);
 
-        player.easyGamesCount = teamGames?.filter((x) => GamesUtils.isEasyGame(x.winChance))?.length!;
+        player.easyGamesCount = teamGames?.filter((x) =>
+          GamesUtils.isEasyGame(x.winChance)
+        )?.length!;
 
         player.b2bEasyGamesCount = GamesUtils.getB2BEasyGamesCount(teamGames!);
       }
@@ -200,13 +215,18 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             0.0
           )!;
 
-        player.expectedFantasyPoints = ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
-        player.fantasyPointsPerGame = ofo > 0 ? this.numberPipe.transform(
-          ofo / player.gamesCount,
-          '1.0-1'
-        )! : '0';
-        player.priceByExpectedFantasyPoints = ofo > 0 && player.price > 0 ? player.price / ofo : 999;
-        player.priceByExpectedFantasyPointsPerGame = ofo > 0 && player.price > 0 ?  player.price / (ofo / player.gamesCount) : 999;
+        player.expectedFantasyPoints =
+          ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
+        player.fantasyPointsPerGame =
+          ofo > 0
+            ? this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!
+            : '0';
+        player.priceByExpectedFantasyPoints =
+          ofo > 0 && player.price > 0 ? player.price / ofo : 999;
+        player.priceByExpectedFantasyPointsPerGame =
+          ofo > 0 && player.price > 0
+            ? player.price / (ofo / player.gamesCount)
+            : 999;
       }
     }
 
@@ -217,7 +237,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
     this.applyPlayersFilter({
       name: 'hideLowGPPlayersEnabled',
-      value: this.hideLowGPPlayersEnabled
+      value: this.hideLowGPPlayersEnabled,
     });
 
     this.applyPlayersFilter({
@@ -244,7 +264,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       name: 'powerPlayUnits',
       value: this.powerPlayUnits,
     });
-
   }
 
   ngAfterViewInit() {
@@ -255,6 +274,39 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   //#endregion NG overrides
 
   //#region Public Methods
+
+  public addPlayerToSquad(player: PlayerChooseRecord) {
+    this.clickedOnCheckboxOrButton = true;
+
+    let playerSquadRecord: PlayerSquadRecord = {
+      playerId: player.playerObject.playerID,
+      playerName: player.playerObject.playerName,
+      position: player.playerObject.position,
+      price: player.playerObject.price,
+      games: player.gamesCount,
+      expectedFantasyPoints: +player.expectedFantasyPoints,
+      isRemoved: false,
+      isNew: true,
+    };
+
+    this.sendAddedToSquadPlayer.emit(playerSquadRecord);
+  }
+
+  public isAddPlayerToSquadButtonHidden(player: PlayerChooseRecord): boolean {
+    return (
+      (this.positionsInSquadAvailable == null) ||
+      (this.positionsInSquadAvailable?.defendersAvailable == 0 &&
+        player.position == 'З') ||
+      (this.positionsInSquadAvailable?.forwardsAvailable == 0 &&
+        player.position == 'Н') ||
+      (this.positionsInSquadAvailable?.goaliesAvailable == 0 &&
+        player.position == 'В') ||
+      (this.positionsInSquadAvailable?.selectedPlayerIds.length! > 0 &&
+        this.positionsInSquadAvailable?.selectedPlayerIds.indexOf(
+          player.playerObject.playerID
+        )! > -1)
+    );
+  }
 
   public deselectAllPlayersInCalendar() {
     this.selectedPlayers = new Map<string, SelectedPlayerModel[]>();
@@ -271,23 +323,32 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       priceSum: 0,
       expectedFantasyPointsSum: 0,
       priceByExpectedFantasyPointsSum: 0,
-      playersCount: 0
-    }
+      playersCount: 0,
+    };
 
     this.sendFirstChoiceOfo.emit(ofoChoice);
     this.sendSecondChoiceOfo.emit(ofoChoice);
   }
 
   ofoPlayersFirstChoiceChanged(player: PlayerChooseRecord) {
-    this.clickedOnCheckbox = true;
-    let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter((x) => x.firstChoice);
+    this.clickedOnCheckboxOrButton = true;
+    let playersWithFirstChoice: PlayerChooseRecord[] = this.players.filter(
+      (x) => x.firstChoice
+    );
 
     let ofoFirstChoice: OfoVariant = {
-      priceSum: playersWithFirstChoice.reduce((n, {price}) => n + price, 0),
-      expectedFantasyPointsSum: playersWithFirstChoice.reduce((n, {expectedFantasyPoints}) => n + +expectedFantasyPoints, 0),
-      priceByExpectedFantasyPointsSum: playersWithFirstChoice.reduce((n, {priceByExpectedFantasyPoints}) => n + priceByExpectedFantasyPoints, 0),
-      playersCount: playersWithFirstChoice.length
-    }
+      priceSum: playersWithFirstChoice.reduce((n, { price }) => n + price, 0),
+      expectedFantasyPointsSum: playersWithFirstChoice.reduce(
+        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        0
+      ),
+      priceByExpectedFantasyPointsSum: playersWithFirstChoice.reduce(
+        (n, { priceByExpectedFantasyPoints }) =>
+          n + priceByExpectedFantasyPoints,
+        0
+      ),
+      playersCount: playersWithFirstChoice.length,
+    };
 
     this.sendFirstChoiceOfo.emit(ofoFirstChoice);
 
@@ -298,15 +359,24 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   ofoPlayersSecondChoiceChanged(player: PlayerChooseRecord) {
-    this.clickedOnCheckbox = true;
-    let playersWithSecondChoice: PlayerChooseRecord[] = this.players.filter((x) => x.secondChoice);
+    this.clickedOnCheckboxOrButton = true;
+    let playersWithSecondChoice: PlayerChooseRecord[] = this.players.filter(
+      (x) => x.secondChoice
+    );
 
     let ofoSecondChoice: OfoVariant = {
-      priceSum: playersWithSecondChoice.reduce((n, {price}) => n + price, 0),
-      expectedFantasyPointsSum: playersWithSecondChoice.reduce((n, {expectedFantasyPoints}) => n + +expectedFantasyPoints, 0),
-      priceByExpectedFantasyPointsSum: playersWithSecondChoice.reduce((n, {priceByExpectedFantasyPoints}) => n + priceByExpectedFantasyPoints, 0),
-      playersCount: playersWithSecondChoice.length
-    }
+      priceSum: playersWithSecondChoice.reduce((n, { price }) => n + price, 0),
+      expectedFantasyPointsSum: playersWithSecondChoice.reduce(
+        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        0
+      ),
+      priceByExpectedFantasyPointsSum: playersWithSecondChoice.reduce(
+        (n, { priceByExpectedFantasyPoints }) =>
+          n + priceByExpectedFantasyPoints,
+        0
+      ),
+      playersCount: playersWithSecondChoice.length,
+    };
 
     this.sendSecondChoiceOfo.emit(ofoSecondChoice);
 
@@ -386,8 +456,14 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         ${player.playerName} (${player.position}, ${player.team})
       </div>`;
 
-    let forecastPimColor: string = player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY ? 'white' : '#ff7e7e';
-    let forecastGPColor: string = player.playerObject.forecastGamesPlayed! >= RED_GP_UPPER_BOUNDARY ? 'white' : '#ff7e7e';
+    let forecastPimColor: string =
+      player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY
+        ? 'white'
+        : '#ff7e7e';
+    let forecastGPColor: string =
+      player.playerObject.forecastGamesPlayed! >= RED_GP_UPPER_BOUNDARY
+        ? 'white'
+        : '#ff7e7e';
 
     let forecast: string = `
     <div>Прогноз на сезон:<div>
@@ -404,11 +480,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle; color:${forecastGPColor}">${
-            this.numberPipe.transform(
-              player.playerObject.forecastGamesPlayed,
-              '1.0-0'
-            ) ?? '-'
-          }</td>
+      this.numberPipe.transform(
+        player.playerObject.forecastGamesPlayed,
+        '1.0-0'
+      ) ?? '-'
+    }</td>
           <td style="text-align: center; vertical-align: middle;">${
             this.numberPipe.transform(
               player.playerObject.forecastGoals,
@@ -422,11 +498,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle; color:${forecastPimColor}">${
-            this.numberPipe.transform(
-              player.playerObject.forecastPIM,
-              '1.0-0'
-            ) ?? '-'
-          }</td>
+      this.numberPipe.transform(player.playerObject.forecastPIM, '1.0-0') ?? '-'
+    }</td>
           <td style="text-align: center; vertical-align: middle;">${
             this.numberPipe.transform(
               player.playerObject.forecastPlusMinus,
@@ -487,8 +560,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       </thead>
       <tbody>
         <tr>
-          <td style="text-align: center; vertical-align: middle;">${player.winPercentage}</td>
-          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm.toFixed(1)}</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.winPercentage
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm.toFixed(
+            1
+          )}</td>
         </tr
       </tbody>
     </table>
@@ -530,9 +607,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           <td style="text-align: center; vertical-align: middle;">${
             opponentTeam.teamFormWinPercentage
           }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            opponentTeam.teamGoalsForm.toFixed(1)
-          }</td>
+          <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamGoalsForm.toFixed(
+            1
+          )}</td>
           <td style="text-align: center; vertical-align: middle;"> ${this.numberPipe.transform(
             nearestGameOFO,
             '1.0-1'
@@ -559,11 +636,13 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   public selectPlayerRow(player: PlayerChooseRecord) {
-    if (this.clickedOnCheckbox) {
-      this.clickedOnCheckbox = false;
+    if (this.clickedOnCheckboxOrButton) {
+      this.clickedOnCheckboxOrButton = false;
       return;
     }
-    this.selectedPlayers = new Map<string, SelectedPlayerModel[]>(this.selectedPlayers);
+    this.selectedPlayers = new Map<string, SelectedPlayerModel[]>(
+      this.selectedPlayers
+    );
 
     let matchingTeamName: string = this.filteredTeamGames.get(
       player.teamObject.teamID
@@ -589,7 +668,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           matchingPlayersInfo?.map((x) => ({
             playerName: player.playerObject.playerName,
             playerID: player.playerObject.playerID,
-            playerExpectedFantasyPoints: this.numberPipe.transform(x.playerExpectedFantasyPoints, '1.0-1')!,
+            playerExpectedFantasyPoints: this.numberPipe.transform(
+              x.playerExpectedFantasyPoints,
+              '1.0-1'
+            )!,
             teamName: matchingTeamName,
             gameDate: teamGame.find((game) => game.gameID == x.gameID)
               ?.gameDate!,
@@ -606,7 +688,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         matchingPlayersInfo?.map((x) => ({
           playerName: player.playerObject.playerName,
           playerID: player.playerObject.playerID,
-          playerExpectedFantasyPoints: this.numberPipe.transform(x.playerExpectedFantasyPoints, '1.0-1')!,
+          playerExpectedFantasyPoints: this.numberPipe.transform(
+            x.playerExpectedFantasyPoints,
+            '1.0-1'
+          )!,
           teamName: matchingTeamName,
           gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
         }))!
@@ -675,7 +760,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       }
 
       if (key == 'hideLowGPPlayersEnabled') {
-        isMatch = !value || record.playerObject?.forecastGamesPlayed! > RED_GP_UPPER_BOUNDARY
+        isMatch =
+          !value ||
+          record.playerObject?.forecastGamesPlayed! > RED_GP_UPPER_BOUNDARY;
       }
 
       if (!isMatch) {
