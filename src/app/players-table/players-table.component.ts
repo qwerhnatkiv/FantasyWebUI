@@ -571,28 +571,28 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     </table>
     `;
 
-    let teamGame: TeamGameInformation = this.filteredTeamGames
+    let teamGame: TeamGameInformation | undefined = this.filteredTeamGames
       .get(player.teamObject.teamID)
-      ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0]!;
+      ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0];
 
-    let opponentTeam: TeamStatsDTO = this.teamStats.find(
-      (x) => x.teamID == teamGame.opponentTeamID
-    )!;
-    let opponentAcronym: string = teamGame.isHome
-      ? `${opponentTeam.teamAcronym}`
-      : `@${opponentTeam.teamAcronym}`;
+    let opponentTeam: TeamStatsDTO | undefined = this.teamStats.find(
+      (x) => x.teamID == teamGame?.opponentTeamID
+    );
+    let opponentAcronym: string = teamGame?.isHome
+      ? `${opponentTeam?.teamAcronym}`
+      : `@${opponentTeam?.teamAcronym}`;
 
     let teamWinColor: string = this.getTooltipWinChanceSectionClass(
-      teamGame.winChance
+      teamGame?.winChance!
     );
 
     let nearestGameOFO: number = this.playerGamesOfoMap
       ?.get(player.playerObject.playerID)
-      ?.find((x) => x.gameID == teamGame.gameID)?.playerExpectedFantasyPoints!;
+      ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
 
     let opponentInfo: string = `
     <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
-      teamGame.winChance
+      teamGame?.winChance!
     )}%</span><div>
     <table class="tooltip-table">
       <thead>
@@ -605,11 +605,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       <tbody>
         <tr>
           <td style="text-align: center; vertical-align: middle;">${
-            opponentTeam.teamFormWinPercentage
+            opponentTeam?.teamFormWinPercentage
           }</td>
-          <td style="text-align: center; vertical-align: middle;">${opponentTeam.teamGoalsForm.toFixed(
+          <td style="text-align: center; vertical-align: middle;">${opponentTeam != null ? opponentTeam.teamGoalsForm.toFixed(
             1
-          )}</td>
+          ) : 0}</td>
           <td style="text-align: center; vertical-align: middle;"> ${this.numberPipe.transform(
             nearestGameOFO,
             '1.0-1'
@@ -702,9 +702,15 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   public isPlayerSelected(player: PlayerChooseRecord) {
-    let matchingTeamName: string = this.filteredTeamGames.get(
+    let teamGames: TeamGameInformation[] = this.filteredTeamGames.get(
       player.teamObject.teamID
-    )![0].teamName;
+    )!;
+
+    if (teamGames.length < 1) {
+      return false;
+    }
+
+    let matchingTeamName: string = teamGames[0].teamName;
     let currentSelectedPlayerForTeam: SelectedPlayerModel[] | undefined =
       this.selectedPlayers.get(matchingTeamName);
 
