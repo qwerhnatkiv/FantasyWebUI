@@ -336,16 +336,12 @@ export class AppComponent implements OnChanges {
                 0.0
               )!;
 
-            let gamesCount: number = this.playerGamesOfoMap?.get(
-              matchingPlayerInfo.playerID
-            )?.length!;
-
             this.squadPlayers.push({
               playerId: matchingPlayerInfo.playerID,
               playerName: matchingPlayerInfo.playerName,
               position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
-              games: gamesCount,
+              games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
               expectedFantasyPoints: ofo,
               isRemoved: false,
               isNew: false
