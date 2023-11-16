@@ -20,8 +20,7 @@
         </span>
       </div>
     </td>
-    <td cdk-footer-cell *cdkFooterCellDef>
-    </td>
+    <td cdk-footer-cell *cdkFooterCellDef></td>
   </ng-container>
 
   <ng-container *ngFor="let column of columns" [cdkColumnDef]="column.header">
@@ -36,7 +35,12 @@
       <div
         class="calendar-cell"
         [ngClass]="getCellTextClass(element[column.header])"
-        [ngxTippy]="generateCellToolTip(element[column.header].game, element[column.header].displayValue)"
+        [ngxTippy]="
+          generateCellToolTip(
+            element[column.header].game,
+            element[column.header].displayValue
+          )
+        "
         tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
         [tippyProps]="{
           allowHTML: true,
@@ -57,6 +61,13 @@
         <span>
           {{ element[column.header].displayValue }}
         </span>
+        <div class="bookmakers-mark-div">
+          <img
+            *ngIf="areOddsFromBookmakers(element[column.header])"
+            src="/assets/images/bookmakers_mark.png"
+            class="bookmakers-mark-logo"
+          />
+        </div>
       </div>
     </td>
     <td cdk-footer-cell *cdkFooterCellDef>

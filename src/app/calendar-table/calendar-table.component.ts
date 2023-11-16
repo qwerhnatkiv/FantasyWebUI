@@ -252,6 +252,10 @@ export class CalendarTableComponent implements OnChanges {
     return element['team'].displayValue.includes('ОФО') && cell.game != null && !isNaN(+cell.displayValue);
   }
 
+  public areOddsFromBookmakers(cell: TableCell): boolean {
+    return cell.game != null && cell.game.isFromBookmakers;
+  }
+
   public getSelectedPlayerCellOpponentName(element: any, cell: TableCell): string {
     let playersTeamName: string = element['team'].cellValue;
 

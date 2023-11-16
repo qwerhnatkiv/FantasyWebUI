@@ -225,3 +225,16 @@ mat-form-field {
   width: 27px;
   height: 27px;
 }
+
+.bookmakers-mark-div {
+  position: absolute;
+  width: 0px;
+}
+
+.bookmakers-mark-logo {
+  position:absolute;
+  width: 12px;
+  height: 12px;
+  top: -15px;
+  right: -40px;
+}
