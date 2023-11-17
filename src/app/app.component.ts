@@ -321,7 +321,9 @@ export class AppComponent implements OnChanges {
       )
       .subscribe({
         next: (result) => {
-          this.squadPlayers = [];
+          let removedIds: Array<number> = this.squadPlayers.filter((x) => x.isRemoved).map((x) => x.playerId);
+          let addedIds: Array<number> = this.squadPlayers.filter((x) => x.isNew).map((x) => x.playerId);
+          this.squadPlayers = []
 
           this.balanceValue = result.balance;
           for (var i = 0, n = result.players.length; i < n; ++i) {
@@ -343,10 +345,37 @@ export class AppComponent implements OnChanges {
               price: matchingPlayerInfo.price,
               games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
               expectedFantasyPoints: ofo,
-              isRemoved: false,
-              isNew: false
+              isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
+              isNew: addedIds.includes(matchingPlayerInfo.playerID)
             });
           }
+
+          for (var i = 0, n = addedIds.length; i < n; ++i) {
+            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
+              (x) => x.playerID == addedIds[i]
+            )!;
+
+            let ofo: number = this.playerGamesOfoMap
+              ?.get(matchingPlayerInfo.playerID)
+              ?.reduce(
+                (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+                0.0
+              )!;
+
+            this.squadPlayers.push({
+              playerId: matchingPlayerInfo.playerID,
+              playerName: matchingPlayerInfo.playerName,
+              position: matchingPlayerInfo.position,
+              price: matchingPlayerInfo.price,
+              games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
+              expectedFantasyPoints: ofo,
+              isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
+              isNew: addedIds.includes(matchingPlayerInfo.playerID)
+            });
+          }
+
+          this.squadPlayers.sort((a, b) => 
+            DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price);
         },
         error: (err) => {
           console.error(err);
