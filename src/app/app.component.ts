@@ -45,6 +45,7 @@ export class AppComponent implements OnChanges {
   public playerStats: PlayerStatsDTO[] = [];
   public squadPlayers: PlayerSquadRecord[] = [];
   public balanceValue: number = 0;
+  public substitutionsLeft: number = 0;
   public squadAvailableSlots: PositionsAvailableToPick | undefined;
 
   set addedToSquadPlayer(value: PlayerSquadRecord) {
@@ -326,6 +327,7 @@ export class AppComponent implements OnChanges {
           this.squadPlayers = []
 
           this.balanceValue = result.balance;
+          this.substitutionsLeft = result.substitutions;
           for (var i = 0, n = result.players.length; i < n; ++i) {
             let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
               (x) => x.playerIdSports == result.players[i].id

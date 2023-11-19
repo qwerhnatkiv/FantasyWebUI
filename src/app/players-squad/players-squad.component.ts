@@ -48,7 +48,7 @@ export class PlayersSquadComponent {
   public dataSource = new MatTableDataSource(this.squadPlayers);
 
   @Input() balanceValue: number = 0;
-  public substitutionsLeft: number = DEFAULT_SUBSTITUTION_VALUE;
+  @Input() substitutionsLeft: number = DEFAULT_SUBSTITUTION_VALUE;
 
   @Output() sendAvailableSlots: EventEmitter<PositionsAvailableToPick> =
     new EventEmitter<PositionsAvailableToPick>();
