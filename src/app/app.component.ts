@@ -130,7 +130,7 @@ export class AppComponent implements OnChanges {
     this.ngxLoader.start();
     this.http
       .get<GamesDTO>(
-        `https://qwerhnatkiv.bsite.net/predictions/games/get?formLength=${this.formLength}`
+        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/games/get?formLength=${this.formLength}`
       )
       .subscribe({
         next: (result) => {
@@ -271,7 +271,7 @@ export class AppComponent implements OnChanges {
 
     this.http
       .get<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }>(
-        `https://qwerhnatkiv.bsite.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${this.formLength}`
+        `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${this.formLength}`
       )
       .subscribe({
         next: (result) => {
@@ -316,7 +316,7 @@ export class AppComponent implements OnChanges {
     this.ngxLoader.start();
     this.http
       .get<SportsSquadDTO>(
-        `https://qwerhnatkiv.bsite.net/sportsSquad?accountId=${USER_ID_NAME.get(
+        `https://qwerhnatkiv-backend.azurewebsites.net/sportsSquad?accountId=${USER_ID_NAME.get(
           this._selectedUser
         )}`
       )
