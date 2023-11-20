@@ -42,7 +42,7 @@ export class PlayersSquadComponent {
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.substitutionsLeft =
-      value.length == this.substitutions ? this.substitutions : this.substitutions + 17 - this._squadPlayers.length;
+      value.length == this.substitutionsLeft ? this.substitutionsLeft : this.substitutionsLeft + 17 - this._squadPlayers.length;
   }
 
   public dataSource = new MatTableDataSource(this.squadPlayers);
@@ -50,7 +50,10 @@ export class PlayersSquadComponent {
   @Input() balanceValue: number = 0;
 
   public substitutionsLeft: number = DEFAULT_SUBSTITUTION_VALUE;
-  @Input() substitutions: number = DEFAULT_SUBSTITUTION_VALUE;
+  @Input() set substitutions(value: number) {
+    this.substitutionsLeft =
+      this._squadPlayers.length == value ? value : value + 17 - this._squadPlayers.length;
+  }
 
   @Output() sendAvailableSlots: EventEmitter<PositionsAvailableToPick> =
     new EventEmitter<PositionsAvailableToPick>();
