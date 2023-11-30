@@ -68,3 +68,18 @@
   color: #FFFFFF;
 }
 
+.clear-squad-changes-button {
+  position: absolute;
+  right: 5px;
+  z-index: 100;
+  margin-right: 0px;
+}
+
+.clear-squad-changes-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}
+
+.is-out-of-limit {
+  color: red;
+}

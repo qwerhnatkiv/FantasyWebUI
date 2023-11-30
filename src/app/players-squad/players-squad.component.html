@@ -59,9 +59,9 @@
       {{ element.price }}
     </td>
     <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      <span>{{ getTotalBalance() | number : "1.0-1" }}</span>
+      <span [class.is-out-of-limit]="getTotalBalance() < 0">{{ getTotalBalance() | number : "1.0-1" }}</span>
       <br/>
-      <span> {{ substitutionsLeft }} </span>
+      <span [class.is-out-of-limit]="substitutionsLeft < 0"> {{ substitutionsLeft }} </span>
     </td>
   </ng-container>
 
@@ -100,3 +100,12 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
 </table>
+<button
+      (click)="clearAllSquadChanges()"
+      [hidden]="isClearAllSquadChangesButtonHidden()"
+      class="clear-squad-changes-button"
+      mat-icon-button
+      aria-label="Clear squad changes"
+    >
+      <mat-icon>cancel</mat-icon>
+</button>

@@ -42,7 +42,9 @@ export class PlayersSquadComponent {
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.substitutionsLeft =
-      value.length == this.substitutionsLeft ? this.substitutionsLeft : this.substitutionsLeft + 17 - this._squadPlayers.length;
+      value.length == this.substitutionsLeft 
+      ? this.substitutionsValue 
+      : this.substitutionsValue - this._squadPlayers.filter((x) => x.isNew).length;
   }
 
   public dataSource = new MatTableDataSource(this.squadPlayers);
@@ -50,9 +52,11 @@ export class PlayersSquadComponent {
   @Input() balanceValue: number = 0;
 
   public substitutionsLeft: number = DEFAULT_SUBSTITUTION_VALUE;
+  private substitutionsValue: number = 0;
   @Input() set substitutions(value: number) {
     this.substitutionsLeft =
       this._squadPlayers.length == value ? value : value + 17 - this._squadPlayers.length;
+    this.substitutionsValue = value;
   }
 
   @Output() sendAvailableSlots: EventEmitter<PositionsAvailableToPick> =
@@ -64,6 +68,7 @@ export class PlayersSquadComponent {
     }
 
     return this.squadPlayers
+      .filter((item) => !item.isRemoved)
       .map((t) => t.expectedFantasyPoints)
       .reduce((acc, value) => acc + (value == null ? 0 : value), 0);
   }
@@ -90,7 +95,7 @@ export class PlayersSquadComponent {
     }
 
     return this.squadPlayers
-      .filter((item) => item.games)
+      .filter((item) => item.games && !item.isRemoved)
       .reduce((sum, current) => sum + current.games, 0);
   }
 
@@ -120,6 +125,17 @@ export class PlayersSquadComponent {
 
     row.isRemoved = !row.isRemoved;
     this.sendAvailableSlots.emit(this.getAvailableSlots());
+  }
+
+  public clearAllSquadChanges() {
+    this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
+
+    this.squadPlayers.filter((x) => x.isRemoved).forEach((x) => x.isRemoved = false);
+    this.sendAvailableSlots.emit(this.getAvailableSlots());
+  }
+
+  public isClearAllSquadChangesButtonHidden() {
+    return this.squadPlayers.filter((x) => x.isNew || x.isRemoved)?.length == 0;
   }
 
   private getAvailableSlots(): PositionsAvailableToPick {

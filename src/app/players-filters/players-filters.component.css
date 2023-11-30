@@ -46,6 +46,11 @@
   display: block !important;
 }
 
+.clear-selected-players-button[hidden] {
+  visibility: hidden;
+  display: inline-block !important;
+}
+
 .choice-row {
   display:flex;
   align-items: center;

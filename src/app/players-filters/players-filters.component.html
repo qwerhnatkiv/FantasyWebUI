@@ -253,7 +253,7 @@
       <button
         class="clear-selected-players-button"
         mat-icon-button
-        [disabled]="firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0"
+        [hidden]="firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0"
         (click)="sendClearAllPlayerSelections.emit()"
       >
         <mat-icon>cancel</mat-icon>

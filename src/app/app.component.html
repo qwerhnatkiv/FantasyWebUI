@@ -33,14 +33,22 @@
       <mat-datepicker #pickerTo></mat-datepicker>
     </mat-form-field>
   </div>
-  <a
-    id="knowledge-base-link"
-    mat-raised-button
-    color="primary"
-    href="https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit"
-    target="_blank"
-    >База знаний</a
-  >
+  <div id="external-links">
+    <a
+      mat-raised-button
+      color="primary"
+      href="https://twitter.com/GameDayNewsNHL"
+      target="_blank"
+      >GameDayNews NHL</a
+    >
+    <a
+      mat-raised-button
+      color="primary"
+      href="https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit"
+      target="_blank"
+      >База знаний</a
+    >
+  </div>
 </div>
 
 <div
@@ -101,6 +109,7 @@
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad
+      style="display: flex;"
       [squadPlayers]="squadPlayers"
       [balanceValue]="balanceValue"
       [substitutions]="substitutionsLeft"
