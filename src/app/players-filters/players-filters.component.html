@@ -155,7 +155,7 @@
       </mat-select>
     </mat-form-field>
 
-    <label class="filter-label" style="margin-left: 50px">УЗ:</label>
+    <label class="filter-label" style="margin-left: auto">УЗ:</label>
     <mat-form-field class="the-widest-filter-form">
       <mat-label>User</mat-label>
       <mat-select
@@ -171,6 +171,17 @@
     <button class="button" mat-icon-button (click)="resetAllFilters()">
       <mat-icon>filter_alt_off</mat-icon>
     </button>
+
+    <a
+      class="button"
+      href="https://www.sports.ru/fantasy/hockey/team/{{selectedUserId}}.html"
+      [hidden]="selectedUserId == null"
+      id="sports-account-button"
+      (click)="resetAllFilters()"
+      target="_blank"
+    >
+      <i class="sports-icon"></i>
+    </a>
   </div>
   <div style="display: flex">
     <div>
@@ -253,7 +264,9 @@
       <button
         class="clear-selected-players-button"
         mat-icon-button
-        [hidden]="firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0"
+        [hidden]="
+          firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0
+        "
         (click)="sendClearAllPlayerSelections.emit()"
       >
         <mat-icon>cancel</mat-icon>

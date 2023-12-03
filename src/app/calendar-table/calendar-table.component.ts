@@ -334,6 +334,10 @@ export class CalendarTableComponent implements OnChanges {
       let weekGames: GamePredictionDTO[] = games.filter(
         (game) => game.weekNumber == week
       );
+      let nextWeekGames: GamePredictionDTO[] = games.filter(
+        (game) => game.weekNumber == week + 1
+      );
+
       let thisWeekMinDate: Date = GamesUtils.getExtremumDateForGames(
         weekGames,
         false
@@ -342,10 +346,23 @@ export class CalendarTableComponent implements OnChanges {
         weekGames,
         true
       );
+      
+      let nextWeekMinDate: Date | undefined = nextWeekGames?.length > 0 ? GamesUtils.getExtremumDateForGames(
+        nextWeekGames,
+        false
+      ) : undefined;
+
+      let newThisWeekMaxDate = new Date();
+      newThisWeekMaxDate.setTime(thisWeekMaxDate.getTime())
+
+      if (nextWeekMinDate != null) {
+        let dateOffset: number = (24*60*60*1000); //1 day
+        newThisWeekMaxDate.setTime(nextWeekMinDate.getTime() - dateOffset);
+      }
 
       let weekDates: Date[] = Utils.getDatesInRange(
         thisWeekMinDate,
-        thisWeekMaxDate
+        newThisWeekMaxDate
       );
 
       allColumns.push({

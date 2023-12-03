@@ -25,6 +25,7 @@ import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/consta
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PlayersTableComponent } from './players-table/players-table.component';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
+import { PlayerChooseRecord } from './interfaces/player-choose-record';
 
 @Component({
   selector: 'app-root',
@@ -53,9 +54,15 @@ export class AppComponent implements OnChanges {
       return;
     }
 
-    this.squadPlayers.push(value);
-    this.squadPlayers.sort((a, b) => 
+    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find((x) => x.playerId == value.playerId);
+    if (matchedPlayer != null) {
+      matchedPlayer.isRemoved = false;
+    }
+    else {
+      this.squadPlayers.push(value);
+      this.squadPlayers.sort((a, b) => 
       DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price);
+    }
 
     this.squadPlayers  = Object.assign([], this.squadPlayers);
   }

@@ -24,6 +24,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   teamsFormControl = new FormControl<string[]>([]);
   powerPlayFormControl = new FormControl<string[]>([]);
   selectedUser: string | undefined = undefined;
+  selectedUserId: number | undefined = undefined;
 
   playersAreNotPlayedDisabled: boolean = true;
   hideLowGPPlayersEnabled: boolean = false;
@@ -91,6 +92,14 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   selectedUserChanged() {
     this.sendSelectedUser.emit(this.selectedUser!);
+
+    if (this.selectedUser == null) {
+      return;
+    }
+
+    this.selectedUserId = USER_ID_NAME.get(
+      this.selectedUser!
+    );
   }
 
   teamsChanged() {
