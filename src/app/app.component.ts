@@ -26,6 +26,7 @@ import { OfoVariant } from './interfaces/ofo-variant';
 import { PlayersTableComponent } from './players-table/players-table.component';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 import { PlayerChooseRecord } from './interfaces/player-choose-record';
+import { UpdateLogInformation } from './interfaces/update-log-information';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +43,7 @@ export class AppComponent implements OnChanges {
 
   public games: GamePredictionDTO[] = [];
   public teamStats: TeamStatsDTO[] = [];
+  public updateLogInfomation: UpdateLogInformation | undefined = undefined;
 
   public playerStats: PlayerStatsDTO[] = [];
   public squadPlayers: PlayerSquadRecord[] = [];
@@ -147,6 +149,7 @@ export class AppComponent implements OnChanges {
 
           this.teamStats = result.teamsStats;
           this.playerStats = result.playerStats;
+          this.updateLogInfomation = result.updateLogInformation;
           this.setUpFilters(setDefaultDates);
         },
         error: (err) => {

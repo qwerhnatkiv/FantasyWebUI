@@ -33,6 +33,14 @@
       <mat-datepicker #pickerTo></mat-datepicker>
     </mat-form-field>
   </div>
+  <div id="update-log-information">
+    <p>
+      Данные обновлены {{updateLogInfomation?.generalUpdateDate | date:"dd.MM.yyyy hh:mm"}}
+    </p>
+    <p>
+      Кэфы обновлены {{updateLogInfomation?.bookmakersUpdateDate | date:"dd.MM.yyyy hh:mm"}}
+    </p>
+  </div>
   <div id="external-links">
     <a
       mat-raised-button
