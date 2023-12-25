@@ -4,6 +4,7 @@ import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAM
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { RED_GP_UPPER_BOUNDARY } from '../../constants'
+import { MatOptionSelectionChange } from '@angular/material/core';
 
 @Component({
   selector: 'app-players-filters',
@@ -84,6 +85,26 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   positionsChanged() {
     this.sendPositions.emit(this.positionsFormControl.value!);
+  }
+
+  positionOnClick(event: MatOptionSelectionChange) {
+    if (event.source.value == DEFAULT_POSITIONS[0]) {
+      if (event.source.selected) {
+        const GK_Position: any[] = [
+          DEFAULT_POSITIONS[0]
+        ];
+  
+        this.positionsFormControl.setValue(GK_Position);
+        this.positionsChanged();
+        
+        this.playersAreNotPlayedDisabled = false;
+        this.playersAreNotPlayedDisabledChanged();
+      }
+      else {
+        this.playersAreNotPlayedDisabled = true;
+        this.playersAreNotPlayedDisabledChanged();
+      }
+    }
   }
 
   formLengthChanged(event: MatSelectChange) {

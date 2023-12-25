@@ -100,6 +100,7 @@
         <mat-option
           *ngFor="let position of selectPositions"
           [value]="position"
+          (onSelectionChange)="positionOnClick($event)"
           >{{ position }}</mat-option
         >
       </mat-select>
