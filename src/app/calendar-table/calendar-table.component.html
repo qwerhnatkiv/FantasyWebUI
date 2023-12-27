@@ -7,6 +7,16 @@
         [class.replaced-by-player]="
           element['team'].displayValue.includes('ОФО')
         "
+        [ngxTippy]="generateTeamCellToolTip(element['team'])"
+        tippyClassName="tooltip-general"
+        [tippyProps]="{
+          allowHTML: true,
+          placement: 'auto-end',
+          trigger: 'click',
+          hideOnClick: 'toggle',
+          maxWidth: 'none',
+          arrow: false
+        }"
       >
         <img
           [src]="
@@ -24,13 +34,14 @@
   </ng-container>
 
   <ng-container *ngFor="let column of columns" [cdkColumnDef]="column.header">
-    <th cdk-header-cell *cdkHeaderCellDef>
+    <th cdk-header-cell *cdkHeaderCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column)">
       {{ column.header }}
     </th>
     <td
       cdk-cell
       *cdkCellDef="let element"
       [ngClass]="getCellClass(element[column.header], column)"
+      [hidden]="showOnlyGamesCount && !isWeekColumn(column)"
     >
       <div
         class="calendar-cell"
@@ -70,7 +81,7 @@
         </div>
       </div>
     </td>
-    <td cdk-footer-cell *cdkFooterCellDef>
+    <td cdk-footer-cell *cdkFooterCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column)">
       {{ column.header }}
     </td>
   </ng-container>

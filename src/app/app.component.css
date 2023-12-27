@@ -12,7 +12,7 @@ footer {
   height: 100px;
 }
 
-.example-container {
+.calendar-container {
   max-width: 100%;
   width: 99%;
   overflow: auto;
@@ -21,21 +21,33 @@ footer {
 
 .hideCalendarButton {
   font-weight: 600;
-  line-height: 27px;
+  line-height: 45px;
   letter-spacing: 0em;
   text-align: center;
 
-  width: 205px;
-  height: 27px;
+  width: 135px;
+  height: 45px;
   background: #fef524;
 
+  margin-left: 10px;
+
   border-radius: 5px;
+}
 
-  position: absolute;
-  top: 67px;
-  left: 10px;
+.hideCalendarButton:hover {
+  background: #f4eb23;
+  cursor: pointer;
+}
 
-  z-index: 10;
+.button {
+  background: #fef524;
+  margin-left: 40px;
+  display: block;
+}
+
+.button:hover {
+  background: #f4eb23;
+  cursor: pointer;
 }
 
 .header-controls {

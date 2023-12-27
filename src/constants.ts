@@ -23,6 +23,9 @@ export const DEFAULT_FORM_LENGTH_COUNT = 12;
 export const RED_PIM_LOWER_BOUNDARY = 40;
 export const RED_GP_UPPER_BOUNDARY = 60;
 
+export const GREEN_TEAM_GF_BOUNDARY = 3.5;
+export const RED_TEAM_GA_BOUNDARY = 3;
+
 export const VERY_GREEN_WIN_LOWER_BOUNDARY = 59;
 export const GREEN_WIN_LOWER_BOUNDARY = 49;
 export const WHITE_WIN_LOWER_BOUNDARY = 32;

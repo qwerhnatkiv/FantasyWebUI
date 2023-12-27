@@ -1,5 +1,15 @@
 <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <div class="header-controls">
+  <div
+    class="hideCalendarButton"
+    (click)="this.isCalendarVisible = !this.isCalendarVisible"
+  >
+    Свернуть
+  </div>
+  <button class="button" mat-icon-button (click)="emitHideShowOnlyGamesCount()">
+    <mat-icon>calendar_view_month</mat-icon>
+  </button>
   <div class="calendar-filters">
     <mat-form-field>
       <mat-label>С: </mat-label>
@@ -35,10 +45,14 @@
   </div>
   <div id="update-log-information">
     <p>
-      Данные обновлены {{updateLogInfomation?.generalUpdateDate | date:"dd.MM.yyyy hh:mm"}}
+      Данные обновлены
+      {{ updateLogInfomation?.generalUpdateDate | date : "dd.MM.yyyy hh:mm" }}
     </p>
     <p>
-      Кэфы обновлены {{updateLogInfomation?.bookmakersUpdateDate | date:"dd.MM.yyyy hh:mm"}}
+      Кэфы обновлены
+      {{
+        updateLogInfomation?.bookmakersUpdateDate | date : "dd.MM.yyyy hh:mm"
+      }}
     </p>
   </div>
   <div id="external-links">
@@ -59,14 +73,7 @@
   </div>
 </div>
 
-<div
-  class="hideCalendarButton"
-  (click)="this.isCalendarVisible = !this.isCalendarVisible"
->
-  Свернуть
-</div>
-
-<section class="example-container" tabindex="0">
+<section class="calendar-container" tabindex="0">
   <app-calendar-table
     [minFilterDate]="minFilterDate"
     [maxFilterDate]="maxFilterDate"
@@ -75,6 +82,7 @@
     [teamStats]="teamStats"
     [selectedPlayers]="selectedPlayers"
     [teamPlayerExpectedOfoMap]="teamPlayerExpectedOfoMap"
+    [events]="hideShowOnlyGamesCount.asObservable()"
   ></app-calendar-table>
 </section>
 
@@ -117,7 +125,7 @@
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad
-      style="display: flex;"
+      style="display: flex"
       [squadPlayers]="squadPlayers"
       [balanceValue]="balanceValue"
       [substitutions]="substitutionsLeft"
