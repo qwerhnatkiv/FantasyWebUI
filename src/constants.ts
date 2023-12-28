@@ -36,6 +36,7 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["", 0],
   ["RaisingTheBar", 534753],
   ["A-N-O N-I-M", 534946],
+  ["o_kai", 536668],
   ["AntonovAC", 535080],
   ["Александр_Ронни", 534791],
   ["Regys", 536129],

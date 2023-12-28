@@ -92,6 +92,7 @@ export class AppComponent implements OnChanges {
   public _selectedUser: string | undefined = undefined;
   set selectedUser(value: string | undefined) {
     this._selectedUser = value;
+    this.squadPlayers = [];
     this.getUserSquad();
   }
 
