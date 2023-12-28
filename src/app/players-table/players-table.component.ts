@@ -19,9 +19,9 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PPToiPipe } from '../pipes/pptoi.pipe';
 import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
-import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { Utils } from '../common/utils';
 import {
+  DEFAULT_POSITIONS,
   GREEN_WIN_LOWER_BOUNDARY,
   RED_GP_UPPER_BOUNDARY,
   RED_PIM_LOWER_BOUNDARY,
@@ -40,7 +40,7 @@ import { PlayerSquadRecord } from '../interfaces/player-squad-record';
   selector: 'app-players-table',
   templateUrl: './players-table.component.html',
   styleUrls: ['./players-table.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayersTableComponent implements AfterViewInit, OnChanges {
   displayedColumns: string[] = [
@@ -113,10 +113,21 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     this._positionsInSquadAvailable = value;
   }
 
+  @Input() set areBestPlayersForEachTeamSelected(value: boolean) {
+    if (value) {
+      this.selectBestPlayersForEachTeamInCalendar();
+    }
+    else {
+      this.deselectAllPlayersInCalendar();
+    }
+  }
+
   public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
     string,
     SelectedPlayerModel[]
   >();
+
+
   @Output() sendSelectedPlayers: EventEmitter<
     Map<string, SelectedPlayerModel[]>
   > = new EventEmitter<Map<string, SelectedPlayerModel[]>>();
@@ -730,6 +741,19 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   //#endregion
 
   //#region Private methods
+
+  private selectBestPlayersForEachTeamInCalendar() {
+    for (let teamStat of this.teamStats) {
+      let teamPlayers: PlayerChooseRecord[] = 
+        this.players.filter((x) => x.teamObject.teamID == teamStat.teamID && x.position != DEFAULT_POSITIONS[0]);
+      
+      let bestTeamPlayer: PlayerChooseRecord = 
+        teamPlayers.sort((n1, n2) => +n2.expectedFantasyPoints - +n1.expectedFantasyPoints)[0];
+      
+      this.selectPlayerRow(bestTeamPlayer);
+
+    }
+  }
 
   private filter(record: PlayerChooseRecord, filter: string) {
     var map = new Map<string, any>(JSON.parse(filter));

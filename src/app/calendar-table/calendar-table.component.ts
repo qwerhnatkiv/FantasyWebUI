@@ -68,14 +68,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     SelectedPlayerModel[]
   >();
 
-  @Input() events: Observable<void> | undefined;
-
+  @Input() showOnlyGamesCountObservable: Observable<void> | undefined;
   private showOnlyGamesCountSubscription: Subscription | undefined;
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
 
   ngOnInit() {
-    this.showOnlyGamesCountSubscription = this.events?.subscribe(
+    this.showOnlyGamesCountSubscription = this.showOnlyGamesCountObservable?.subscribe(
       () => (this.showOnlyGamesCount = !this.showOnlyGamesCount)
     );
   }

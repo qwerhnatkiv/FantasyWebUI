@@ -27,7 +27,7 @@ import { PlayersTableComponent } from './players-table/players-table.component';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 import { PlayerChooseRecord } from './interfaces/player-choose-record';
 import { UpdateLogInformation } from './interfaces/update-log-information';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -52,10 +52,16 @@ export class AppComponent implements OnChanges {
   public substitutionsLeft: number = 0;
   public squadAvailableSlots: PositionsAvailableToPick | undefined;
 
-  public hideShowOnlyGamesCount: Subject<void> = new Subject<void>();
+  public hideShowOnlyGamesCountSubject: Subject<void> = new Subject<void>();
+
+  public areBestPlayersForEachTeamSelected: boolean = false;
 
   public emitHideShowOnlyGamesCount() {
-    this.hideShowOnlyGamesCount.next();
+    this.hideShowOnlyGamesCountSubject.next();
+  }
+
+  public emitSelectBestPlayersForEachTeam() {
+    this.areBestPlayersForEachTeamSelected = !this.areBestPlayersForEachTeamSelected;
   }
 
   set addedToSquadPlayer(value: PlayerSquadRecord) {

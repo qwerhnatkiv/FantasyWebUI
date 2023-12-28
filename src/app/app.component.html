@@ -10,6 +10,9 @@
   <button class="button" mat-icon-button (click)="emitHideShowOnlyGamesCount()">
     <mat-icon>calendar_view_month</mat-icon>
   </button>
+  <button class="button" mat-icon-button (click)="emitSelectBestPlayersForEachTeam()">
+    <mat-icon> {{ areBestPlayersForEachTeamSelected ? "person_add_disabled" : "person_add" }}</mat-icon>
+  </button>
   <div class="calendar-filters">
     <mat-form-field>
       <mat-label>С: </mat-label>
@@ -82,7 +85,7 @@
     [teamStats]="teamStats"
     [selectedPlayers]="selectedPlayers"
     [teamPlayerExpectedOfoMap]="teamPlayerExpectedOfoMap"
-    [events]="hideShowOnlyGamesCount.asObservable()"
+    [showOnlyGamesCountObservable]="hideShowOnlyGamesCountSubject.asObservable()"
   ></app-calendar-table>
 </section>
 
@@ -122,6 +125,7 @@
     [minFilterDate]="minFilterDate"
     [maxFilterDate]="maxFilterDate"
     [positionsInSquadAvailable]="squadAvailableSlots!"
+    [areBestPlayersForEachTeamSelected]="areBestPlayersForEachTeamSelected"
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad
