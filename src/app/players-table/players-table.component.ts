@@ -753,6 +753,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       if (bestTeamPlayer.gamesCount == 0) {
         continue;
       }
+      
 
       this.selectPlayerRow(bestTeamPlayer);
 
