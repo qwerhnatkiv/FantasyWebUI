@@ -750,6 +750,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       let bestTeamPlayer: PlayerChooseRecord = 
         teamPlayers.sort((n1, n2) => +n2.expectedFantasyPoints - +n1.expectedFantasyPoints)[0];
       
+      if (bestTeamPlayer.gamesCount == 0) {
+        continue;
+      }
+
       this.selectPlayerRow(bestTeamPlayer);
 
     }
