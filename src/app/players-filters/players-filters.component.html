@@ -1,6 +1,6 @@
 <div class="player-filters-block">
   <div class="filters-row">
-    <label class="filter-label">Цена от:</label>
+    <label class="filter-label">Price from:</label>
     <mat-form-field class="filter-form">
       <mat-label>Price</mat-label>
       <mat-select
@@ -22,7 +22,7 @@
     >
       <mat-icon>cancel</mat-icon>
     </button>
-    <label class="filter-label" style="margin-left: 5px">до:</label>
+    <label class="filter-label" style="margin-left: 5px">to:</label>
     <mat-form-field class="filter-form">
       <mat-label>Price</mat-label>
       <mat-select
@@ -51,7 +51,7 @@
 
     <div class="vl"></div>
 
-    <label class="filter-label" style="margin-left: 10px">Команды:</label>
+    <label class="filter-label" style="margin-left: 10px">Teams:</label>
     <mat-form-field class="wider-filter-form">
       <mat-label>Teams</mat-label>
       <mat-select
@@ -89,7 +89,7 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label" style="margin-left: 10px">Позиции:</label>
+    <label class="filter-label" style="margin-left: 10px">Pos:</label>
     <mat-form-field class="filter-form">
       <mat-label>Positions</mat-label>
       <mat-select
@@ -117,7 +117,7 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label" style="margin-left: 10px">ПП:</label>
+    <label class="filter-label" style="margin-left: 10px">PP:</label>
     <mat-form-field class="filter-form">
       <mat-label>PP</mat-label>
       <mat-select
@@ -141,9 +141,9 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label">Длина формы:</label>
+    <label class="filter-label">Form length:</label>
     <mat-form-field class="filter-form">
-      <mat-label>Форма: </mat-label>
+      <mat-label>Form: </mat-label>
       <mat-select
         [(value)]="formLength"
         (selectionChange)="formLengthChanged($event)"
@@ -156,7 +156,7 @@
       </mat-select>
     </mat-form-field>
 
-    <label class="filter-label" style="margin-left: auto">УЗ:</label>
+    <label class="filter-label" style="margin-left: auto">Squad:</label>
     <mat-form-field class="the-widest-filter-form">
       <mat-label>User</mat-label>
       <mat-select
@@ -193,10 +193,10 @@
         <table class="choice-table">
           <thead>
             <tr>
-              <th>Вариант 1:</th>
-              <th>Цена</th>
-              <th>ОФО</th>
-              <th>Ц/ОФО</th>
+              <th>Choice 1:</th>
+              <th>Price</th>
+              <th>EFP</th>
+              <th>P/EFP</th>
             </tr>
           </thead>
           <tbody>
@@ -229,10 +229,10 @@
         <table class="choice-table">
           <thead>
             <tr>
-              <th>Вариант 2:</th>
-              <th>Цена</th>
-              <th>ОФО</th>
-              <th>Ц/ОФО</th>
+              <th>Choice 2:</th>
+              <th>Price</th>
+              <th>EFP</th>
+              <th>P/EFP</th>
             </tr>
           </thead>
           <tbody>
@@ -275,14 +275,13 @@
       <mat-checkbox
         [(ngModel)]="playersAreNotPlayedDisabled"
         (change)="playersAreNotPlayedDisabledChanged()"
-        >Скрыть игроков без игр в {{ formLength }}
-        {{ formLength != 1 ? "последних матчах" : "последнем матче" }}
+        >Hide players that have not played in last {{ formLength }} games
       </mat-checkbox>
       <br />
       <mat-checkbox
         [(ngModel)]="hideLowGPPlayersEnabled"
         (change)="hideLowGPPlayersEnabledChanged()"
-        >Скрыть игроков с менее {{ RED_GP_UPPER_BOUNDARY }} прогнозных GP
+        >Hide players with less than {{ RED_GP_UPPER_BOUNDARY }} forecast GP
       </mat-checkbox>
     </div>
   </div>

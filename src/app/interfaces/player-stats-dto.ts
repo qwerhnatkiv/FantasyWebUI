@@ -2,6 +2,7 @@ export interface PlayerStatsDTO {
     playerID: number
     playerIdSports: number
     playerName: string
+    playerNameEng: string;
     teamID: number
     position: string
     price: number

@@ -6,7 +6,7 @@ export const DEFAULT_PRICES = [
 ];
 
 export const DEFAULT_POSITIONS = [
-  'В', 'З', 'Н'
+  'GK', 'DF', 'FW'
 ]
 
 export const DEFAULT_SUBSTITUTION_VALUE = 5;
@@ -30,7 +30,7 @@ export const VERY_GREEN_WIN_LOWER_BOUNDARY = 59;
 export const GREEN_WIN_LOWER_BOUNDARY = 49;
 export const WHITE_WIN_LOWER_BOUNDARY = 32;
 
-export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
+export const POWER_PLAY_UNITS = ['none', 'PP1', 'PP2']
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["", 0],
@@ -38,7 +38,7 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["A-N-O N-I-M", 534946],
   ["o_kai", 536668],
   ["AntonovAC", 535080],
-  ["Александр_Ронни", 534791],
+  //["Александр_Ронни", 534791],
   ["Regys", 536129],
   ["Wolski", 534799],
   ['graf_007', 535451]
