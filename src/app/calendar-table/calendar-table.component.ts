@@ -118,7 +118,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
         }
 
-        rowToReplace.team.displayValue = value[0].playerName + ' (EFP)';
+        rowToReplace.team.displayValue = value[0].playerName + ' (ОФО)';
         for (let game of value) {
           let gameDateStr: string = this.datepipe.transform(
             game.gameDate,
@@ -299,7 +299,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
     return (
-      element['team'].displayValue.includes('EFP') &&
+      element['team'].displayValue.includes('ОФО') &&
       cell.game != null &&
       !isNaN(+cell.displayValue)
     );
@@ -422,10 +422,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     let homeTeamWinChance: string = `<span style="color:${homeTeamColor}">${
       game.homeTeamAcronym
-    }: Win ${Math.round(game.homeTeamWinChance)}%</span>`;
+    }: Победа ${Math.round(game.homeTeamWinChance)}%</span>`;
     let awayTeamWinChance: string = `<span style="color:${awayTeamColor}">${
       game.awayTeamAcronym
-    }: Win ${Math.round(game.awayTeamWinChance)}%</span>`;
+    }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
 
     let playersMap: PlayerExpectedFantasyPointsInfo[] =
       this.teamPlayerExpectedOfoMap
@@ -434,11 +434,11 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     let playersToolTip: string = '';
 
     if (playersMap != null && playersMap.length > 0) {
-      playersToolTip += '<br>Best picks: <br>';
+      playersToolTip += '<br>Лучшие пики: <br>';
       playersMap.forEach((x) => {
         playersToolTip += `${x.playerName} (${x.price}), ${
           x.powerPlayNumber
-        }, ${x.playerExpectedFantasyPoints.toFixed(0)} EFP <br>`;
+        }, ${x.playerExpectedFantasyPoints.toFixed(0)} ОФО <br>`;
       });
     }
 

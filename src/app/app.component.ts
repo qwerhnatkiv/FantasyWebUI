@@ -21,7 +21,7 @@ import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
-import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, DEFAULT_POSITIONS_MAP, USER_ID_NAME } from 'src/constants';
+import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PlayersTableComponent } from './players-table/players-table.component';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
@@ -366,8 +366,8 @@ export class AppComponent implements OnChanges {
 
             this.squadPlayers.push({
               playerId: matchingPlayerInfo.playerID,
-              playerName: matchingPlayerInfo.playerNameEng,
-              position: DEFAULT_POSITIONS_MAP.get(matchingPlayerInfo.position)!,
+              playerName: matchingPlayerInfo.playerName,
+              position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
               games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
               expectedFantasyPoints: ofo,
@@ -390,8 +390,8 @@ export class AppComponent implements OnChanges {
 
             this.squadPlayers.push({
               playerId: matchingPlayerInfo.playerID,
-              playerName: matchingPlayerInfo.playerNameEng,
-              position: DEFAULT_POSITIONS_MAP.get(matchingPlayerInfo.position)!,
+              playerName: matchingPlayerInfo.playerName,
+              position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
               games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
               expectedFantasyPoints: ofo,
@@ -437,11 +437,11 @@ export class AppComponent implements OnChanges {
       }
   
       let powerPlayInfo: string = playerStat.formPowerPlayNumber > 0
-            ? `PP${playerStat.formPowerPlayNumber}`
-            : 'none'
+            ? `ПП${playerStat.formPowerPlayNumber}`
+            : 'нет'
   
       let modelInfo: PlayerExpectedFantasyPointsInfo = {
-        playerName: playerStat.playerNameEng,
+        playerName: playerStat.playerName,
         playerExpectedFantasyPoints: playerOfoSum,
         price: playerStat.price,
         powerPlayNumber: powerPlayInfo,

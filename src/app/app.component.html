@@ -5,7 +5,7 @@
     class="hideCalendarButton"
     (click)="this.isCalendarVisible = !this.isCalendarVisible"
   >
-    {{ this.isCalendarVisible ? "Hide" : "Show" }}
+    Свернуть
   </div>
   <button class="button" mat-icon-button (click)="emitHideShowOnlyGamesCount()">
     <mat-icon>calendar_view_month</mat-icon>
@@ -15,7 +15,7 @@
   </button>
   <div class="calendar-filters">
     <mat-form-field>
-      <mat-label>From: </mat-label>
+      <mat-label>С: </mat-label>
       <input
         matInput
         [matDatepicker]="pickerFrom"
@@ -31,7 +31,7 @@
     </mat-form-field>
 
     <mat-form-field>
-      <mat-label>To: </mat-label>
+      <mat-label>По: </mat-label>
       <input
         matInput
         [matDatepicker]="pickerTo"
@@ -48,11 +48,11 @@
   </div>
   <div id="update-log-information">
     <p>
-      Data updated:
+      Данные обновлены
       {{ updateLogInfomation?.generalUpdateDate | date : "dd.MM.yyyy HH:mm" }}
     </p>
     <p>
-      Coefs updated:
+      Кэфы обновлены
       {{
         updateLogInfomation?.bookmakersUpdateDate | date : "dd.MM.yyyy HH:mm"
       }}
@@ -71,7 +71,7 @@
       color="primary"
       href="https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit"
       target="_blank"
-      >Knowledge base</a
+      >База знаний</a
     >
   </div>
 </div>

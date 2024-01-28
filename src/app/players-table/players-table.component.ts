@@ -22,7 +22,6 @@ import { TeamGameInformation } from '../interfaces/team-game-information';
 import { Utils } from '../common/utils';
 import {
   DEFAULT_POSITIONS,
-  DEFAULT_POSITIONS_MAP,
   GREEN_WIN_LOWER_BOUNDARY,
   RED_GP_UPPER_BOUNDARY,
   RED_PIM_LOWER_BOUNDARY,
@@ -164,9 +163,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         this.players.push({
           firstChoice: false,
           secondChoice: false,
-          playerName: player.playerNameEng,
+          playerName: player.playerName,
           team: matchingTeam.teamAcronym,
-          position: DEFAULT_POSITIONS_MAP.get(player.position)!,
+          position: player.position,
           price: player.price,
           gamesCount: this.filteredTeamGames.get(player.teamID)?.length!,
           b2bGamesCount: 0,
@@ -179,8 +178,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           ),
           powerPlayNumber:
             player.formPowerPlayNumber > 0
-              ? `PP${player.formPowerPlayNumber}`
-              : 'none',
+              ? `ПП${player.formPowerPlayNumber}`
+              : 'нет',
           toi: player.formTOI,
           shotsOnGoal: player.formShotsOnGoal,
           iXG: Math.round(player.formIxG * 100) / 100,
@@ -292,8 +291,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
     let playerSquadRecord: PlayerSquadRecord = {
       playerId: player.playerObject.playerID,
-      playerName: player.playerObject.playerNameEng,
-      position: DEFAULT_POSITIONS_MAP.get(player.playerObject.position)!,
+      playerName: player.playerObject.playerName,
+      position: player.playerObject.position,
       price: player.playerObject.price,
       games: player.gamesCount,
       expectedFantasyPoints: +player.expectedFantasyPoints,
@@ -308,11 +307,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     return (
       (this.positionsInSquadAvailable == null) ||
       (this.positionsInSquadAvailable?.defendersAvailable == 0 &&
-        player.position == DEFAULT_POSITIONS[1]) ||
+        player.position == 'З') ||
       (this.positionsInSquadAvailable?.forwardsAvailable == 0 &&
-        player.position == DEFAULT_POSITIONS[2]) ||
+        player.position == 'Н') ||
       (this.positionsInSquadAvailable?.goaliesAvailable == 0 &&
-        player.position == DEFAULT_POSITIONS[0]) ||
+        player.position == 'В') ||
       (this.positionsInSquadAvailable?.selectedPlayerIds.length! > 0 &&
         this.positionsInSquadAvailable?.selectedPlayerIds.indexOf(
           player.playerObject.playerID
@@ -478,7 +477,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         : '#ff7e7e';
 
     let forecast: string = `
-    <div>Season forecast:<div>
+    <div>Прогноз на сезон:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
@@ -524,7 +523,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     `;
 
     let form: string = `
-    <div>Form:<div>
+    <div>Форма:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
@@ -533,7 +532,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
           <th>A</th>
           <th>PIM</th>
           <th>+-</th>
-          <th>PP</th>
+          <th>ПП</th>
         </tr>
       </thead>
       <tbody>
@@ -562,12 +561,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     `;
 
     let teamForm: string = `
-    <div>Team form:<div>
+    <div>Форма команды:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Pts</th>
-          <th>AvgGoals</th>
+          <th>%Очк</th>
+          <th>СрЗаб</th>
         </tr>
       </thead>
       <tbody>
@@ -603,15 +602,15 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
 
     let opponentInfo: string = `
-    <div>Next opponent: ${opponentAcronym}, <span style="color:${teamWinColor}">Win: ${Math.round(
+    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
       teamGame?.winChance!
     )}%</span><div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Pts</th>
-          <th>AvgGoals</th>
-          <th> Player EFP</th>
+          <th>%Очк</th>
+          <th>СрЗаб</th>
+          <th> ОФО Игрока</th>
         </tr>
       </thead>
       <tbody>
@@ -678,7 +677,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
         this.selectedPlayers.set(
           matchingTeamName,
           matchingPlayersInfo?.map((x) => ({
-            playerName: player.playerObject.playerNameEng,
+            playerName: player.playerObject.playerName,
             playerID: player.playerObject.playerID,
             playerExpectedFantasyPoints: this.numberPipe.transform(
               x.playerExpectedFantasyPoints,
@@ -698,7 +697,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       this.selectedPlayers.set(
         matchingTeamName,
         matchingPlayersInfo?.map((x) => ({
-          playerName: player.playerObject.playerNameEng,
+          playerName: player.playerObject.playerName,
           playerID: player.playerObject.playerID,
           playerExpectedFantasyPoints: this.numberPipe.transform(
             x.playerExpectedFantasyPoints,

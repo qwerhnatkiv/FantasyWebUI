@@ -86,7 +86,7 @@
         mat-sort-header
         sortActionDescription="Sort by playerName"
       >
-        Player
+        Игрок
       </th>
       <td
         mat-cell
@@ -111,7 +111,7 @@
         mat-sort-header
         sortActionDescription="Sort by team"
       >
-        Team
+        Ком
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.team }}
@@ -125,7 +125,7 @@
         mat-sort-header
         sortActionDescription="Sort by position"
       >
-        Pos
+        Поз
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.position }}
@@ -139,7 +139,7 @@
         mat-sort-header
         sortActionDescription="Sort by price"
       >
-        Price
+        Цена
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.price }}
@@ -153,7 +153,7 @@
         mat-sort-header
         sortActionDescription="Sort by gamesCount"
       >
-        {{ isSelectedOnlyGoalies() ? "G (B2B)" : "G" }}
+        {{ isSelectedOnlyGoalies() ? "Игр (Б2Б)" : "Игр" }}
       </th>
       <td mat-cell *matCellDef="let element">
         {{
@@ -171,7 +171,7 @@
         mat-sort-header
         sortActionDescription="Sort by easyGamesCount"
       >
-        {{ isSelectedOnlyGoalies() ? "EG (B2B)" : "EG" }}
+        {{ isSelectedOnlyGoalies() ? "ЛИ (Б2Б)" : "ЛИ" }}
       </th>
       <td mat-cell *matCellDef="let element">
         {{
@@ -189,7 +189,7 @@
         mat-sort-header
         sortActionDescription="Sort by winPercentage"
       >
-        %Pts
+        %Очк
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.winPercentage }}
@@ -204,7 +204,7 @@
         sortActionDescription="Sort by powerPlayTime"
         [hidden]="isSelectedOnlyGoalies()"
       >
-        PP Time
+        ВвБ
       </th>
       <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
         {{ element.powerPlayTime }}
@@ -219,7 +219,7 @@
         sortActionDescription="Sort by powerPlayNumber"
         [hidden]="isSelectedOnlyGoalies()"
       >
-        PP
+        ПП
       </th>
       <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
         {{ element.powerPlayNumber }}
@@ -249,7 +249,7 @@
         sortActionDescription="Sort by shotsOnGoal"
         [hidden]="isSelectedOnlyGoalies()"
       >
-        Sh
+        БВ
       </th>
       <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
         {{ element.shotsOnGoal }}
@@ -308,7 +308,7 @@
         mat-sort-header
         sortActionDescription="Sort by expectedFantasyPoints"
       >
-        EFP
+        ОФО
       </th>
       <td mat-cell *matCellDef="let element" class="bold">
         {{ element.expectedFantasyPoints }}
@@ -322,7 +322,7 @@
         mat-sort-header
         sortActionDescription="Sort by fantasyPointsPerGame"
       >
-        EPPG
+        ОФПГ
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.fantasyPointsPerGame }}
@@ -336,7 +336,7 @@
         mat-sort-header
         sortActionDescription="Sort by priceByExpectedFantasyPoints"
       >
-        P/EFP
+        Ц/ОФО
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.priceByExpectedFantasyPoints | number : "1.0-1" }}
@@ -350,7 +350,7 @@
         mat-sort-header
         sortActionDescription="Sort by priceByExpectedFantasyPointsPerGame"
       >
-        P/EPPG
+        Ц/ОФПГ
       </th>
       <td mat-cell *matCellDef="let element">
         {{ element.priceByExpectedFantasyPointsPerGame | number : "1.0-1" }}
@@ -364,7 +364,7 @@
         mat-sort-header
         sortActionDescription="Sort by sources"
       >
-        Sources
+        Источники
       </th>
       <td mat-cell *matCellDef="let element" class="right-column">
         {{ element.forecastSources }}
