@@ -51,7 +51,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public teamNameLogoPathMap: any = TEAM_NAME_LOGO_PATH_MAP;
   public showOnlyGamesCount: boolean = false;
-
+  
+  @Input() showFullCalendar: boolean = false;
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
   @Input() isCalendarVisible: boolean = false;
@@ -72,11 +73,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private showOnlyGamesCountSubscription: Subscription | undefined;
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
+  private yesterdayDate: Date = new Date();
 
   ngOnInit() {
     this.showOnlyGamesCountSubscription = this.showOnlyGamesCountObservable?.subscribe(
       () => (this.showOnlyGamesCount = !this.showOnlyGamesCount)
     );
+    this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
   }
 
   ngOnDestroy() {
@@ -238,7 +241,17 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public getCellClass(cell: TableCell, column: TableColumn) {
-    let classStatement: string =
+    if (this.isOldDate(column)) {
+      let className = 'calendar-cell-old';
+
+      if (cell.weekGames! <= 1) {
+        className += ' strike';
+      }
+
+      return className;
+    }
+
+    let classStatement: string = 
       this.minFilterDate != null &&
       this.maxFilterDate != null &&
       column.columnDef != null &&
@@ -274,6 +287,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       return 'calendar-cell-week';
     }
 
+    if (cell.game?.isOldGame) {
+      return 'calendar-cell-old-content';
+    }
+
     if (numericValue < 0) {
       return 'calendar-cell-empty';
     }
@@ -295,6 +312,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public isWeekColumn(column: TableColumn): boolean {
     return column.header.includes('w');
+  }
+
+  public isOldDate(column: TableColumn): boolean {
+    return column.columnDef?.getTime()! < this.yesterdayDate.getTime();
   }
 
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
@@ -516,7 +537,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       );
 
       allColumns.push({
-        columnDef: undefined,
+        columnDef: thisWeekMinDate,
         header: `w${week}`,
       });
 

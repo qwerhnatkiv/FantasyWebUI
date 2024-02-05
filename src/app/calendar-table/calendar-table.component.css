@@ -70,6 +70,21 @@ td:nth-child(1) {
   background: #dfdfdf;
 }
 
+.calendar-cell-old {
+  background: white;
+  background-image: radial-gradient(black #9C9C9C, transparent 0);
+  background-size: 40px 40px;
+  background-position: -19px -19px;
+
+  background: repeating-linear-gradient(
+    45deg,
+    #adadad,
+    #adadad 10px,
+    #9C9C9C 10px,
+    #9C9C9C 20px
+  );
+}
+
 .calendar-cell {
   font-weight: 600;
   width: 70px;
@@ -86,6 +101,11 @@ td:nth-child(1) {
   display:flex;
   align-items: center;
   justify-content: space-around;
+}
+
+.calendar-cell-old-content {
+  background: black;
+  color: white;
 }
 
 .calendar-cell-not-selected > .calendar-cell-empty {
@@ -152,6 +172,17 @@ td:nth-child(1) {
     #fef524 40%,
     #ff7e7e 40%,
     #ff7e7e 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-old-content:hover {
+  background: linear-gradient(
+    to top,
+    #606060 0%,
+    #606060 40%,
+    black 40%,
+    black 100%
   );
   border-radius: 10px 10px 0 0;
 }

@@ -34,14 +34,14 @@
   </ng-container>
 
   <ng-container *ngFor="let column of columns" [cdkColumnDef]="column.header">
-    <th cdk-header-cell *cdkHeaderCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column)">
+    <th cdk-header-cell *cdkHeaderCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column) || !showFullCalendar && isOldDate(column)">
       {{ column.header }}
     </th>
     <td
       cdk-cell
       *cdkCellDef="let element"
       [ngClass]="getCellClass(element[column.header], column)"
-      [hidden]="showOnlyGamesCount && !isWeekColumn(column)"
+      [hidden]="showOnlyGamesCount && !isWeekColumn(column) || !showFullCalendar && isOldDate(column)"
     >
       <div
         class="calendar-cell"
@@ -81,7 +81,8 @@
         </div>
       </div>
     </td>
-    <td cdk-footer-cell *cdkFooterCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column)">
+    <td cdk-footer-cell *cdkFooterCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column) || 
+                                                    !showFullCalendar && isOldDate(column)">
       {{ column.header }}
     </td>
   </ng-container>

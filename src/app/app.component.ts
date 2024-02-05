@@ -23,11 +23,9 @@ import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
-import { PlayersTableComponent } from './players-table/players-table.component';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
-import { PlayerChooseRecord } from './interfaces/player-choose-record';
 import { UpdateLogInformation } from './interfaces/update-log-information';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -55,6 +53,11 @@ export class AppComponent implements OnChanges {
   public hideShowOnlyGamesCountSubject: Subject<void> = new Subject<void>();
 
   public areBestPlayersForEachTeamSelected: boolean = false;
+  public showFullCalendar: boolean = false;
+
+  public emitHideShowFullCalendar() {
+    this.showFullCalendar = !this.showFullCalendar;
+  }
 
   public emitHideShowOnlyGamesCount() {
     this.hideShowOnlyGamesCountSubject.next();
@@ -175,12 +178,18 @@ export class AppComponent implements OnChanges {
 
   private setUpFilters(setDefaultDates: boolean) {
     let weeks: number[] = this.games
-      ?.map((x) => x.weekNumber)
+        ?.map((x) => x.weekNumber)
+        .filter(Utils.onlyUnique)
+        .sort((n1, n2) => n1 - n2);
+
+    let upcomingWeeks: number[] = this.games
+      ?.filter((x) => !x.isOldGame)
+      .map((x) => x.weekNumber)
       .filter(Utils.onlyUnique)
       .sort((n1, n2) => n1 - n2);
 
     if (setDefaultDates) {
-      this.setFiltersDefaultDates(weeks, this.games);
+      this.setFiltersDefaultDates(upcomingWeeks, this.games.filter((x) => !x.isOldGame));
     }
     this.updateFilteredTeamsGamesMap();
     this.setOfoDataForPlayers();
@@ -203,7 +212,6 @@ export class AppComponent implements OnChanges {
     games: GamePredictionDTO[]
   ): void {
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
-    let today = new Date();
     this.minFilterDate = new Date(minDate.getTime());
     // minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
 

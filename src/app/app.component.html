@@ -7,6 +7,9 @@
   >
     Свернуть
   </div>
+  <button class="button" mat-icon-button (click)="emitHideShowFullCalendar()">
+    <mat-icon>calendar_month</mat-icon>
+  </button>
   <button class="button" mat-icon-button (click)="emitHideShowOnlyGamesCount()">
     <mat-icon>calendar_view_month</mat-icon>
   </button>
@@ -86,6 +89,7 @@
     [selectedPlayers]="selectedPlayers"
     [teamPlayerExpectedOfoMap]="teamPlayerExpectedOfoMap"
     [showOnlyGamesCountObservable]="hideShowOnlyGamesCountSubject.asObservable()"
+    [showFullCalendar]="showFullCalendar"
   ></app-calendar-table>
 </section>
 
