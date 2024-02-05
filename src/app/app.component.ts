@@ -56,7 +56,7 @@ export class AppComponent implements OnChanges {
   public showFullCalendar: boolean = false;
 
   public emitHideShowFullCalendar() {
-    this.showFullCalendar = !this.showFullCalendar;
+    this.showFullCalendar = !this.showFullCalendar; 
   }
 
   public emitHideShowOnlyGamesCount() {
