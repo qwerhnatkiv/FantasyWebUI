@@ -13,4 +13,6 @@ export interface GamePredictionDTO {
   gameId: number;
   isFromBookmakers: boolean;
   isOldGame: boolean;
+  homeTeamGoals: number | null;
+  awayTeamGoals: number | null;
 }

@@ -476,6 +476,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     ${playersToolTip}
     `;
 
+    if (game.isOldGame) {
+      generatedTooltip += `<br>${homeTeamStats.teamAcronym} ${game.homeTeamGoals}:${game.awayTeamGoals} ${awayTeamStats.teamAcronym}`
+    }
+
     return generatedTooltip;
   }
 
@@ -526,8 +530,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       let newThisWeekMaxDate = new Date();
       newThisWeekMaxDate.setTime(thisWeekMaxDate.getTime());
 
+      let dateOffset: number = 24 * 60 * 60 * 1000; //1 day
       if (nextWeekMinDate != null) {
-        let dateOffset: number = 24 * 60 * 60 * 1000; //1 day
         newThisWeekMaxDate.setTime(nextWeekMinDate.getTime() - dateOffset);
       }
 
@@ -537,7 +541,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       );
 
       allColumns.push({
-        columnDef: thisWeekMinDate,
+        columnDef: thisWeekMaxDate,
         header: `w${week}`,
       });
 
