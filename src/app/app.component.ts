@@ -71,7 +71,6 @@ export class AppComponent implements OnChanges {
     if (this.squadPlayers.length <= 0) {
       return;
     }
-
     let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find((x) => x.playerId == value.playerId);
     if (matchedPlayer != null) {
       matchedPlayer.isRemoved = false;

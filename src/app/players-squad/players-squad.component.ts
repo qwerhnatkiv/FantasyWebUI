@@ -36,7 +36,7 @@ export class PlayersSquadComponent {
   get squadPlayers(): PlayerSquadRecord[] {
     return this._squadPlayers;
   }
-  @Input() set squadPlayers(value: PlayerSquadRecord[]) {
+  @Input('squadPlayers') set squadPlayers(value: PlayerSquadRecord[]) {
     this._squadPlayers = value;
     this.dataSource = new MatTableDataSource(this.squadPlayers);
 
@@ -46,6 +46,8 @@ export class PlayersSquadComponent {
       ? this.substitutionsValue 
       : this.substitutionsValue - this._squadPlayers.filter((x) => x.isNew).length;
   }
+
+  @Output('squadPlayersChange') squadPlayersChange:EventEmitter<PlayerSquadRecord[]> = new EventEmitter<PlayerSquadRecord[]>();
 
   public dataSource = new MatTableDataSource(this.squadPlayers);
 
@@ -125,12 +127,13 @@ export class PlayersSquadComponent {
 
     row.isRemoved = !row.isRemoved;
     this.sendAvailableSlots.emit(this.getAvailableSlots());
+    this.squadPlayersChange.emit(this.squadPlayers);
   }
 
   public clearAllSquadChanges() {
     this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
-
     this.squadPlayers.filter((x) => x.isRemoved).forEach((x) => x.isRemoved = false);
+
     this.sendAvailableSlots.emit(this.getAvailableSlots());
   }
 
