@@ -208,6 +208,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             (game) =>
               (game.homeTeamName == teamName ||
                 game.awayTeamName == teamName) &&
+                !game.isOldGame &&
               `w${game.weekNumber}` === column.header
           ).length;
 
@@ -566,7 +567,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         let gamesCount = games.filter(
           (game) =>
             game.weekNumber === week &&
-            (team == game.homeTeamName || team == game.awayTeamName)
+            (team == game.homeTeamName || team == game.awayTeamName) && !game.isOldGame
         ).length;
 
         if (gamesCount <= 1) {

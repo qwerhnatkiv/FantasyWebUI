@@ -176,11 +176,6 @@ export class AppComponent implements OnChanges {
   }
 
   private setUpFilters(setDefaultDates: boolean) {
-    let weeks: number[] = this.games
-        ?.map((x) => x.weekNumber)
-        .filter(Utils.onlyUnique)
-        .sort((n1, n2) => n1 - n2);
-
     let upcomingWeeks: number[] = this.games
       ?.filter((x) => !x.isOldGame)
       .map((x) => x.weekNumber)
@@ -231,10 +226,13 @@ export class AppComponent implements OnChanges {
         thisWeekMinDate.getTime() <= this.minFilterDate?.getTime()! &&
         thisWeekMaxDate.getTime() >= this.minFilterDate?.getTime()!
       ) {
-        this.maxFilterDate = GamesUtils.getExtremumDateForGames(
+        let nextWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
           games.filter((game) => game.weekNumber == week + 1),
           true
         );
+
+        let today: Date = new Date();
+        this.maxFilterDate = today.getDay() != 0 ? thisWeekMaxDate : nextWeekMaxDate;
       }
     });
   }
