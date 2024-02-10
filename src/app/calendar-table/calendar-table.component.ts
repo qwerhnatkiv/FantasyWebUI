@@ -208,12 +208,19 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             (game) =>
               (game.homeTeamName == teamName ||
                 game.awayTeamName == teamName) &&
-                !game.isOldGame &&
+              `w${game.weekNumber}` === column.header
+          ).length;
+
+          let gamesForWeekCountCutted: number = games.filter(
+            (game) =>
+              (game.homeTeamName == teamName ||
+                game.awayTeamName == teamName) &&
+                !game.isOldGame && 
               `w${game.weekNumber}` === column.header
           ).length;
 
           teamSpecificRow.push(
-            new TableCell(gamesForWeekCount.toString(), gamesForWeekCount)
+            new TableCell(gamesForWeekCountCutted.toString(), gamesForWeekCount, gamesForWeekCount, undefined, true)
           );
           currentWeekName = column.header;
           continue;
@@ -245,10 +252,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     if (this.isOldDate(column)) {
       let className = 'calendar-cell-old';
 
-      if (cell.weekGames! <= 1) {
-        className += ' strike';
-      }
-
       return className;
     }
 
@@ -261,7 +264,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         ? 'calendar-cell-selected'
         : 'calendar-cell-not-selected';
 
-    if (cell.weekGames! <= 1) {
+    if (cell.weekGames! <= 1 && !cell.isWeekCell) {
       classStatement += ' strike';
     }
 
@@ -275,7 +278,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     if (
       cell.displayValue != '' &&
       !isNaN(+cell.displayValue) &&
-      cell.game == null
+      cell.isWeekCell
     ) {
       if (cell.cellValue > 3) {
         return 'calendar-cell-week-green';

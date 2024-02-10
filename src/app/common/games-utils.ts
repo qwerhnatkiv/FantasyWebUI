@@ -1,4 +1,4 @@
-import { GREEN_WIN_LOWER_BOUNDARY } from 'src/constants';
+import { GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { TeamGameInformation } from '../interfaces/team-game-information';
 
@@ -60,6 +60,22 @@ export module GamesUtils {
     return b2bCounter;
   }
 
+  export function getTooltipWinChanceSectionClass(winChance: number) {
+    if (winChance >= VERY_GREEN_WIN_LOWER_BOUNDARY) {
+      return '#00AA30';
+    }
+
+    if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
+      return '#64ff8f';
+    }
+
+    if (winChance >= WHITE_WIN_LOWER_BOUNDARY) {
+      return 'white';
+    }
+
+    return '#ff7e7e';
+  }
+
   export function getB2BEasyGamesCount(
     teamGames: TeamGameInformation[]
   ): number {
@@ -98,5 +114,11 @@ export module GamesUtils {
     }
 
     return b2bCounter;
+  }
+
+  export function GetPPText(ppNumber: number) {
+    return ppNumber > 0
+              ? `ПП${ppNumber}`
+              : 'нет';
   }
 }

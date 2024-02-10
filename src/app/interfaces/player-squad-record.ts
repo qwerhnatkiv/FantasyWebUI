@@ -1,10 +1,6 @@
-export interface PlayerSquadRecord {
-    playerId: number;
-    playerName: string;
-    position: string;
-    price: number;
-    games: number;
-    expectedFantasyPoints: number;
+import { PlayerCommonRecord } from "./player-common-record";
+
+export interface PlayerSquadRecord extends PlayerCommonRecord {
     isRemoved: boolean;
     isNew: boolean;
 }

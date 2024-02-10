@@ -3,16 +3,17 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
-  OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import { DEFAULT_SUBSTITUTION_VALUE } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { TeamGameInformation } from '../interfaces/team-game-information';
+import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
+import { TeamStatsDTO } from '../interfaces/team-stats-dto';
+import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
@@ -52,6 +53,15 @@ export class PlayersSquadComponent {
   public dataSource = new MatTableDataSource(this.squadPlayers);
 
   @Input() balanceValue: number = 0;
+
+  @Input() filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
+    number,
+    TeamGameInformation[]
+  >();
+  @Input() teamStats: TeamStatsDTO[] = [];
+  @Input() playerGamesOfoMap:
+    | Map<number, PlayerExpectedFantasyPointsDTO[]>
+    | undefined;
 
   public substitutionsLeft: number = DEFAULT_SUBSTITUTION_VALUE;
   private substitutionsValue: number = 0;
@@ -97,8 +107,8 @@ export class PlayersSquadComponent {
     }
 
     return this.squadPlayers
-      .filter((item) => item.games && !item.isRemoved)
-      .reduce((sum, current) => sum + current.games, 0);
+      .filter((item) => item.gamesCount && !item.isRemoved)
+      .reduce((sum, current) => sum + current.gamesCount, 0);
   }
 
   public removeRestoreRow(row: PlayerSquadRecord): void {
@@ -137,6 +147,10 @@ export class PlayersSquadComponent {
     this.sendAvailableSlots.emit(this.getAvailableSlots());
   }
 
+  public generateCellToolTip(player: PlayerSquadRecord): string | null {
+    return PlayerTooltipBuilder.generatePlayerTooltip(player, this.filteredTeamGames, this.teamStats, this.playerGamesOfoMap);
+  }
+
   public isClearAllSquadChangesButtonHidden() {
     return this.squadPlayers.filter((x) => x.isNew || x.isRemoved)?.length == 0;
   }
@@ -161,7 +175,7 @@ export class PlayersSquadComponent {
     const forwardsAvailable: number =
       9 - notRemovedPlayers.filter((item) => item.position == 'Н').length;
     const selectedPlayersIds: Array<number> = notRemovedPlayers.map(
-      (item) => item.playerId
+      (item) => item.playerObject.playerID
     );
 
     return {

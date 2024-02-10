@@ -71,7 +71,7 @@ export class AppComponent implements OnChanges {
     if (this.squadPlayers.length <= 0) {
       return;
     }
-    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find((x) => x.playerId == value.playerId);
+    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find((x) => x.playerObject.playerID == value.playerObject.playerID);
     if (matchedPlayer != null) {
       matchedPlayer.isRemoved = false;
     }
@@ -351,8 +351,8 @@ export class AppComponent implements OnChanges {
       )
       .subscribe({
         next: (result) => {
-          let removedIds: Array<number> = this.squadPlayers.filter((x) => x.isRemoved).map((x) => x.playerId);
-          let addedIds: Array<number> = this.squadPlayers.filter((x) => x.isNew).map((x) => x.playerId);
+          let removedIds: Array<number> = this.squadPlayers.filter((x) => x.isRemoved).map((x) => x.playerObject.playerID);
+          let addedIds: Array<number> = this.squadPlayers.filter((x) => x.isNew).map((x) => x.playerObject.playerID);
           this.squadPlayers = []
 
           this.balanceValue = result.balance;
@@ -362,28 +362,8 @@ export class AppComponent implements OnChanges {
               (x) => x.playerIdSports == result.players[i].id
             )!;
 
-            let ofo: number = this.playerGamesOfoMap
-              ?.get(matchingPlayerInfo.playerID)
-              ?.reduce(
-                (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
-                0.0
-              )!;
-
-            this.squadPlayers.push({
-              playerId: matchingPlayerInfo.playerID,
-              playerName: matchingPlayerInfo.playerName,
-              position: matchingPlayerInfo.position,
-              price: matchingPlayerInfo.price,
-              games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
-              expectedFantasyPoints: ofo,
-              isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
-              isNew: addedIds.includes(matchingPlayerInfo.playerID)
-            });
-          }
-
-          for (var i = 0, n = addedIds.length; i < n; ++i) {
-            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
-              (x) => x.playerID == addedIds[i]
+            let matchingTeam: TeamStatsDTO = this.teamStats?.find(
+              (team) => team.teamID == matchingPlayerInfo.teamID
             )!;
 
             let ofo: number = this.playerGamesOfoMap
@@ -394,14 +374,46 @@ export class AppComponent implements OnChanges {
               )!;
 
             this.squadPlayers.push({
-              playerId: matchingPlayerInfo.playerID,
               playerName: matchingPlayerInfo.playerName,
               position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
-              games: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
+              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
               expectedFantasyPoints: ofo,
               isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
-              isNew: addedIds.includes(matchingPlayerInfo.playerID)
+              isNew: addedIds.includes(matchingPlayerInfo.playerID),
+              playerObject: matchingPlayerInfo,
+              teamObject: matchingTeam,
+              powerPlayNumber: GamesUtils.GetPPText(matchingPlayerInfo.formPowerPlayNumber),
+            });
+          }
+
+          for (var i = 0, n = addedIds.length; i < n; ++i) {
+            let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
+              (x) => x.playerID == addedIds[i]
+            )!;
+
+            let matchingTeam: TeamStatsDTO = this.teamStats?.find(
+              (team) => team.teamID == matchingPlayerInfo.teamID
+            )!;
+
+            let ofo: number = this.playerGamesOfoMap
+              ?.get(matchingPlayerInfo.playerID)
+              ?.reduce(
+                (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+                0.0
+              )!;
+
+            this.squadPlayers.push({
+              playerName: matchingPlayerInfo.playerName,
+              position: matchingPlayerInfo.position,
+              price: matchingPlayerInfo.price,
+              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
+              expectedFantasyPoints: ofo,
+              isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
+              isNew: addedIds.includes(matchingPlayerInfo.playerID),
+              playerObject: matchingPlayerInfo,
+              teamObject: matchingTeam,
+              powerPlayNumber: GamesUtils.GetPPText(matchingPlayerInfo.formPowerPlayNumber),
             });
           }
 

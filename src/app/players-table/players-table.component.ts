@@ -35,6 +35,7 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
+import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
 
 @Component({
   selector: 'app-players-table',
@@ -176,16 +177,13 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             player.formPowerPlayTime,
             player.formPowerPlayTeamPosition
           ),
-          powerPlayNumber:
-            player.formPowerPlayNumber > 0
-              ? `ПП${player.formPowerPlayNumber}`
-              : 'нет',
+          powerPlayNumber: GamesUtils.GetPPText(player.formPowerPlayNumber),
           toi: player.formTOI,
           shotsOnGoal: player.formShotsOnGoal,
           iXG: Math.round(player.formIxG * 100) / 100,
           iCF: player.formICF,
           iHDCF: player.formIHDCF,
-          expectedFantasyPoints: '',
+          expectedFantasyPoints: 0,
           fantasyPointsPerGame: '',
           priceByExpectedFantasyPoints: 0,
           priceByExpectedFantasyPointsPerGame: 0,
@@ -226,8 +224,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
             0.0
           )!;
 
-        player.expectedFantasyPoints =
-          ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
+        player.expectedFantasyPoints = ofo;
+          //ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
         player.fantasyPointsPerGame =
           ofo > 0
             ? this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!
@@ -290,14 +288,16 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     this.clickedOnCheckboxOrButton = true;
 
     let playerSquadRecord: PlayerSquadRecord = {
-      playerId: player.playerObject.playerID,
       playerName: player.playerObject.playerName,
       position: player.playerObject.position,
       price: player.playerObject.price,
-      games: player.gamesCount,
-      expectedFantasyPoints: +player.expectedFantasyPoints,
+      gamesCount: player.gamesCount,
+      expectedFantasyPoints: player.expectedFantasyPoints,
       isRemoved: false,
       isNew: true,
+      playerObject: player.playerObject,
+      teamObject: player.teamObject,
+      powerPlayNumber: player.powerPlayNumber,
     };
 
     this.sendAddedToSquadPlayer.emit(playerSquadRecord);
@@ -462,188 +462,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   }
 
   public generateCellToolTip(player: PlayerChooseRecord): string | null {
-    let header: string = `
-      <div style="font-size: 16px; line-height: 19px; text-align: center;">
-        ${player.playerName} (${player.position}, ${player.team})
-      </div>`;
-
-    let forecastPimColor: string =
-      player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY
-        ? 'white'
-        : '#ff7e7e';
-    let forecastGPColor: string =
-      player.playerObject.forecastGamesPlayed! >= RED_GP_UPPER_BOUNDARY
-        ? 'white'
-        : '#ff7e7e';
-
-    let forecast: string = `
-    <div>Прогноз на сезон:<div>
-    <table class="tooltip-table">
-      <thead>
-        <tr>
-          <th style="color:${forecastGPColor}">GP</th>
-          <th>G</th>
-          <th>A</th>
-          <th style="color:${forecastPimColor}">PIM</th>
-          <th>+-</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle; color:${forecastGPColor}">${
-      this.numberPipe.transform(
-        player.playerObject.forecastGamesPlayed,
-        '1.0-0'
-      ) ?? '-'
-    }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(
-              player.playerObject.forecastGoals,
-              '1.0-0'
-            ) ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(
-              player.playerObject.forecastAssists,
-              '1.0-0'
-            ) ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle; color:${forecastPimColor}">${
-      this.numberPipe.transform(player.playerObject.forecastPIM, '1.0-0') ?? '-'
-    }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            this.numberPipe.transform(
-              player.playerObject.forecastPlusMinus,
-              '1.0-0'
-            ) ?? '-'
-          }</td>
-        </tr
-      </tbody>
-    </table>
-    `;
-
-    let form: string = `
-    <div>Форма:<div>
-    <table class="tooltip-table">
-      <thead>
-        <tr>
-          <th>GP</th>
-          <th>G</th>
-          <th>A</th>
-          <th>PIM</th>
-          <th>+-</th>
-          <th>ПП</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.formGamesPlayed ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.formGoals ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.formAssists ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.formPIM ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.formPlusMinus ?? '-'
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.powerPlayNumber
-          }</td>
-        </tr
-      </tbody>
-    </table>
-    `;
-
-    let teamForm: string = `
-    <div>Форма команды:<div>
-    <table class="tooltip-table">
-      <thead>
-        <tr>
-          <th>%Очк</th>
-          <th>СрЗаб</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle;">${
-            player.winPercentage
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${player.teamObject.teamGoalsForm.toFixed(
-            1
-          )}</td>
-        </tr
-      </tbody>
-    </table>
-    `;
-
-    let teamGame: TeamGameInformation | undefined = this.filteredTeamGames
-      .get(player.teamObject.teamID)
-      ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0];
-
-    let opponentTeam: TeamStatsDTO | undefined = this.teamStats.find(
-      (x) => x.teamID == teamGame?.opponentTeamID
-    );
-    let opponentAcronym: string = teamGame?.isHome
-      ? `${opponentTeam?.teamAcronym}`
-      : `@${opponentTeam?.teamAcronym}`;
-
-    let teamWinColor: string = this.getTooltipWinChanceSectionClass(
-      teamGame?.winChance!
-    );
-
-    let nearestGameOFO: number = this.playerGamesOfoMap
-      ?.get(player.playerObject.playerID)
-      ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
-
-    let opponentInfo: string = `
-    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
-      teamGame?.winChance!
-    )}%</span><div>
-    <table class="tooltip-table">
-      <thead>
-        <tr>
-          <th>%Очк</th>
-          <th>СрЗаб</th>
-          <th> ОФО Игрока</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center; vertical-align: middle;">${
-            opponentTeam?.teamFormWinPercentage
-          }</td>
-          <td style="text-align: center; vertical-align: middle;">${opponentTeam != null ? opponentTeam.teamGoalsForm.toFixed(
-            1
-          ) : 0}</td>
-          <td style="text-align: center; vertical-align: middle;"> ${this.numberPipe.transform(
-            nearestGameOFO,
-            '1.0-1'
-          )}</td>
-        </tr
-      </tbody>
-    </table>
-    `;
-
-    return `
-    <div style="font-family: Inter;
-                font-size: 12px;
-                font-weight: 500;
-                line-height: 15px;
-                letter-spacing: 0em;
-                text-align: left;"
-                >
-      ${header} <br>
-      ${forecast} <br>
-      ${form} <br>
-      ${teamForm} <br>
-      ${opponentInfo}
-    </div>`;
+    return PlayerTooltipBuilder.generatePlayerTooltip(player, this.filteredTeamGames, this.teamStats, this.playerGamesOfoMap);
   }
 
   public selectPlayerRow(player: PlayerChooseRecord) {
@@ -813,22 +632,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
       Array.from(this.filterDictionary.entries())
     );
     this.dataSource.filter = jsonString;
-  }
-
-  private getTooltipWinChanceSectionClass(winChance: number) {
-    if (winChance >= VERY_GREEN_WIN_LOWER_BOUNDARY) {
-      return '#00AA30';
-    }
-
-    if (winChance >= GREEN_WIN_LOWER_BOUNDARY) {
-      return '#64ff8f';
-    }
-
-    if (winChance >= WHITE_WIN_LOWER_BOUNDARY) {
-      return 'white';
-    }
-
-    return '#ff7e7e';
   }
 
   //#endregion
