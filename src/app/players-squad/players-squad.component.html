@@ -81,7 +81,7 @@
     </td>
   </ng-container>
 
-  <ng-container matColumnDef="games">
+  <ng-container matColumnDef="gamesCount">
     <th mat-header-cell *matHeaderCellDef>Игр</th>
     <td
       mat-cell
@@ -90,7 +90,7 @@
       [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
       [class.removed-cell]="element.isRemoved"
     >
-      {{ element.games }}
+      {{ element.gamesCount }}
     </td>
     <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
       {{ getTotalGames() | number : "1.0-0" }}

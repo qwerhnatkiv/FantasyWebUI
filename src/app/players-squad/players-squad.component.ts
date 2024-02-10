@@ -26,7 +26,7 @@ export class PlayersSquadComponent {
     'position',
     'playerName',
     'price',
-    'games',
+    'gamesCount',
     'expectedFantasyPoints',
   ];
 
