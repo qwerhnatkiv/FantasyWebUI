@@ -220,7 +220,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           ).length;
 
           teamSpecificRow.push(
-            new TableCell(gamesForWeekCountCutted.toString(), gamesForWeekCount, gamesForWeekCount, undefined, true)
+            new TableCell(gamesForWeekCountCutted.toString(), gamesForWeekCountCutted, gamesForWeekCount, undefined, true)
           );
           currentWeekName = column.header;
           continue;
@@ -280,11 +280,11 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       !isNaN(+cell.displayValue) &&
       cell.isWeekCell
     ) {
-      if (cell.cellValue > 3) {
+      if (this.showFullCalendar ? cell.weekGames! > 3 : cell.cellValue > 3) {
         return 'calendar-cell-week-green';
       }
 
-      if (cell.cellValue < 2) {
+      if (this.showFullCalendar ? cell.weekGames! < 2 : cell.cellValue < 2) {
         return 'calendar-cell-week-red';
       }
 
