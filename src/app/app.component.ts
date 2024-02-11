@@ -207,7 +207,6 @@ export class AppComponent implements OnChanges {
   ): void {
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
     this.minFilterDate = new Date(minDate.getTime());
-    // minDate > today ? new Date(minDate.getTime()) : new Date(today.getTime());
 
     weeks.forEach((week) => {
       let weekGames: GamePredictionDTO[] = games.filter(
@@ -223,15 +222,25 @@ export class AppComponent implements OnChanges {
       );
 
       if (
-        thisWeekMinDate.getTime() <= this.minFilterDate?.getTime()! &&
-        thisWeekMaxDate.getTime() >= this.minFilterDate?.getTime()!
+        thisWeekMinDate.getTime() <= minDate.getTime()! &&
+        thisWeekMaxDate.getTime() >= minDate.getTime()!
       ) {
+        let nextWeekGames: GamePredictionDTO[] = games.filter(
+          (game) => game.weekNumber == week + 1
+        );
+
+        let nextWeekMinDate: Date | undefined =
+        nextWeekGames?.length > 0
+          ? GamesUtils.getExtremumDateForGames(nextWeekGames, false)
+          : undefined;
+
         let nextWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
-          games.filter((game) => game.weekNumber == week + 1),
+          nextWeekGames,
           true
         );
 
         let today: Date = new Date();
+        this.minFilterDate = today.getDay() != 0 ? this.minFilterDate : nextWeekMinDate;
         this.maxFilterDate = today.getDay() != 0 ? thisWeekMaxDate : nextWeekMaxDate;
       }
     });
