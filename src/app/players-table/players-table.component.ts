@@ -564,12 +564,12 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
   private selectBestPlayersForEachTeamInCalendar() {
     for (let teamStat of this.teamStats) {
       let teamPlayers: PlayerChooseRecord[] = 
-        this.players.filter((x) => x.teamObject.teamID == teamStat.teamID && x.position != DEFAULT_POSITIONS[0]);
+        this.players.filter((x) => x.teamObject.teamID == teamStat.teamID && x.position != DEFAULT_POSITIONS[0] && x.expectedFantasyPoints != null);
       
       let bestTeamPlayer: PlayerChooseRecord = 
-        teamPlayers.sort((n1, n2) => +n2.expectedFantasyPoints - +n1.expectedFantasyPoints)[0];
+        teamPlayers.sort((n1, n2) => n2.expectedFantasyPoints - n1.expectedFantasyPoints)[0];
       
-      if (bestTeamPlayer.gamesCount == 0) {
+      if (bestTeamPlayer == null || bestTeamPlayer.gamesCount == 0) {
         continue;
       }
       
