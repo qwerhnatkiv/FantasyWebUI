@@ -1,11 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  QueryList,
   SimpleChanges,
+  ViewChildren,
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { MatTableDataSource } from '@angular/material/table';
@@ -30,6 +33,7 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
 import { Observable, Subscription } from 'rxjs';
+import { CdkCell, CdkHeaderCell } from '@angular/cdk/table';
 
 @Component({
   selector: 'app-calendar-table',
@@ -51,8 +55,31 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public teamNameLogoPathMap: any = TEAM_NAME_LOGO_PATH_MAP;
   public showOnlyGamesCount: boolean = false;
+
+  private _showFullCalendar: boolean = false;
+  @Input() set showFullCalendar(value: boolean) {
+    this._showFullCalendar = value;
+
+    let today: Date = new Date();
+    let todayStr = this.datepipe.transform(
+      today,
+      DEFAULT_DATE_FORMAT
+    )!;
+
+    if (this.cells != null) {
+      setTimeout(() => {
+        let todayCell = this.cells.find(cell => cell.nativeElement.innerText == todayStr);
+
+        if (todayCell != null) {
+          todayCell?.nativeElement.scrollIntoView({inline: 'center', behavior: 'smooth'});
+        }
+      }, 300);
+    }
+  }
+  get showFullCalendar(): boolean {
+    return this._showFullCalendar;
+  }
   
-  @Input() showFullCalendar: boolean = false;
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
   @Input() isCalendarVisible: boolean = false;
@@ -74,6 +101,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
   private yesterdayDate: Date = new Date();
+
+  @ViewChildren(CdkHeaderCell, { read: ElementRef }) cells!: QueryList<
+    ElementRef<HTMLTableRowElement>
+  >;
 
   ngOnInit() {
     this.showOnlyGamesCountSubscription = this.showOnlyGamesCountObservable?.subscribe(
