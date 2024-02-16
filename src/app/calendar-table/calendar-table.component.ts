@@ -60,18 +60,18 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   @Input() set showFullCalendar(value: boolean) {
     this._showFullCalendar = value;
 
-    let today: Date = new Date();
-    let todayStr = this.datepipe.transform(
-      today,
+    let dayOfScrolling: Date = Utils.addDateDays(Utils.getMonday(new Date(), 1), -2);
+    let dayOfScrollingStr = this.datepipe.transform(
+      dayOfScrolling,
       DEFAULT_DATE_FORMAT
     )!;
 
     if (this.cells != null) {
       setTimeout(() => {
-        let todayCell = this.cells.find(cell => cell.nativeElement.innerText == todayStr);
+        let dayOfScrollingCell = this.cells.find(cell => cell.nativeElement.innerText == dayOfScrollingStr);
 
-        if (todayCell != null) {
-          todayCell?.nativeElement.scrollIntoView({inline: 'center', behavior: 'smooth'});
+        if (dayOfScrollingCell != null) {
+          dayOfScrollingCell?.nativeElement.scrollIntoView({inline: 'start', behavior: 'smooth'});
         }
       }, 300);
     }

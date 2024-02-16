@@ -44,4 +44,11 @@ export module Utils {
   export function onlyUnique(value: any, index: number, array: any[]) {
     return array.indexOf(value) === index;
   }
+
+  export function getMonday(date: Date, weeksBefore: number) {
+    date = new Date(date);
+    let day: number = date.getDay();
+    let diff: number = date.getDate() - day - (weeksBefore * 7) + (day == 0 ? -6 : 1); // adjust when day is sunday
+    return new Date(date.setDate(diff));
+  }
 }
