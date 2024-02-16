@@ -22,10 +22,10 @@
     [dataSource]="dataSource"
     class="players-table"
     matSort
+    matSortDisableClear="true"
     matSortActive="expectedFantasyPoints"
     matSortDirection="desc"
     matSortStart="desc"
-    (matSortChange)="announceSortChange($event)"
   >
     <ng-container matColumnDef="firstChoice">
       <th
@@ -335,6 +335,7 @@
         *matHeaderCellDef
         mat-sort-header
         sortActionDescription="Sort by priceByExpectedFantasyPoints"
+        start="asc"
       >
         Ц/ОФО
       </th>
@@ -349,6 +350,7 @@
         *matHeaderCellDef
         mat-sort-header
         sortActionDescription="Sort by priceByExpectedFantasyPointsPerGame"
+        start="asc"
       >
         Ц/ОФПГ
       </th>

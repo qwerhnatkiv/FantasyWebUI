@@ -1,4 +1,3 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -10,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { PlayerChooseRecord } from '../interfaces/player-choose-record';
 import { PlayersFilter } from '../interfaces/players-filter';
@@ -69,7 +68,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'sources',
     'addPlayerToSquad',
   ];
-  constructor(private _liveAnnouncer: LiveAnnouncer) {
+  constructor() {
     this.dataSource.filterPredicate = this.filter;
   }
 
@@ -450,15 +449,6 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
 
     return '';
-  }
-
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
   }
 
   public generateCellToolTip(player: PlayerChooseRecord): string | null {
