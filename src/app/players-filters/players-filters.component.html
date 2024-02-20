@@ -168,6 +168,15 @@
         }}</mat-option>
       </mat-select>
     </mat-form-field>
+    <button
+      (click)="resetSelectedUserFilter()"
+      [hidden]="selectedUser == null"
+      class="clear-filter-button"
+      mat-icon-button
+      aria-label="Clear user filter"
+    >
+      <mat-icon>cancel</mat-icon>
+    </button>
 
     <button class="button" mat-icon-button (click)="resetAllFilters()">
       <mat-icon>filter_alt_off</mat-icon>

@@ -167,20 +167,23 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.powerPlayUnitsChanged()
   }
 
+  public resetSelectedUserFilter() {
+    this.selectedUser = undefined; 
+    this.selectedUserChanged()
+  }
+
   public resetAllFilters() {
     this.resetLowerBoundPriceFilter();
     this.resetUpperBoundPriceFilter();
     this.setDefaultPositions();
     this.deselectAllTeams();
     this.resetPowerPlayFilter();
+    this.resetSelectedUserFilter();
 
     if (this.formLength != DEFAULT_FORM_LENGTH) {
       this.formLength = DEFAULT_FORM_LENGTH;
       this.sendFormLength.emit(this.formLength);
     }
-
-    this.selectedUser = undefined;
-    this.selectedUserChanged();
 
     this.sendClearAllPlayerSelections.emit();
 

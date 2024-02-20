@@ -48,6 +48,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CustomDateAdapter } from './common/custom-date-adapter';
 import { PositionsMapPipe } from './pipes/positions-map.pipe';
+import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -101,6 +102,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
+    ObservablesProxyHandlingService
   ],
   bootstrap: [AppComponent],
 })

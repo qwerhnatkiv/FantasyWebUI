@@ -74,7 +74,10 @@ export class PlayersSquadComponent {
   @Output() sendAvailableSlots: EventEmitter<PositionsAvailableToPick> =
     new EventEmitter<PositionsAvailableToPick>();
 
-  getTotalOFO() {
+    @Output() sendSelectedPlayerId: EventEmitter<number> =
+    new EventEmitter<number>();
+
+  public getTotalOFO() {
     if (this.squadPlayers == null) {
       return 0;
     }
@@ -109,6 +112,10 @@ export class PlayersSquadComponent {
     return this.squadPlayers
       .filter((item) => item.gamesCount && !item.isRemoved)
       .reduce((sum, current) => sum + current.gamesCount, 0);
+  }
+
+  public sendSelectedPlayer(row: PlayerSquadRecord): void {
+    this.sendSelectedPlayerId.emit(row.playerObject.playerID);
   }
 
   public removeRestoreRow(row: PlayerSquadRecord): void {

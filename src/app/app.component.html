@@ -88,7 +88,6 @@
     [teamStats]="teamStats"
     [selectedPlayers]="selectedPlayers"
     [teamPlayerExpectedOfoMap]="teamPlayerExpectedOfoMap"
-    [showOnlyGamesCountObservable]="hideShowOnlyGamesCountSubject.asObservable()"
     [showFullCalendar]="showFullCalendar"
   ></app-calendar-table>
 </section>
@@ -141,6 +140,7 @@
       [teamStats]="teamStats"
       [filteredTeamGames]="filteredTeamGames"
       [playerGamesOfoMap]="playerGamesOfoMap"
+      (sendSelectedPlayerId)="emitSelectPlayerById($event)"
     ></app-players-squad>
   </div>
 </section>

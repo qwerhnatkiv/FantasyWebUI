@@ -4,7 +4,6 @@ import {
   Component,
   OnChanges,
   SimpleChanges,
-  ViewChild,
 } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { GamePredictionDTO } from './interfaces/game-prediction-dto';
@@ -25,7 +24,7 @@ import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/consta
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 import { UpdateLogInformation } from './interfaces/update-log-information';
-import { Subject } from 'rxjs';
+import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 
 @Component({
   selector: 'app-root',
@@ -50,8 +49,6 @@ export class AppComponent implements OnChanges {
   public substitutionsLeft: number = 0;
   public squadAvailableSlots: PositionsAvailableToPick | undefined;
 
-  public hideShowOnlyGamesCountSubject: Subject<void> = new Subject<void>();
-
   public areBestPlayersForEachTeamSelected: boolean = false;
   public showFullCalendar: boolean = false;
 
@@ -60,7 +57,11 @@ export class AppComponent implements OnChanges {
   }
 
   public emitHideShowOnlyGamesCount() {
-    this.hideShowOnlyGamesCountSubject.next();
+    this._observablesProxyHandlingService.triggerHideShowOnlyGamesCountSubject();
+  }
+
+  public emitSelectPlayerById(val: number) {
+    this._observablesProxyHandlingService.triggerSelectPlayerByIdSubject(val);
   }
 
   public emitSelectBestPlayersForEachTeam() {
@@ -132,7 +133,7 @@ export class AppComponent implements OnChanges {
     TeamGameInformation[]
   >();
 
-  constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService) {
+  constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService, private _observablesProxyHandlingService: ObservablesProxyHandlingService) {
     this.getCalendarData(true);
   }
 
@@ -348,6 +349,7 @@ export class AppComponent implements OnChanges {
   private getUserSquad() {
     if (this._selectedUser == null || this._selectedUser == "") {
       this.squadPlayers = [];
+      this.balanceValue = 0;
       return;
     }
 

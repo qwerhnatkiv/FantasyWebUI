@@ -38,6 +38,7 @@
       class="left-align"
       [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
       [class.removed-cell]="element.isRemoved"
+      (click)="sendSelectedPlayer(element)"
       [ngxTippy]="generateCellToolTip(element)"
       tippyClassName="tooltip-general"
       [tippyProps]="{
@@ -66,6 +67,7 @@
       mat-cell
       *matCellDef="let element"
       [class.removed-cell]="element.isRemoved"
+      (click)="sendSelectedPlayer(element)"
       [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
     >
       {{ element.price }}
@@ -88,6 +90,7 @@
       *matCellDef="let element"
       class="right-column"
       [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      (click)="sendSelectedPlayer(element)"
       [class.removed-cell]="element.isRemoved"
     >
       {{ element.gamesCount }}

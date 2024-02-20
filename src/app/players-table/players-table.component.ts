@@ -1,10 +1,13 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -35,6 +38,8 @@ import { OfoVariant } from '../interfaces/ofo-variant';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
+import { Observable, Subscription } from 'rxjs';
+import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 
 @Component({
   selector: 'app-players-table',
@@ -42,7 +47,7 @@ import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
   styleUrls: ['./players-table.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlayersTableComponent implements AfterViewInit, OnChanges {
+export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
   displayedColumns: string[] = [
     'firstChoice',
     'secondChoice',
@@ -68,9 +73,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     'sources',
     'addPlayerToSquad',
   ];
-  constructor() {
-    this.dataSource.filterPredicate = this.filter;
-  }
+  constructor(private _observablesProxyHandlingService: ObservablesProxyHandlingService, 
+              private _changeDetectorRef: ChangeDetectorRef) {
+      this.dataSource.filterPredicate = this.filter;
+    }
 
   private filterDictionary: Map<string, any> = new Map<string, any>();
 
@@ -122,6 +128,8 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
     }
   }
 
+  private selectPlayerByIdSubscription: Subscription | undefined;
+
   public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
     string,
     SelectedPlayerModel[]
@@ -146,6 +154,20 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges {
 
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
   //#region NG overrides
+
+  ngOnInit() {
+    this.selectPlayerByIdSubscription = this._observablesProxyHandlingService.$selectPlayerByIdSubject?.subscribe(
+      (playerId) => {
+          let player: PlayerChooseRecord = this.players.find((x) => x.playerObject.playerID == playerId)!;
+          this.selectPlayerRow(player);
+          this._changeDetectorRef.detectChanges();
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.selectPlayerByIdSubscription?.unsubscribe();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (

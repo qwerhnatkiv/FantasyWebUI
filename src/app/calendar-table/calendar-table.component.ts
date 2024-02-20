@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -34,6 +35,7 @@ import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
 import { Observable, Subscription } from 'rxjs';
 import { CdkCell, CdkHeaderCell } from '@angular/cdk/table';
+import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 
 @Component({
   selector: 'app-calendar-table',
@@ -54,7 +56,14 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   );
 
   public teamNameLogoPathMap: any = TEAM_NAME_LOGO_PATH_MAP;
-  public showOnlyGamesCount: boolean = false;
+
+  private _showOnlyGamesCount: boolean = false;
+  get showOnlyGamesCount(): boolean {
+    return this._showOnlyGamesCount;
+  }
+  set showOnlyGamesCount(val: boolean) {
+      this._showOnlyGamesCount = val;
+  }
 
   private _showFullCalendar: boolean = false;
   @Input() set showFullCalendar(value: boolean) {
@@ -96,7 +105,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     SelectedPlayerModel[]
   >();
 
-  @Input() showOnlyGamesCountObservable: Observable<void> | undefined;
   private showOnlyGamesCountSubscription: Subscription | undefined;
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
@@ -106,9 +114,15 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     ElementRef<HTMLTableRowElement>
   >;
 
+  constructor(private _observablesProxyHandlingService: ObservablesProxyHandlingService, 
+              private _changeDetectorRef: ChangeDetectorRef) {}
+
   ngOnInit() {
-    this.showOnlyGamesCountSubscription = this.showOnlyGamesCountObservable?.subscribe(
-      () => (this.showOnlyGamesCount = !this.showOnlyGamesCount)
+    this.showOnlyGamesCountSubscription = this._observablesProxyHandlingService.$hideShowOnlyGamesCountSubject?.subscribe(
+      () => {
+          this.showOnlyGamesCount = !this.showOnlyGamesCount;
+          this._changeDetectorRef.detectChanges();
+      }
     );
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
   }

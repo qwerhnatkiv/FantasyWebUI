@@ -221,7 +221,7 @@ td.strike {
 td.strike:before {
   content: " ";
   position: absolute;
-  top: 50%;
+  top: 49%;
   left: 0;
   border-bottom: 3px solid #ff7e7e;
   width: 100%;
