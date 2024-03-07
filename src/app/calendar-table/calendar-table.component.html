@@ -70,7 +70,15 @@
           class="team-logo"
         />
         <span>
-          {{ !element[column.header].isWeekCell || !showFullCalendar ? element[column.header].displayValue : element[column.header].weekGames }}
+          {{ 
+            !element[column.header].isWeekCell || !showFullCalendar
+              ? element[column.header].isWeekCell
+                ? showOnlyGamesCount
+                  ? element[column.header].displayValue
+                  : element[column.header].cellValue
+                : element[column.header].displayValue
+              : element[column.header].weekGames 
+          }}
         </span>
         <div class="bookmakers-mark-div">
           <img

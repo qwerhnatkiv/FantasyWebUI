@@ -256,7 +256,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
               `w${game.weekNumber}` === column.header
           ).length;
 
-          let gamesForWeekCountCutted: number = games.filter(
+          let gamesForWeekCountActive: number = games.filter(
             (game) =>
               (game.homeTeamName == teamName ||
                 game.awayTeamName == teamName) &&
@@ -264,8 +264,24 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
               `w${game.weekNumber}` === column.header
           ).length;
 
+          let gamesForWeekCountAll: number = games.filter(
+            (game) =>
+              (game.homeTeamName == teamName ||
+                game.awayTeamName == teamName) &&
+                !game.isOldGame && 
+              game.weekNumber <= +column.header.replace('w', '')
+          ).length;
+
+          let cellTextValue = gamesForWeekCountAll == gamesForWeekCountActive ? 
+            gamesForWeekCountActive.toString() :
+            gamesForWeekCountActive.toString() + '/' + gamesForWeekCountAll.toString() 
+
           teamSpecificRow.push(
-            new TableCell(gamesForWeekCountCutted.toString(), gamesForWeekCountCutted, gamesForWeekCount, undefined, true)
+            new TableCell(cellTextValue, 
+            gamesForWeekCountActive, 
+            gamesForWeekCount, 
+            undefined, 
+            true)
           );
           currentWeekName = column.header;
           continue;
@@ -319,10 +335,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   public getCellTextClass(cell: TableCell) {
     let numericValue: number = Number(cell.cellValue);
 
-    // If not NaN when parsed to number, then it's week count cell
     if (
-      cell.displayValue != '' &&
-      !isNaN(+cell.displayValue) &&
       cell.isWeekCell
     ) {
       if (this.showFullCalendar ? cell.weekGames! > 3 : cell.cellValue > 3) {
