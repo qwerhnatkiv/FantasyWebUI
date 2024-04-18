@@ -235,10 +235,12 @@ export class AppComponent implements OnChanges {
           ? GamesUtils.getExtremumDateForGames(nextWeekGames, false)
           : undefined;
 
-        let nextWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
-          nextWeekGames,
-          true
-        );
+        let nextWeekMaxDate: Date = nextWeekGames.length > 0 
+          ? GamesUtils.getExtremumDateForGames(
+            nextWeekGames,
+            true
+          )
+          : thisWeekMaxDate;
 
         let today: Date = new Date();
         this.minFilterDate = today.getDay() != 0 ? this.minFilterDate : nextWeekMinDate;
