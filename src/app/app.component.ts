@@ -209,6 +209,12 @@ export class AppComponent implements OnChanges {
     let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
     this.minFilterDate = new Date(minDate.getTime());
 
+    if (weeks.length === 0) {
+      this.minFilterDate = new Date();
+      this.maxFilterDate = new Date();
+      return;
+    }
+
     weeks.forEach((week) => {
       let weekGames: GamePredictionDTO[] = games.filter(
         (game) => game.weekNumber == week

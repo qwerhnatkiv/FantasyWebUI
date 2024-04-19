@@ -7,6 +7,10 @@ export module GamesUtils {
     games: GamePredictionDTO[],
     sortSequence: boolean
   ): Date {
+    if (games.length === 0) {
+      return new Date();
+    }
+
     let expression: (extremum: Date, game: GamePredictionDTO) => Date;
     if (!sortSequence) {
       expression = (min, game) => (game.gameDate < min ? game.gameDate : min);
