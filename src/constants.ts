@@ -80,7 +80,7 @@ export const TEAMS = [
 
 export const TEAM_NAME_LOGO_PATH_MAP = {
   'Anaheim Ducks': 'anaheim-ducks-logo.svg',
-  'Arizona Coyotes': 'arizona-coyotes-logo.svg',
+  'Utah Hockey Club': 'utah-hockey-club-logo.svg',
   'Boston Bruins': 'boston-bruins-logo.svg',
   'Buffalo Sabres': 'buffalo-sabres-logo.svg',
   'Calgary Flames': 'calgary-flames-logo.svg',
