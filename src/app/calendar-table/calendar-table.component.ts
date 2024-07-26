@@ -62,14 +62,17 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return this._showOnlyGamesCount;
   }
   set showOnlyGamesCount(val: boolean) {
-      this._showOnlyGamesCount = val;
+    this._showOnlyGamesCount = val;
   }
 
   private _showFullCalendar: boolean = false;
   @Input() set showFullCalendar(value: boolean) {
     this._showFullCalendar = value;
 
-    let dayOfScrolling: Date = Utils.addDateDays(Utils.getMonday(new Date(), 1), -2);
+    let dayOfScrolling: Date = Utils.addDateDays(
+      Utils.getMonday(new Date(), 1),
+      -2
+    );
     let dayOfScrollingStr = this.datepipe.transform(
       dayOfScrolling,
       DEFAULT_DATE_FORMAT
@@ -77,10 +80,15 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     if (this.cells != null) {
       setTimeout(() => {
-        let dayOfScrollingCell = this.cells.find(cell => cell.nativeElement.innerText == dayOfScrollingStr);
+        let dayOfScrollingCell = this.cells.find(
+          (cell) => cell.nativeElement.innerText == dayOfScrollingStr
+        );
 
         if (dayOfScrollingCell != null) {
-          dayOfScrollingCell?.nativeElement.scrollIntoView({inline: 'start', behavior: 'smooth'});
+          dayOfScrollingCell?.nativeElement.scrollIntoView({
+            inline: 'start',
+            behavior: 'smooth',
+          });
         }
       }, 300);
     }
@@ -88,7 +96,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   get showFullCalendar(): boolean {
     return this._showFullCalendar;
   }
-  
+
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
   @Input() isCalendarVisible: boolean = false;
@@ -114,16 +122,19 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     ElementRef<HTMLTableRowElement>
   >;
 
-  constructor(private _observablesProxyHandlingService: ObservablesProxyHandlingService, 
-              private _changeDetectorRef: ChangeDetectorRef) {}
+  constructor(
+    private _observablesProxyHandlingService: ObservablesProxyHandlingService,
+    private _changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.showOnlyGamesCountSubscription = this._observablesProxyHandlingService.$hideShowOnlyGamesCountSubject?.subscribe(
-      () => {
+    this.showOnlyGamesCountSubscription =
+      this._observablesProxyHandlingService.$hideShowOnlyGamesCountSubject?.subscribe(
+        () => {
           this.showOnlyGamesCount = !this.showOnlyGamesCount;
           this._changeDetectorRef.detectChanges();
-      }
-    );
+        }
+      );
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
   }
 
@@ -260,7 +271,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             (game) =>
               (game.homeTeamName == teamName ||
                 game.awayTeamName == teamName) &&
-                !game.isOldGame && 
+              !game.isOldGame &&
               `w${game.weekNumber}` === column.header
           ).length;
 
@@ -268,20 +279,25 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             (game) =>
               (game.homeTeamName == teamName ||
                 game.awayTeamName == teamName) &&
-                !game.isOldGame && 
+              !game.isOldGame &&
               game.weekNumber <= +column.header.replace('w', '')
           ).length;
 
-          let cellTextValue = gamesForWeekCountAll == gamesForWeekCountActive ? 
-            gamesForWeekCountActive.toString() :
-            gamesForWeekCountActive.toString() + '/' + gamesForWeekCountAll.toString() 
+          let cellTextValue =
+            gamesForWeekCountAll == gamesForWeekCountActive
+              ? gamesForWeekCountActive.toString()
+              : gamesForWeekCountActive.toString() +
+                '/' +
+                gamesForWeekCountAll.toString();
 
           teamSpecificRow.push(
-            new TableCell(cellTextValue, 
-            gamesForWeekCountActive, 
-            gamesForWeekCount, 
-            undefined, 
-            true)
+            new TableCell(
+              cellTextValue,
+              gamesForWeekCountActive,
+              gamesForWeekCount,
+              undefined,
+              true
+            )
           );
           currentWeekName = column.header;
           continue;
@@ -316,7 +332,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       return className;
     }
 
-    let classStatement: string = 
+    let classStatement: string =
       this.minFilterDate != null &&
       this.maxFilterDate != null &&
       column.columnDef != null &&
@@ -335,9 +351,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   public getCellTextClass(cell: TableCell) {
     let numericValue: number = Number(cell.cellValue);
 
-    if (
-      cell.isWeekCell
-    ) {
+    if (cell.isWeekCell) {
       if (this.showFullCalendar ? cell.weekGames! > 3 : cell.cellValue > 3) {
         return 'calendar-cell-week-green';
       }
@@ -410,22 +424,20 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       <div style="font-size: 20px; line-height: 19px; text-align: center;">
         ${teamCell.displayValue}
       </div>`;
-    
-    let teamStat: TeamStatsDTO | undefined = this.teamStats.find((x) => x.teamName == teamCell.displayValue);
+
+    let teamStat: TeamStatsDTO | undefined = this.teamStats.find(
+      (x) => x.teamName == teamCell.displayValue
+    );
 
     if (teamStat == null) {
       return null;
     }
 
     let gfForecastPimColor: string =
-      teamStat.teamGoalsForm! <= GREEN_TEAM_GF_BOUNDARY
-        ? 'white'
-        : '#64ff8f';
-      
+      teamStat.teamGoalsForm! <= GREEN_TEAM_GF_BOUNDARY ? 'white' : '#64ff8f';
+
     let gaForecastPimColor: string =
-      teamStat.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY
-        ? 'white'
-        : '#ff7e7e';
+      teamStat.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY ? 'white' : '#ff7e7e';
 
     let averageTeamStat: string = `
           <div>
@@ -436,7 +448,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             |
             </span>
             <span style="color:${gaForecastPimColor}">
-              ${this.numberPipe.transform(teamStat.teamGoalsAwayForm, '1.0-1')} GA
+              ${this.numberPipe.transform(
+                teamStat.teamGoalsAwayForm,
+                '1.0-1'
+              )} GA
             </span>
             <span>
             |
@@ -539,7 +554,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     `;
 
     if (game.isOldGame) {
-      generatedTooltip += `<br>${homeTeamStats.teamAcronym} ${game.homeTeamGoals}:${game.awayTeamGoals} ${awayTeamStats.teamAcronym}`
+      generatedTooltip += `<br>${homeTeamStats.teamAcronym} ${game.homeTeamGoals}:${game.awayTeamGoals} ${awayTeamStats.teamAcronym}`;
     }
 
     return generatedTooltip;
@@ -575,26 +590,22 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         (game) => game.weekNumber == week + 1
       );
 
-      let thisWeekMinDate: Date = GamesUtils.getExtremumDateForGames(
-        weekGames,
-        false
-      );
-      let thisWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
-        weekGames,
-        true
+      let thisWeekMinDate: Date = Utils.getMonday(
+        GamesUtils.getExtremumDateForGames(weekGames, false),
+        0
       );
 
       let nextWeekMinDate: Date | undefined =
         nextWeekGames?.length > 0
-          ? GamesUtils.getExtremumDateForGames(nextWeekGames, false)
+          ? Utils.getMonday(
+              GamesUtils.getExtremumDateForGames(nextWeekGames, false),
+              0
+            )
           : undefined;
 
       let newThisWeekMaxDate = new Date();
-      newThisWeekMaxDate.setTime(thisWeekMaxDate.getTime());
-
-      let dateOffset: number = 24 * 60 * 60 * 1000; //1 day
       if (nextWeekMinDate != null) {
-        newThisWeekMaxDate.setTime(nextWeekMinDate.getTime() - dateOffset);
+        newThisWeekMaxDate = Utils.addDateDays(nextWeekMinDate, -1);
       }
 
       let weekDates: Date[] = Utils.getDatesInRange(
@@ -603,7 +614,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       );
 
       allColumns.push({
-        columnDef: thisWeekMaxDate,
+        columnDef: newThisWeekMaxDate,
         header: `w${week}`,
       });
 
@@ -628,7 +639,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         let gamesCount = games.filter(
           (game) =>
             game.weekNumber === week &&
-            (team == game.homeTeamName || team == game.awayTeamName) && !game.isOldGame
+            (team == game.homeTeamName || team == game.awayTeamName) &&
+            !game.isOldGame
         ).length;
 
         if (gamesCount <= 1) {

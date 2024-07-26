@@ -163,7 +163,6 @@ export class AppComponent implements OnChanges {
           this.games = result.gamePredictions.sort(
             (n1, n2) => n1.weekNumber - n2.weekNumber
           );
-
           this.teamStats = result.teamsStats;
           this.playerStats = result.playerStats;
           this.updateLogInfomation = result.updateLogInformation;

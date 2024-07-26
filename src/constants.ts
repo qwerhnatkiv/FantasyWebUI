@@ -17,7 +17,7 @@ export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string
   ['Н', 'FW']
 ]);
 
-export const DEFAULT_FORM_LENGTH = 10;
+export const DEFAULT_FORM_LENGTH = 5;
 export const DEFAULT_FORM_LENGTH_COUNT = 12;
 
 export const RED_PIM_LOWER_BOUNDARY = 40;
