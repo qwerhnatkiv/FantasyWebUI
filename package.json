@@ -33,7 +33,7 @@
     "tippy.js": "^6.3.7",
     "ts-transformer-keys": "^0.4.4",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "^0.13.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.0",
