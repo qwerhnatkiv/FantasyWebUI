@@ -18,9 +18,12 @@ import { TeamWeek } from '../classes/team-week';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { GamesUtils } from '../common/games-utils';
 import {
+  DEFAULT_AWAY_GAME_TEAM_PREFIX,
   DEFAULT_DATE_FORMAT,
+  DEFAULT_WEEK_HEADER_PREFIX,
   GREEN_TEAM_GF_BOUNDARY,
   GREEN_WIN_LOWER_BOUNDARY,
+  LOW_GAMES_WEEK_BOUNDARY,
   RED_TEAM_GA_BOUNDARY,
   TEAM_NAME_LOGO_PATH_MAP,
   VERY_GREEN_WIN_LOWER_BOUNDARY,
@@ -36,6 +39,7 @@ import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
 import { Observable, Subscription } from 'rxjs';
 import { CdkCell, CdkHeaderCell } from '@angular/cdk/table';
 import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
+import { ja } from 'date-fns/locale';
 
 @Component({
   selector: 'app-calendar-table',
@@ -191,127 +195,92 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public setUpDataSourceAndColumns(games: GamePredictionDTO[]) {
-    let teams: string[] = games
+    const teams: string[] = games
       ?.map((x) => x.homeTeamName)
       .filter(Utils.onlyUnique)
       .sort((n1, n2) => Utils.sortTypes(n1, n2));
 
-    let weeks: number[] = games
+    const weeks: number[] = games
       ?.map((x) => x.weekNumber)
       .filter(Utils.onlyUnique)
       .sort((n1, n2) => n1 - n2);
 
-    this.setTeamWeeksToStrike(games, weeks, teams);
+    this.columnsToDisplay = ['team'];
 
-    this.columns = this.generateTableColumns(weeks, games);
+    for (let i = 0, n = teams.length; i < n; ++i) {
+      const teamName: string = teams[i];
+      const teamGames: GamePredictionDTO[] = games.filter(
+        (game) =>
+          teamName === game.homeTeamName || teamName === game.awayTeamName
+      );
+      const teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
 
-    this.columnsToDisplay = ['team'].concat(
-      this.columns.map((x) => x.header).slice()
-    );
-
-    for (var i = 0, n = teams.length; i < n; ++i) {
-      let teamName: string = teams[i];
-
-      let currentWeekName: string = '';
-
-      let teamSpecificRow: TableCell[] = [new TableCell(teamName, teamName)];
-
-      for (var j = 0, k = this.columns.length; j < k; ++j) {
-        let column: TableColumn = this.columns[j];
-
-        let homeGame: GamePredictionDTO | undefined = games.find(
-          (x) =>
-            x.homeTeamName == teamName &&
-            this.datepipe.transform(x.gameDate, 'dd.MM')! == column.header
+      for (let j = 0, m = weeks.length; j < m; ++j) {
+        const week: number = weeks[j];
+        const weekTeamGames: GamePredictionDTO[] = teamGames.filter(
+          (game) => game.weekNumber == week
         );
-        if (homeGame != null) {
-          teamSpecificRow.push(
-            new TableCell(
-              homeGame.awayTeamAcronym,
-              homeGame.homeTeamWinChance,
-              this.teamWeeksToStrikethrough.find(
-                (item) =>
-                  teamName == item.teamName && homeGame?.weekNumber == item.week
-              )?.gamesCount,
-              homeGame
-            )
-          );
-          continue;
-        }
 
-        let awayGame: GamePredictionDTO | undefined = games.find(
-          (x) =>
-            x.awayTeamName == teamName &&
-            this.datepipe.transform(x.gameDate, 'dd.MM')! == column.header
+        const allGamesPriorToWeek: GamePredictionDTO[] = games.filter(
+          (game) =>
+            (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
+            !game.isOldGame &&
+            game.weekNumber <= week
         );
-        if (awayGame != null) {
-          teamSpecificRow.push(
-            new TableCell(
-              '@' + awayGame.homeTeamAcronym,
-              awayGame.awayTeamWinChance,
-              this.teamWeeksToStrikethrough.find(
-                (item) =>
-                  teamName == item.teamName && awayGame?.weekNumber == item.week
-              )?.gamesCount,
-              awayGame
-            )
+
+        const lowGamesTeamWeek: TeamWeek | null = this.setLowGamesWeekForTeam(
+          weekTeamGames,
+          teamName,
+          week
+        );
+
+        const nextWeekMinDate: Date | null = this.getNextWeekMinDate(
+          games,
+          week
+        );
+        const weekColumns: Array<TableColumn> = this.getWeekColumns(
+          games.filter((game) => game.weekNumber === week),
+          week,
+          nextWeekMinDate
+        );
+
+        for (let k = 0, l = weekColumns.length; k < l; ++k) {
+          const column: TableColumn = weekColumns[k];
+
+          if (
+            this.columnsToDisplay.findIndex((x) => x == column.header) === -1
+          ) {
+            this.columns.push(column);
+            this.columnsToDisplay.push(column.header);
+          }
+
+          const gameTableCell: TableCell | null = this.getGameCalendarCell(
+            weekTeamGames,
+            teamName,
+            column.header,
+            lowGamesTeamWeek?.gamesCount
           );
-          continue;
-        }
 
-        if (column.header.includes('w')) {
-          let gamesForWeekCount: number = games.filter(
-            (game) =>
-              (game.homeTeamName == teamName ||
-                game.awayTeamName == teamName) &&
-              `w${game.weekNumber}` === column.header
-          ).length;
+          if (gameTableCell != null) {
+            teamSpecificRow.push(gameTableCell);
+            continue;
+          }
 
-          let gamesForWeekCountActive: number = games.filter(
-            (game) =>
-              (game.homeTeamName == teamName ||
-                game.awayTeamName == teamName) &&
-              !game.isOldGame &&
-              `w${game.weekNumber}` === column.header
-          ).length;
+          const calendarTableCell: TableCell | null = this.getWeekCalendarCell(
+            column.header,
+            weekTeamGames,
+            allGamesPriorToWeek
+          );
 
-          let gamesForWeekCountAll: number = games.filter(
-            (game) =>
-              (game.homeTeamName == teamName ||
-                game.awayTeamName == teamName) &&
-              !game.isOldGame &&
-              game.weekNumber <= +column.header.replace('w', '')
-          ).length;
-
-          let cellTextValue =
-            gamesForWeekCountAll == gamesForWeekCountActive
-              ? gamesForWeekCountActive.toString()
-              : gamesForWeekCountActive.toString() +
-                '/' +
-                gamesForWeekCountAll.toString();
+          if (calendarTableCell != null) {
+            teamSpecificRow.push(calendarTableCell);
+            continue;
+          }
 
           teamSpecificRow.push(
-            new TableCell(
-              cellTextValue,
-              gamesForWeekCountActive,
-              gamesForWeekCount,
-              undefined,
-              true
-            )
+            this.getEmptyCalendarCell(lowGamesTeamWeek?.gamesCount)
           );
-          currentWeekName = column.header;
-          continue;
         }
-        teamSpecificRow.push(
-          new TableCell(
-            '',
-            -1,
-            this.teamWeeksToStrikethrough.find(
-              (item) =>
-                teamName == item.teamName && `w${item.week}` === currentWeekName
-            )?.gamesCount
-          )
-        );
       }
 
       this.dataSourceArray.push(
@@ -576,79 +545,203 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return '#ff7e7e';
   }
 
-  private generateTableColumns(
-    weeks: number[],
-    games: GamePredictionDTO[]
-  ): TableColumn[] {
-    let allColumns: TableColumn[] = [];
+  /**
+   * Returns all columns for specific game week in calendar
+   * @param weekGames All games for specific week
+   * @param week Week number
+   * @param nextWeekMinDate Min date for next week
+   * @returns Array of calendar columns
+   */
+  private getWeekColumns(
+    weekGames: Array<GamePredictionDTO>,
+    week: number,
+    nextWeekMinDate: Date | null
+  ): Array<TableColumn> {
+    const thisWeekMinDate: Date = Utils.getMonday(
+      GamesUtils.getExtremumDateForGames(weekGames, false),
+      0
+    );
 
-    weeks.forEach((week) => {
-      let weekGames: GamePredictionDTO[] = games.filter(
-        (game) => game.weekNumber == week
-      );
-      let nextWeekGames: GamePredictionDTO[] = games.filter(
-        (game) => game.weekNumber == week + 1
-      );
+    // Set latest date if that's latest week
+    // Otherwise, set the day before next week first day
+    const thisWeekMaxDate =
+      nextWeekMinDate != null
+        ? Utils.addDateDays(nextWeekMinDate, -1)
+        : GamesUtils.getExtremumDateForGames(weekGames, true);
 
-      let thisWeekMinDate: Date = Utils.getMonday(
-        GamesUtils.getExtremumDateForGames(weekGames, false),
-        0
-      );
+    const weekDates: Date[] = Utils.getDatesInRange(
+      thisWeekMinDate,
+      thisWeekMaxDate
+    );
 
-      let nextWeekMinDate: Date | undefined =
-        nextWeekGames?.length > 0
-          ? Utils.getMonday(
-              GamesUtils.getExtremumDateForGames(nextWeekGames, false),
-              0
-            )
-          : undefined;
+    // Set initial column value with just week and it's number
+    const weekColumns: Array<TableColumn> = [{
+      columnDef: thisWeekMaxDate,
+      header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
+    }];
 
-      let newThisWeekMaxDate = new Date();
-      if (nextWeekMinDate != null) {
-        newThisWeekMaxDate = Utils.addDateDays(nextWeekMinDate, -1);
-      }
-
-      let weekDates: Date[] = Utils.getDatesInRange(
-        thisWeekMinDate,
-        newThisWeekMaxDate
-      );
-
-      allColumns.push({
-        columnDef: newThisWeekMaxDate,
-        header: `w${week}`,
-      });
-
-      weekDates.forEach((date) => {
-        allColumns.push({
-          columnDef: date,
-          header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
-        });
+    // Set all other columns with specific week dates
+    weekDates.forEach((date) => {
+      weekColumns.push({
+        columnDef: date,
+        header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
       });
     });
 
-    return allColumns;
+    return weekColumns;
   }
 
-  private setTeamWeeksToStrike(
+  /**
+   * Returns min date for next week
+   * @param games All Games
+   * @param week Current week number
+   * @returns Min date for next week, or null if there is no next week
+   */
+  private getNextWeekMinDate(
     games: GamePredictionDTO[],
-    weeks: number[],
-    teams: string[]
-  ) {
-    teams.forEach((team) => {
-      weeks.forEach((week) => {
-        let gamesCount = games.filter(
-          (game) =>
-            game.weekNumber === week &&
-            (team == game.homeTeamName || team == game.awayTeamName) &&
-            !game.isOldGame
-        ).length;
+    week: number
+  ): Date | null {
+    const nextWeekTeamGames: GamePredictionDTO[] = games.filter(
+      (game) => game.weekNumber == week + 1
+    );
 
-        if (gamesCount <= 1) {
-          this.teamWeeksToStrikethrough.push(
-            new TeamWeek(team, week, gamesCount)
-          );
-        }
-      });
-    });
+    return nextWeekTeamGames?.length > 0
+      ? Utils.getMonday(
+          GamesUtils.getExtremumDateForGames(nextWeekTeamGames, false),
+          0
+        )
+      : null;
+  }
+
+  /**
+   * Determines whether specific week is considered to be
+   * with low amount of games or not.
+   * If so, function adds this team-week combination to array of those combinations.
+   * @param teamWeekGames All games for specific team and week for that team
+   * @param teamName Team Name
+   * @param week Week number
+   * @returns Team-week combination
+   */
+  private setLowGamesWeekForTeam(
+    teamWeekGames: GamePredictionDTO[],
+    teamName: string,
+    week: number
+  ): TeamWeek | null {
+    const gamesCount: number = Utils.count(
+      teamWeekGames,
+      (game) => !game.isOldGame
+    );
+
+    if (gamesCount <= LOW_GAMES_WEEK_BOUNDARY) {
+      const teamWeek: TeamWeek = new TeamWeek(teamName, week, gamesCount);
+      this.teamWeeksToStrikethrough.push(teamWeek);
+
+      return teamWeek;
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets calendar cell object that contains data about team game on specific date
+   * @param weekTeamGames All games for team at specific week
+   * @param teamName Team name
+   * @param columnHeaderText Column header text (date)
+   * @param weekGamesCount Amount of games in a week for a team that cell coresponds to
+   * @returns Game calendar cell
+   */
+  private getGameCalendarCell(
+    weekTeamGames: GamePredictionDTO[],
+    teamName: string,
+    columnHeaderText: string,
+    weekGamesCount: number | undefined
+  ): TableCell | null {
+
+    // get home game based on column date value
+    const homeGame: GamePredictionDTO | undefined = weekTeamGames.find(
+      (x) =>
+        x.homeTeamName == teamName &&
+        this.datepipe.transform(x.gameDate, DEFAULT_DATE_FORMAT)! ==
+          columnHeaderText
+    );
+
+    // if it's home game for team -> return new cell object
+    if (homeGame != null) {
+      return new TableCell(
+        homeGame.awayTeamAcronym,
+        homeGame.homeTeamWinChance,
+        weekGamesCount,
+        homeGame
+      );
+    }
+
+    // get away game based on column date value
+    const awayGame: GamePredictionDTO | undefined = weekTeamGames.find(
+      (x) =>
+        x.awayTeamName == teamName &&
+        this.datepipe.transform(x.gameDate, DEFAULT_DATE_FORMAT)! ==
+          columnHeaderText
+    );
+
+    // if it's away game for team -> return new cell object
+    if (awayGame != null) {
+      return new TableCell(
+        DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym,
+        awayGame.awayTeamWinChance,
+        weekGamesCount,
+        awayGame
+      );
+    }
+
+    // return null if it's not home or away game for team.
+    // Then it should be either week cell, or empty cell with no games
+    return null;
+  }
+
+  /**
+   * Gets calendar cell object that contains data about week
+   * @param columnHeaderText Text of column header
+   * @param weekTeamGames Games specifically for current week
+   * @param allGamesPriorToWeek All games that are scheduled prior to current week
+   * @returns Week calendar cell
+   */
+  private getWeekCalendarCell(
+    columnHeaderText: string,
+    weekTeamGames: GamePredictionDTO[],
+    allGamesPriorToWeek: GamePredictionDTO[]
+  ): TableCell | null {
+
+    // If it's not week column -> return null
+    if (!columnHeaderText.includes(DEFAULT_WEEK_HEADER_PREFIX)) {
+      return null;
+    }
+
+    // Consider only games that are left in current week
+    const activeGamesForWeekCount: number = weekTeamGames.filter(
+      (game) => !game.isOldGame
+    ).length;
+
+    // Choose between normal and simplified calendar view
+    const cellTextValue = activeGamesForWeekCount == allGamesPriorToWeek.length 
+      ? activeGamesForWeekCount.toString()
+      : GamesUtils.getSimplifiedCalendarViewCellText(activeGamesForWeekCount, allGamesPriorToWeek.length);
+
+    // Create table cell
+    return new TableCell(
+      cellTextValue,
+      activeGamesForWeekCount,
+      weekTeamGames.length,
+      undefined,
+      true
+    );
+  }
+
+  /**
+   * Gets empty calendar cell in case if this is not game cell or week cell
+   * @param weekGamesCount Amount of games in a week for a team that cell coresponds to
+   * @returns TableCell object with empty data
+   */
+  private getEmptyCalendarCell(weekGamesCount: number | undefined): TableCell {
+    return new TableCell('', -1, weekGamesCount);
   }
 }

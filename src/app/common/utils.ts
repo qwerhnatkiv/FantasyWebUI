@@ -51,4 +51,20 @@ export module Utils {
     let diff: number = date.getDate() - day - (weeksBefore * 7) + (day == 0 ? -6 : 1); // adjust when day is sunday
     return new Date(date.setDate(diff));
   }
+
+  /**
+   * Returns count of array items with specific predicate filter
+   * @param items Array of items 
+   * @param predicateFn Predicate to filter the items
+   * @returns Count of items in filtered array
+   */
+  export function count<T>(items: Array<T>, predicateFn: (item: T) => boolean): number {
+    return items.reduce(
+      (n, item) => 
+        predicateFn(item)
+      ? n + 1
+      : n,
+      0
+    )
+  }
 }

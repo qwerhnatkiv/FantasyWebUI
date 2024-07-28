@@ -32,6 +32,8 @@ export const WHITE_WIN_LOWER_BOUNDARY = 33.49;
 
 export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
+export const LOW_GAMES_WEEK_BOUNDARY = 1;
+
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["RaisingTheBar", 534753],
   ["A-N-O N-I-M", 534946],
@@ -112,3 +114,6 @@ export const TEAM_NAME_LOGO_PATH_MAP = {
   'Washington Capitals': 'washington-capitals-logo.svg',
   'Winnipeg Jets': 'winnipeg-jets-logo.svg',
 }
+
+export const DEFAULT_WEEK_HEADER_PREFIX = 'w';
+export const DEFAULT_AWAY_GAME_TEAM_PREFIX = '@';

@@ -125,4 +125,15 @@ export module GamesUtils {
               ? `ПП${ppNumber}`
               : 'нет';
   }
+
+  /**
+   * Generates and returns cell value for simplified calendar view (only weeks).
+   * Currently it's in "activeGamesForWeekCount/allGamesPriorToWeekCount" format
+   * @param activeGamesForWeekCount Active (not played yet) games in current week count
+   * @param allGamesPriorToWeekCount All games before current week inluding current week count
+   * @returns Cell value for simplified calendar view
+   */
+  export function getSimplifiedCalendarViewCellText(activeGamesForWeekCount: number, allGamesPriorToWeekCount: number): string {
+    return activeGamesForWeekCount.toString() + '/' + allGamesPriorToWeekCount.toString()
+  }
 }
