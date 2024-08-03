@@ -49,6 +49,9 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CustomDateAdapter } from './common/custom-date-adapter';
 import { PositionsMapPipe } from './pipes/positions-map.pipe';
 import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { CellClassPipe } from './pipes/cell-class.pipe';
+import { CellTextClassPipe } from './pipes/cell-text-class.pipe';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -68,6 +71,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PlayersTableComponent,
     PlayersFiltersComponent,
     PlayersSquadComponent,
+    CellClassPipe,
+    CellTextClassPipe
   ],
   imports: [
     BrowserModule,
@@ -93,6 +98,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatPaginatorModule,
     MatRadioModule,
     MatCheckboxModule,
+    ScrollingModule
   ],
   providers: [
     {

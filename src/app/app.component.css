@@ -14,7 +14,7 @@ footer {
 
 .calendar-container {
   max-width: 100%;
-  width: 99%;
+  width: 100%;
   overflow: auto;
   flex-grow: 10;
 }

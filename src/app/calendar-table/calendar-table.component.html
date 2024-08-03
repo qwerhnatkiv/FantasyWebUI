@@ -1,108 +1,156 @@
-<table cdk-table [dataSource]="dataSource!" [hidden]="!this.isCalendarVisible">
-  <ng-container cdkColumnDef="team" sticky>
-    <th cdk-header-cell *cdkHeaderCellDef></th>
-    <td cdk-cell *cdkCellDef="let element">
-      <div
-        class="team-cell"
-        [class.replaced-by-player]="
-          element['team'].displayValue.includes('ОФО')
-        "
-        [ngxTippy]="generateTeamCellToolTip(element['team'])"
-        tippyClassName="tooltip-general"
-        [tippyProps]="{
-          allowHTML: true,
-          placement: 'auto-end',
-          trigger: 'click',
-          hideOnClick: 'toggle',
-          maxWidth: 'none',
-          arrow: false
-        }"
-      >
-        <img
-          [src]="
-            '/assets/images/logo/' +
-            teamNameLogoPathMap[element['team'].cellValue]
+<cdk-virtual-scroll-viewport
+  class="scroll-view-port"
+  orientation="horizontal"
+  itemSize="70"
+>
+  <table
+    cdk-table
+    [dataSource]="dataSource!"
+    [hidden]="!this.isCalendarVisible"
+  >
+    <ng-container cdkColumnDef="team" sticky>
+      <th cdk-header-cell *cdkHeaderCellDef></th>
+      <td cdk-cell *cdkCellDef="let element">
+        <div
+          class="team-cell"
+          [class.replaced-by-player]="
+            element['team'].displayValue.includes('ОФО')
           "
-          class="team-logo"
-        />
-        <span>
-          {{ element["team"].displayValue }}
-        </span>
-      </div>
-    </td>
-    <td cdk-footer-cell *cdkFooterCellDef></td>
-  </ng-container>
-
-  <ng-container *ngFor="let column of columns" [cdkColumnDef]="column.header">
-    <th cdk-header-cell *cdkHeaderCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column) || !showFullCalendar && isOldDate(column)">
-      {{ column.header }}
-    </th>
-    <td
-      cdk-cell
-      *cdkCellDef="let element"
-      [ngClass]="getCellClass(element[column.header], column)"
-      [hidden]="showOnlyGamesCount && !isWeekColumn(column) || !showFullCalendar && isOldDate(column)"
-    >
-      <div
-        class="calendar-cell"
-        [ngClass]="getCellTextClass(element[column.header])"
-        [ngxTippy]="
-          generateCellToolTip(
-            element[column.header].game,
-            element[column.header].displayValue
-          )
-        "
-        tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
-        [tippyProps]="{
-          allowHTML: true,
-          placement: 'bottom',
-          arrow: false,
-        }"
-      >
-        <img
-          *ngIf="isPlayerSelectedCell(element, element[column.header])"
-          [src]="
-            '/assets/images/logo/' +
-            teamNameLogoPathMap[
-              getSelectedPlayerCellOpponentName(element, element[column.header])
-            ]
-          "
-          class="team-logo"
-        />
-        <span>
-          {{ 
-            !element[column.header].isWeekCell || !showFullCalendar
-              ? element[column.header].isWeekCell
-                ? showOnlyGamesCount
-                  ? element[column.header].displayValue
-                  : element[column.header].cellValue
-                : element[column.header].displayValue
-              : element[column.header].weekGames 
-          }}
-        </span>
-        <div class="bookmakers-mark-div">
+          [ngxTippy]="generateTeamCellToolTip(element['team'])"
+          tippyClassName="tooltip-general"
+          [tippyProps]="{
+            allowHTML: true,
+            placement: 'auto-end',
+            trigger: 'click',
+            hideOnClick: 'toggle',
+            maxWidth: 'none',
+            arrow: false
+          }"
+        >
           <img
-            *ngIf="areOddsFromBookmakers(element[column.header])"
-            src="/assets/images/bookmakers_mark.png"
-            class="bookmakers-mark-logo"
+            [src]="
+              '/assets/images/logo/' +
+              teamNameLogoPathMap[element['team'].cellValue]
+            "
+            class="team-logo"
           />
+          <span>
+            {{ element["team"].displayValue }}
+          </span>
         </div>
-      </div>
-    </td>
-    <td cdk-footer-cell *cdkFooterCellDef [hidden]="showOnlyGamesCount && !isWeekColumn(column) || 
-                                                    !showFullCalendar && isOldDate(column)">
-      {{ column.header }}
-    </td>
-  </ng-container>
+      </td>
+      <td cdk-footer-cell *cdkFooterCellDef></td>
+    </ng-container>
 
-  <tr cdk-header-row *cdkHeaderRowDef="columnsToDisplay"></tr>
-  <tr cdk-row *cdkRowDef="let row; columns: columnsToDisplay"></tr>
-  <tr cdk-footer-row *cdkFooterRowDef="columnsToDisplay"></tr>
+    @for (column of columns; track column) {
+    <ng-container [cdkColumnDef]="column.header">
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        [hidden]="
+          (showOnlyGamesCount && !isWeekColumn(column)) ||
+          (!showFullCalendar && isOldDate(column))
+        "
+        class="virtual-horizontal-cell"
+      >
+        {{ column.header }}
+      </th>
+      <td
+        cdk-cell
+        *cdkCellDef="let element"
+        [ngClass]="
+          column
+            | cellClass
+              : minFilterDate
+              : maxFilterDate
+              : element[column.header].isWeekCell
+              : element[column.header].weekGames
+              : yesterdayDate
+        "
+        [hidden]="
+          (showOnlyGamesCount && !isWeekColumn(column)) ||
+          (!showFullCalendar && isOldDate(column))
+        "
+        class="virtual-horizontal-cell"
+      >
+        <div
+          class="calendar-cell"
+          [ngClass]="
+            element[column.header].weekGames
+              | cellTextClass
+                : element[column.header].isWeekCell
+                : showFullCalendar
+                : element[column.header].isOldGame
+                : element[column.header].cellValue
+          "
+          [ngxTippy]="
+            generateCellToolTip(
+              element[column.header].game,
+              element[column.header].displayValue
+            )
+          "
+          tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
+          [tippyProps]="{
+            allowHTML: true,
+            placement: 'bottom',
+            arrow: false,
+          }"
+        >
+          <img
+            *ngIf="isPlayerSelectedCell(element, element[column.header])"
+            [src]="
+              '/assets/images/logo/' +
+              teamNameLogoPathMap[
+                getSelectedPlayerCellOpponentName(
+                  element,
+                  element[column.header]
+                )
+              ]
+            "
+            class="team-logo"
+          />
+          <span>
+            {{
+              !element[column.header].isWeekCell || !showFullCalendar
+                ? element[column.header].isWeekCell
+                  ? showOnlyGamesCount
+                    ? element[column.header].displayValue
+                    : element[column.header].cellValue
+                  : element[column.header].displayValue
+                : element[column.header].weekGames
+            }}
+          </span>
+          <div class="bookmakers-mark-div">
+            <img
+              *ngIf="areOddsFromBookmakers(element[column.header])"
+              src="/assets/images/bookmakers_mark.png"
+              class="bookmakers-mark-logo"
+            />
+          </div>
+        </div>
+      </td>
+      <td
+        cdk-footer-cell
+        *cdkFooterCellDef
+        [hidden]="
+          (showOnlyGamesCount && !isWeekColumn(column)) ||
+          (!showFullCalendar && isOldDate(column))
+        "
+      >
+        {{ column.header }}
+      </td>
+    </ng-container>
+    }
 
-  <!-- Row shown when there is no matching data. -->
-  <tr class="cdk-row" *cdkNoDataRow>
-    <td class="cdk-cell" colspan="4">
-      No calendar games were received from the server
-    </td>
-  </tr>
-</table>
+    <tr cdk-header-row *cdkHeaderRowDef="columnsToDisplay"></tr>
+    <tr cdk-row *cdkRowDef="let row; columns: columnsToDisplay"></tr>
+    <tr cdk-footer-row *cdkFooterRowDef="columnsToDisplay"></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr class="cdk-row" *cdkNoDataRow>
+      <td class="cdk-cell" colspan="4">
+        No calendar games were received from the server
+      </td>
+    </tr>
+  </table>
+</cdk-virtual-scroll-viewport>

@@ -1,7 +1,18 @@
 table {
-  width: 800px;
+  width: 100%;
   margin-left: 10px;
+  overflow: hidden;
 }
+
+.scroll-view-port {
+  height: 960px;
+  width: 100%;
+}
+
+.virtual-horizontal-cell {
+  width: 70px;
+}
+
 
 .team-cell {
   color: black;

@@ -9,6 +9,7 @@ import {
   OnInit,
   QueryList,
   SimpleChanges,
+  ViewChild,
   ViewChildren,
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -36,10 +37,12 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, ReplaySubject, Subscription } from 'rxjs';
 import { CdkCell, CdkHeaderCell } from '@angular/cdk/table';
 import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 import { ja } from 'date-fns/locale';
+import { CdkVirtualScrollRepeater, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ListRange } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-calendar-table',
@@ -54,7 +57,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
 
   public columns: Array<TableColumn> = [];
-  public columnsToDisplay: string[] = this.columns.map((x) => x.header).slice();
+  public columnsToDisplay: string[] = [];
   public dataSource: MatTableDataSource<any> = new MatTableDataSource(
     this.dataSourceArray
   );
@@ -120,11 +123,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private showOnlyGamesCountSubscription: Subscription | undefined;
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
-  private yesterdayDate: Date = new Date();
+  public yesterdayDate: Date = new Date();
 
   @ViewChildren(CdkHeaderCell, { read: ElementRef }) cells!: QueryList<
     ElementRef<HTMLTableRowElement>
   >;
+
+  @ViewChild(CdkVirtualScrollViewport, { static: true }) _viewPort!: CdkVirtualScrollViewport;
 
   constructor(
     private _observablesProxyHandlingService: ObservablesProxyHandlingService,
@@ -140,6 +145,14 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         }
       );
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
+
+    const handler = new ColumnScrollDataHandler(
+      this._viewPort,
+      this.columns
+    );
+    handler.columnsToDisplayStream.subscribe(
+      (columns) => (this.columnsToDisplay = columns.map(x => x.header))
+    );
   }
 
   ngOnDestroy() {
@@ -205,7 +218,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       .filter(Utils.onlyUnique)
       .sort((n1, n2) => n1 - n2);
 
-    this.columnsToDisplay = ['team'];
+    const displayColumns: string[] = ['team'];
+    const allColumns: TableColumn[] = [];
 
     for (let i = 0, n = teams.length; i < n; ++i) {
       const teamName: string = teams[i];
@@ -248,10 +262,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           const column: TableColumn = weekColumns[k];
 
           if (
-            this.columnsToDisplay.findIndex((x) => x == column.header) === -1
+            displayColumns.findIndex((x) => x == column.header) === -1
           ) {
-            this.columns.push(column);
-            this.columnsToDisplay.push(column.header);
+            allColumns.push(column);
+            displayColumns.push(column.header);
           }
 
           const gameTableCell: TableCell | null = this.getGameCalendarCell(
@@ -285,78 +299,20 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
       this.dataSourceArray.push(
         Object.fromEntries(
-          this.columnsToDisplay.map((_, i) => [
-            this.columnsToDisplay[i],
+          displayColumns.map((_, i) => [
+            displayColumns[i],
             teamSpecificRow[i],
           ])
         )
       );
     }
-  }
 
-  public getCellClass(cell: TableCell, column: TableColumn) {
-    if (this.isOldDate(column)) {
-      let className = 'calendar-cell-old';
-
-      return className;
-    }
-
-    let classStatement: string =
-      this.minFilterDate != null &&
-      this.maxFilterDate != null &&
-      column.columnDef != null &&
-      column.columnDef! >= this.minFilterDate &&
-      column.columnDef! <= this.maxFilterDate
-        ? 'calendar-cell-selected'
-        : 'calendar-cell-not-selected';
-
-    if (cell.weekGames! <= 1 && !cell.isWeekCell) {
-      classStatement += ' strike';
-    }
-
-    return classStatement;
-  }
-
-  public getCellTextClass(cell: TableCell) {
-    let numericValue: number = Number(cell.cellValue);
-
-    if (cell.isWeekCell) {
-      if (this.showFullCalendar ? cell.weekGames! > 3 : cell.cellValue > 3) {
-        return 'calendar-cell-week-green';
-      }
-
-      if (this.showFullCalendar ? cell.weekGames! < 2 : cell.cellValue < 2) {
-        return 'calendar-cell-week-red';
-      }
-
-      return 'calendar-cell-week';
-    }
-
-    if (cell.game?.isOldGame) {
-      return 'calendar-cell-old-content';
-    }
-
-    if (numericValue < 0) {
-      return 'calendar-cell-empty';
-    }
-
-    if (numericValue >= VERY_GREEN_WIN_LOWER_BOUNDARY) {
-      return 'calendar-cell-very-green';
-    }
-
-    if (numericValue >= GREEN_WIN_LOWER_BOUNDARY) {
-      return 'calendar-cell-green';
-    }
-
-    if (numericValue >= WHITE_WIN_LOWER_BOUNDARY) {
-      return 'calendar-cell-normal';
-    }
-
-    return 'calendar-cell-red';
+    this.columns = allColumns;
+    this.columnsToDisplay = displayColumns;
   }
 
   public isWeekColumn(column: TableColumn): boolean {
-    return column.header.includes('w');
+    return column.header.startsWith('w');
   }
 
   public isOldDate(column: TableColumn): boolean {
@@ -403,22 +359,22 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     let gfForecastPimColor: string =
-      teamStat.teamGoalsForm! <= GREEN_TEAM_GF_BOUNDARY ? 'white' : '#64ff8f';
+      teamStat?.teamGoalsForm! <= GREEN_TEAM_GF_BOUNDARY ? 'white' : '#64ff8f';
 
     let gaForecastPimColor: string =
-      teamStat.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY ? 'white' : '#ff7e7e';
+      teamStat?.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY ? 'white' : '#ff7e7e';
 
     let averageTeamStat: string = `
           <div>
             <span style="color:${gfForecastPimColor}">
-              ${this.numberPipe.transform(teamStat.teamGoalsForm, '1.0-1')} GF
+              ${this.numberPipe.transform(teamStat?.teamGoalsForm, '1.0-1')} GF
             </span>
             <span>
             |
             </span>
             <span style="color:${gaForecastPimColor}">
               ${this.numberPipe.transform(
-                teamStat.teamGoalsAwayForm,
+                teamStat?.teamGoalsAwayForm,
                 '1.0-1'
               )} GA
             </span>
@@ -426,29 +382,29 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             |
             </span>
             <span>
-              ${this.numberPipe.transform(teamStat.teamFormSF, '1.0-1')} SF
+              ${this.numberPipe.transform(teamStat?.teamFormSF, '1.0-1')} SF
             </span>
             <span>
             |
             </span>
             <span>
-              ${this.numberPipe.transform(teamStat.teamFormSA, '1.0-1')} SA
+              ${this.numberPipe.transform(teamStat?.teamFormSA, '1.0-1')} SA
             </span>
             <span>
             |
             </span>
             <span>
-              ${this.numberPipe.transform(teamStat.teamFormXGF, '1.0-1')} xGF
+              ${this.numberPipe.transform(teamStat?.teamFormXGF, '1.0-1')} xGF
             </span>
             <span>
             |
             </span>
             <span>
-              ${this.numberPipe.transform(teamStat.teamFormXGA, '1.0-1')} xGA
+              ${this.numberPipe.transform(teamStat?.teamFormXGA, '1.0-1')} xGA
             </span>
           </div>
           <div> 
-            ${teamStat.teamForm}
+            ${teamStat?.teamForm}
           </div>
       `;
 
@@ -743,5 +699,33 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
    */
   private getEmptyCalendarCell(weekGamesCount: number | undefined): TableCell {
     return new TableCell('', -1, weekGamesCount);
+  }
+}
+
+export class ColumnScrollDataHandler
+  implements CdkVirtualScrollRepeater<TableColumn>
+{
+  private columnsToDisplaySubject = new ReplaySubject<TableColumn[]>(1);
+  readonly columnsToDisplayStream = this.columnsToDisplaySubject.asObservable();
+
+  constructor(
+    private viewPort: CdkVirtualScrollViewport,
+    private allColumns: TableColumn[]
+  ) {
+    this.dataStream = of(this.allColumns);
+    viewPort.renderedRangeStream.subscribe((range) => {
+      this.columnsToDisplaySubject.next(
+        allColumns.slice(range.start, range.end)
+      );
+    });
+    viewPort.attach(this);
+  }
+  readonly dataStream: Observable<readonly TableColumn[]>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  measureRangeSize(
+    range: ListRange,
+    orientation: 'horizontal' | 'vertical'
+  ): number {
+    return 0;
   }
 }

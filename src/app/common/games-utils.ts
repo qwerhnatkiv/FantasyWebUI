@@ -136,4 +136,14 @@ export module GamesUtils {
   export function getSimplifiedCalendarViewCellText(activeGamesForWeekCount: number, allGamesPriorToWeekCount: number): string {
     return activeGamesForWeekCount.toString() + '/' + allGamesPriorToWeekCount.toString()
   }
+
+  /**
+   * Compares two dates and determines whether source date is older than target date
+   * @param sourceDate Main date
+   * @param targetDate Date to compare with
+   * @returns True/False result
+   */
+  export function isOldDate(sourceDate: Date | undefined, targetDate: Date): boolean {
+    return sourceDate?.getTime()! < targetDate.getTime();
+  }
 }
