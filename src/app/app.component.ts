@@ -20,7 +20,11 @@ import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
 import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
-import { DEFAULT_FORM_LENGTH, DEFAULT_POSITIONS, USER_ID_NAME } from 'src/constants';
+import {
+  DEFAULT_FORM_LENGTH,
+  DEFAULT_POSITIONS,
+  USER_ID_NAME,
+} from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 import { UpdateLogInformation } from './interfaces/update-log-information';
@@ -53,7 +57,7 @@ export class AppComponent implements OnChanges {
   public showFullCalendar: boolean = false;
 
   public emitHideShowFullCalendar() {
-    this.showFullCalendar = !this.showFullCalendar; 
+    this.showFullCalendar = !this.showFullCalendar;
   }
 
   public emitHideShowOnlyGamesCount() {
@@ -65,24 +69,29 @@ export class AppComponent implements OnChanges {
   }
 
   public emitSelectBestPlayersForEachTeam() {
-    this.areBestPlayersForEachTeamSelected = !this.areBestPlayersForEachTeamSelected;
+    this.areBestPlayersForEachTeamSelected =
+      !this.areBestPlayersForEachTeamSelected;
   }
 
   set addedToSquadPlayer(value: PlayerSquadRecord) {
     if (this.squadPlayers.length <= 0) {
       return;
     }
-    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find((x) => x.playerObject.playerID == value.playerObject.playerID);
+    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
+      (x) => x.playerObject.playerID == value.playerObject.playerID
+    );
     if (matchedPlayer != null) {
       matchedPlayer.isRemoved = false;
-    }
-    else {
+    } else {
       this.squadPlayers.push(value);
-      this.squadPlayers.sort((a, b) => 
-      DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price);
+      this.squadPlayers.sort(
+        (a, b) =>
+          DEFAULT_POSITIONS.indexOf(a.position) -
+            DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price
+      );
     }
 
-    this.squadPlayers  = Object.assign([], this.squadPlayers);
+    this.squadPlayers = Object.assign([], this.squadPlayers);
   }
 
   public lowerBoundPrice: number | undefined = undefined;
@@ -94,7 +103,10 @@ export class AppComponent implements OnChanges {
   public hideLowGPPlayersEnabled: boolean = false;
   public shouldDeselectAllSelectedPlayers: boolean = false;
 
-  public teamPlayerExpectedOfoMap: Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>> = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
+  public teamPlayerExpectedOfoMap: Map<
+    number,
+    Map<Date, PlayerExpectedFantasyPointsInfo[]>
+  > = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
   private formLength: number = DEFAULT_FORM_LENGTH;
 
@@ -133,7 +145,11 @@ export class AppComponent implements OnChanges {
     TeamGameInformation[]
   >();
 
-  constructor(private http: HttpClient, private ngxLoader: NgxUiLoaderService, private _observablesProxyHandlingService: ObservablesProxyHandlingService) {
+  constructor(
+    private http: HttpClient,
+    private ngxLoader: NgxUiLoaderService,
+    private _observablesProxyHandlingService: ObservablesProxyHandlingService
+  ) {
     this.getCalendarData(true);
   }
 
@@ -149,7 +165,8 @@ export class AppComponent implements OnChanges {
   }
 
   public deselectAllSelectedPlayers() {
-    this.shouldDeselectAllSelectedPlayers = !this.shouldDeselectAllSelectedPlayers;
+    this.shouldDeselectAllSelectedPlayers =
+      !this.shouldDeselectAllSelectedPlayers;
   }
 
   private getCalendarData(setDefaultDates: boolean) {
@@ -184,7 +201,10 @@ export class AppComponent implements OnChanges {
       .sort((n1, n2) => n1 - n2);
 
     if (setDefaultDates) {
-      this.setFiltersDefaultDates(upcomingWeeks, this.games.filter((x) => !x.isOldGame));
+      this.setFiltersDefaultDates(
+        upcomingWeeks,
+        this.games.filter((x) => !x.isOldGame)
+      );
     }
     this.updateFilteredTeamsGamesMap();
     this.setOfoDataForPlayers();
@@ -206,7 +226,10 @@ export class AppComponent implements OnChanges {
     weeks: number[],
     games: GamePredictionDTO[]
   ): void {
-    let minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
+    const minDate: Date = Utils.getMonday(
+      GamesUtils.getExtremumDateForGames(games, false),
+      0
+    );
     this.minFilterDate = new Date(minDate.getTime());
 
     if (weeks.length === 0) {
@@ -215,44 +238,47 @@ export class AppComponent implements OnChanges {
       return;
     }
 
-    weeks.forEach((week) => {
-      let weekGames: GamePredictionDTO[] = games.filter(
+    for(const week of weeks) {
+      const weekGames: GamePredictionDTO[] = games.filter(
         (game) => game.weekNumber == week
       );
-      let thisWeekMinDate: Date = GamesUtils.getExtremumDateForGames(
-        weekGames,
-        false
+
+      const nextWeekGames: GamePredictionDTO[] = games.filter(
+        (game) => game.weekNumber == week + 1
       );
-      let thisWeekMaxDate: Date = GamesUtils.getExtremumDateForGames(
-        weekGames,
-        true
+
+      const thisWeekMinDate: Date = Utils.getMonday(
+        GamesUtils.getExtremumDateForGames(weekGames, false),
+        0
       );
+
+      const nextWeekMinDate: Date | undefined =
+        nextWeekGames?.length > 0
+          ? Utils.getMonday(GamesUtils.getExtremumDateForGames(nextWeekGames, false), 0)
+          : undefined;
+
+      const thisWeekMaxDate =
+        nextWeekMinDate != null
+          ? Utils.addDateDays(nextWeekMinDate, -1)
+          : GamesUtils.getExtremumDateForGames(weekGames, true);
+
+      const nextWeekMaxDate: Date =
+        nextWeekGames.length > 0
+          ? GamesUtils.getExtremumDateForGames(nextWeekGames, true)
+          : thisWeekMaxDate;
 
       if (
         thisWeekMinDate.getTime() <= minDate.getTime()! &&
         thisWeekMaxDate.getTime() >= minDate.getTime()!
       ) {
-        let nextWeekGames: GamePredictionDTO[] = games.filter(
-          (game) => game.weekNumber == week + 1
-        );
-
-        let nextWeekMinDate: Date | undefined =
-        nextWeekGames?.length > 0
-          ? GamesUtils.getExtremumDateForGames(nextWeekGames, false)
-          : undefined;
-
-        let nextWeekMaxDate: Date = nextWeekGames.length > 0 
-          ? GamesUtils.getExtremumDateForGames(
-            nextWeekGames,
-            true
-          )
-          : thisWeekMaxDate;
-
-        let today: Date = new Date();
-        this.minFilterDate = today.getDay() != 0 ? this.minFilterDate : nextWeekMinDate;
-        this.maxFilterDate = today.getDay() != 0 ? thisWeekMaxDate : nextWeekMaxDate;
+        const today: Date = new Date();
+        this.minFilterDate =
+          today.getDay() != 0 || today.getTime() < this.minFilterDate?.getTime()! ? this.minFilterDate : nextWeekMinDate;
+        this.maxFilterDate =
+          today.getDay() != 0 || today.getTime() < this.minFilterDate?.getTime()! ? thisWeekMaxDate : nextWeekMaxDate;
+        break;
       }
-    });
+    }
   }
 
   private updateFilteredTeamsGamesMap() {
@@ -328,7 +354,10 @@ export class AppComponent implements OnChanges {
           let keys: string[] = Object.keys(result);
           let key: number;
 
-          this.teamPlayerExpectedOfoMap = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
+          this.teamPlayerExpectedOfoMap = new Map<
+            number,
+            Map<Date, PlayerExpectedFantasyPointsInfo[]>
+          >();
 
           for (var i = 0, n = keys.length; i < n; ++i) {
             key = +keys[i];
@@ -339,7 +368,11 @@ export class AppComponent implements OnChanges {
 
           for (let [_, gameOfoMap] of this.teamPlayerExpectedOfoMap) {
             for (let [dateKey, value] of gameOfoMap) {
-              value = value.sort((n1, n2) => n2.playerExpectedFantasyPoints - n1.playerExpectedFantasyPoints);
+              value = value.sort(
+                (n1, n2) =>
+                  n2.playerExpectedFantasyPoints -
+                  n1.playerExpectedFantasyPoints
+              );
               gameOfoMap.set(dateKey, value.splice(0, 3));
             }
           }
@@ -355,7 +388,7 @@ export class AppComponent implements OnChanges {
   }
 
   private getUserSquad() {
-    if (this._selectedUser == null || this._selectedUser == "") {
+    if (this._selectedUser == null || this._selectedUser == '') {
       this.squadPlayers = [];
       this.balanceValue = 0;
       return;
@@ -370,9 +403,13 @@ export class AppComponent implements OnChanges {
       )
       .subscribe({
         next: (result) => {
-          let removedIds: Array<number> = this.squadPlayers.filter((x) => x.isRemoved).map((x) => x.playerObject.playerID);
-          let addedIds: Array<number> = this.squadPlayers.filter((x) => x.isNew).map((x) => x.playerObject.playerID);
-          this.squadPlayers = []
+          let removedIds: Array<number> = this.squadPlayers
+            .filter((x) => x.isRemoved)
+            .map((x) => x.playerObject.playerID);
+          let addedIds: Array<number> = this.squadPlayers
+            .filter((x) => x.isNew)
+            .map((x) => x.playerObject.playerID);
+          this.squadPlayers = [];
 
           this.balanceValue = result.balance;
           this.substitutionsLeft = result.substitutions;
@@ -396,13 +433,16 @@ export class AppComponent implements OnChanges {
               playerName: matchingPlayerInfo.playerName,
               position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
-              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
+              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
+                ?.length!,
               expectedFantasyPoints: ofo ?? 0,
               isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
               isNew: addedIds.includes(matchingPlayerInfo.playerID),
               playerObject: matchingPlayerInfo,
               teamObject: matchingTeam,
-              powerPlayNumber: GamesUtils.GetPPText(matchingPlayerInfo.formPowerPlayNumber),
+              powerPlayNumber: GamesUtils.GetPPText(
+                matchingPlayerInfo.formPowerPlayNumber
+              ),
             });
           }
 
@@ -426,18 +466,24 @@ export class AppComponent implements OnChanges {
               playerName: matchingPlayerInfo.playerName,
               position: matchingPlayerInfo.position,
               price: matchingPlayerInfo.price,
-              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)?.length!,
+              gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
+                ?.length!,
               expectedFantasyPoints: ofo ?? 0,
               isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
               isNew: addedIds.includes(matchingPlayerInfo.playerID),
               playerObject: matchingPlayerInfo,
               teamObject: matchingTeam,
-              powerPlayNumber: GamesUtils.GetPPText(matchingPlayerInfo.formPowerPlayNumber),
+              powerPlayNumber: GamesUtils.GetPPText(
+                matchingPlayerInfo.formPowerPlayNumber
+              ),
             });
           }
 
-          this.squadPlayers.sort((a, b) => 
-            DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price);
+          this.squadPlayers.sort(
+            (a, b) =>
+              DEFAULT_POSITIONS.indexOf(a.position) -
+                DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price
+          );
         },
         error: (err) => {
           console.error(err);
@@ -446,7 +492,10 @@ export class AppComponent implements OnChanges {
       });
   }
 
-  private setTop3PlayersForEachTeam(playerId: number, playersOfoDataArray: PlayerExpectedFantasyPointsDTO[]) {
+  private setTop3PlayersForEachTeam(
+    playerId: number,
+    playersOfoDataArray: PlayerExpectedFantasyPointsDTO[]
+  ) {
     if (playersOfoDataArray.length == 0) {
       return;
     }
@@ -454,34 +503,43 @@ export class AppComponent implements OnChanges {
     let teamID: number = playersOfoDataArray[0].teamID;
 
     if (!this.teamPlayerExpectedOfoMap.has(teamID)) {
-      this.teamPlayerExpectedOfoMap.set(teamID, new Map<Date, PlayerExpectedFantasyPointsInfo[]>());
+      this.teamPlayerExpectedOfoMap.set(
+        teamID,
+        new Map<Date, PlayerExpectedFantasyPointsInfo[]>()
+      );
     }
 
-    let playerStat: PlayerStatsDTO = this.playerStats.find((y) => playerId == y.playerID)!;
-  
+    let playerStat: PlayerStatsDTO = this.playerStats.find(
+      (y) => playerId == y.playerID
+    )!;
+
     if (playerStat == null) {
       return;
     }
 
     playersOfoDataArray.forEach((x) => {
       let playerOfoSum = x.playerExpectedFantasyPoints;
-      let game: GamePredictionDTO = this.games.find((y) => y.gameId == x.gameID)!;
+      let game: GamePredictionDTO = this.games.find(
+        (y) => y.gameId == x.gameID
+      )!;
 
-      let gameOfoMap: Map<Date, PlayerExpectedFantasyPointsInfo[]> = this.teamPlayerExpectedOfoMap.get(teamID)!;
+      let gameOfoMap: Map<Date, PlayerExpectedFantasyPointsInfo[]> =
+        this.teamPlayerExpectedOfoMap.get(teamID)!;
       if (!gameOfoMap.has(game.gameDate)) {
         gameOfoMap.set(game.gameDate, []);
       }
-  
-      let powerPlayInfo: string = playerStat.formPowerPlayNumber > 0
-            ? `ПП${playerStat.formPowerPlayNumber}`
-            : 'нет'
-  
+
+      let powerPlayInfo: string =
+        playerStat.formPowerPlayNumber > 0
+          ? `ПП${playerStat.formPowerPlayNumber}`
+          : 'нет';
+
       let modelInfo: PlayerExpectedFantasyPointsInfo = {
         playerName: playerStat.playerName,
         playerExpectedFantasyPoints: playerOfoSum,
         price: playerStat.price,
         powerPlayNumber: powerPlayInfo,
-        isFire: false
+        isFire: false,
       };
 
       gameOfoMap.get(game.gameDate)?.push(modelInfo);
