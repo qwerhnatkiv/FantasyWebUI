@@ -311,14 +311,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this.columnsToDisplay = displayColumns;
   }
 
-  public isWeekColumn(column: TableColumn): boolean {
-    return column.header.startsWith('w');
-  }
-
-  public isOldDate(column: TableColumn): boolean {
-    return column.columnDef?.getTime()! < this.yesterdayDate.getTime();
-  }
-
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
     return (
       element['team'].displayValue.includes('ОФО') &&
@@ -534,6 +526,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     const weekColumns: Array<TableColumn> = [{
       columnDef: thisWeekMaxDate,
       header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
+      isWeekColumn: true,
+      isOldDate: thisWeekMaxDate.getTime() < this.yesterdayDate.getTime()
     }];
 
     // Set all other columns with specific week dates
@@ -541,6 +535,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       weekColumns.push({
         columnDef: date,
         header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
+        isWeekColumn: false,
+        isOldDate: date.getTime() < this.yesterdayDate.getTime()
       });
     });
 

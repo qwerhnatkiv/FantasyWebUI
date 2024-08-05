@@ -48,8 +48,8 @@
         cdk-header-cell
         *cdkHeaderCellDef
         [hidden]="
-          (showOnlyGamesCount && !isWeekColumn(column)) ||
-          (!showFullCalendar && isOldDate(column))
+          (showOnlyGamesCount && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
         "
         class="virtual-horizontal-cell"
       >
@@ -68,8 +68,8 @@
               : yesterdayDate
         "
         [hidden]="
-          (showOnlyGamesCount && !isWeekColumn(column)) ||
-          (!showFullCalendar && isOldDate(column))
+          (showOnlyGamesCount && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
         "
         class="virtual-horizontal-cell"
       >
@@ -133,8 +133,8 @@
         cdk-footer-cell
         *cdkFooterCellDef
         [hidden]="
-          (showOnlyGamesCount && !isWeekColumn(column)) ||
-          (!showFullCalendar && isOldDate(column))
+          (showOnlyGamesCount && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
         "
       >
         {{ column.header }}
