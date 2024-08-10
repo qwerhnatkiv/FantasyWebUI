@@ -33,25 +33,30 @@ import { MatSortModule } from '@angular/material/sort';
 import { PlayersFiltersComponent } from './players-filters/players-filters.component';
 
 import { NgFor } from '@angular/common';
-import { MatSelectModule } from '@angular/material/select';
-import {MatDividerModule} from '@angular/material/divider';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
+import {
+  MAT_SELECT_SCROLL_STRATEGY,
+  MatSelectModule,
+} from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 
-import {CdkTableModule} from '@angular/cdk/table';
-import {MatPaginatorModule} from '@angular/material/paginator';
+import { CdkTableModule } from '@angular/cdk/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { PlayersSquadComponent } from './players-squad/players-squad.component';
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from '@angular/material/radio';
 
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CustomDateAdapter } from './common/custom-date-adapter';
 import { PositionsMapPipe } from './pipes/positions-map.pipe';
 import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CellClassPipe } from './pipes/cell-class.pipe';
 import { CellTextClassPipe } from './pipes/cell-text-class.pipe';
+import { Overlay } from '@angular/cdk/overlay';
+import { selectScrollStrategyFactory } from './strategies/select-scroll-strategy';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -72,7 +77,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PlayersFiltersComponent,
     PlayersSquadComponent,
     CellClassPipe,
-    CellTextClassPipe
+    CellTextClassPipe,
   ],
   imports: [
     BrowserModule,
@@ -98,7 +103,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatPaginatorModule,
     MatRadioModule,
     MatCheckboxModule,
-    ScrollingModule
+    ScrollingModule,
   ],
   providers: [
     {
@@ -108,7 +113,12 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
-    ObservablesProxyHandlingService
+    {
+      provide: MAT_SELECT_SCROLL_STRATEGY,
+      useFactory: selectScrollStrategyFactory,
+      deps: [Overlay],
+    },
+    ObservablesProxyHandlingService,
   ],
   bootstrap: [AppComponent],
 })
