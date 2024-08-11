@@ -55,8 +55,6 @@ import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CellClassPipe } from './pipes/cell-class.pipe';
 import { CellTextClassPipe } from './pipes/cell-text-class.pipe';
-import { Overlay } from '@angular/cdk/overlay';
-import { selectScrollStrategyFactory } from './strategies/select-scroll-strategy';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -113,11 +111,6 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
-    {
-      provide: MAT_SELECT_SCROLL_STRATEGY,
-      useFactory: selectScrollStrategyFactory,
-      deps: [Overlay],
-    },
     ObservablesProxyHandlingService,
   ],
   bootstrap: [AppComponent],

@@ -47,3 +47,9 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+div.mat-mdc-select-panel {
+  overflow: auto !important;
+  will-change: scroll-position !important;
+  -webkit-overflow-scrolling: touch !important;
+}
