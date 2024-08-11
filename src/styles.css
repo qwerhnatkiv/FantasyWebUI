@@ -49,7 +49,6 @@ body {
 }
 
 div.mat-mdc-select-panel {
-  overflow: auto !important;
-  will-change: scroll-position !important;
+  touch-action: pan-y !important;
   -webkit-overflow-scrolling: touch !important;
 }
