@@ -9,13 +9,13 @@
         {{ maxFilterDate | date : "dd.MM.yyyy" }}
       </label>
     </div>
-    <button
+    <i-button
       class="clear-table-calendar-button"
-      mat-icon-button
-      (click)="deselectAllPlayersInCalendar()"
-    >
-      <mat-icon class="clear-table-calendar-icon">event_busy</mat-icon>
-    </button>
+      iconPath="/assets/images/clear-list.png"
+      [iconRelativeSize]="65"
+      (clickEmitter)="deselectAllPlayersInCalendar()"
+      tooltipText="Сбросить выделенных игроков в списке"
+    ></i-button>
   </div>
   <table
     mat-table
@@ -312,7 +312,7 @@
         ОФО
       </th>
       <td mat-cell *matCellDef="let element" class="bold">
-        {{ element.expectedFantasyPoints | number: '1.0-1' }}
+        {{ element.expectedFantasyPoints | number : "1.0-1" }}
       </td>
     </ng-container>
 

@@ -35,18 +35,7 @@ footer {
 }
 
 .hideCalendarButton:hover {
-  background: #f4eb23;
-  cursor: pointer;
-}
-
-.button {
-  background: #fef524;
-  margin-left: 40px;
-  display: block;
-}
-
-.button:hover {
-  background: #f4eb23;
+  background: #e2d90b;
   cursor: pointer;
 }
 
@@ -55,6 +44,11 @@ footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.header-calendar-action-buttons {
+  display: flex;
+  gap: 20px;
 }
 
 .calendar-filters {

@@ -24,7 +24,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
   powerPlayFormControl = new FormControl<string[]>([]);
-  selectedUser: string | undefined = undefined;
+  selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
 
   playersAreNotPlayedDisabled: boolean = true;
@@ -115,6 +115,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.sendSelectedUser.emit(this.selectedUser!);
 
     if (this.selectedUser == null) {
+      this.selectedUserId = undefined;
       return;
     }
 
@@ -168,7 +169,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   }
 
   public resetSelectedUserFilter() {
-    this.selectedUser = undefined; 
+    this.selectedUser = null; 
     this.selectedUserChanged()
   }
 
@@ -192,5 +193,12 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
     this.hideLowGPPlayersEnabled = false;
     this.hideLowGPPlayersEnabledChanged();
+  }
+
+  /**
+   * Opens user's profile on SPORTS.RU resource
+   */
+  public openSportsRuProfile(): void {
+    window.open(`https://www.sports.ru/fantasy/hockey/team/${this.selectedUserId}.html`);
   }
 }

@@ -55,6 +55,7 @@ import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CellClassPipe } from './pipes/cell-class.pipe';
 import { CellTextClassPipe } from './pipes/cell-text-class.pipe';
+import { IButtonComponent } from './common-components/i-button/i-button.component';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -76,6 +77,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PlayersSquadComponent,
     CellClassPipe,
     CellTextClassPipe,
+    IButtonComponent
   ],
   imports: [
     BrowserModule,
@@ -102,7 +104,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatRadioModule,
     MatCheckboxModule,
     ScrollingModule,
-  ],
+],
   providers: [
     {
       provide: DateAdapter,
