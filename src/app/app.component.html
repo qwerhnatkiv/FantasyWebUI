@@ -15,21 +15,21 @@
       [allowActiveState]="true"
       iconPath="/assets/images/calendar.png"
       (clickEmitter)="emitHideShowFullCalendar()"
-      tooltipText="Развернуть/Свернуть весь календарь (включая прошедшие матчи)"
+      [tooltipText]="showFullCalendar ? 'Скрыть завершенные недели' : 'Показать завершенные недели'"
     ></i-button>
     <i-button
       [allowActiveState]="true"
       iconPath="/assets/images/minesweeper.png"
       [iconRelativeSize]="65"
       (clickEmitter)="emitHideShowOnlyGamesCount()"
-      tooltipText="Сжать календарь, оставив только количество матчей команды на каждой неделе"
+      [tooltipText]="showFullCalendar ? 'Показать полный календарь' : 'Показать только число игр (режим сапера)'"
     ></i-button>
     <i-button
       [allowActiveState]="true"
       iconPath="/assets/images/select-best-players.png"
       [iconRelativeSize]="70"
       (clickEmitter)="emitSelectBestPlayersForEachTeam()"
-      tooltipText="Выбрать в календаре лучшего игрока из каждой команды"
+      tooltipText="Отобразить лучших по ОФО игроков"
     ></i-button>
   </div>
   <div class="calendar-filters">
