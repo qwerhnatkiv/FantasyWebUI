@@ -9,20 +9,28 @@
       class="hideCalendarButton"
       (click)="this.isCalendarVisible = !this.isCalendarVisible"
     >
-      {{ this.isCalendarVisible ? 'Свернуть' : 'Развернуть' }}
+      {{ this.isCalendarVisible ? "Свернуть" : "Развернуть" }}
     </div>
     <i-button
       [allowActiveState]="true"
       iconPath="/assets/images/calendar.png"
       (clickEmitter)="emitHideShowFullCalendar()"
-      [tooltipText]="showFullCalendar ? 'Скрыть завершенные недели' : 'Показать завершенные недели'"
+      [tooltipText]="
+        showFullCalendar
+          ? 'Скрыть завершенные недели'
+          : 'Показать завершенные недели'
+      "
     ></i-button>
     <i-button
       [allowActiveState]="true"
       iconPath="/assets/images/minesweeper.png"
       [iconRelativeSize]="65"
       (clickEmitter)="emitHideShowOnlyGamesCount()"
-      [tooltipText]="showOnlyCalendarGamesCount ? 'Показать полный календарь' : 'Показать только число игр (режим сапера)'"
+      [tooltipText]="
+        showOnlyCalendarGamesCount
+          ? 'Показать полный календарь'
+          : 'Показать только число игр (режим сапера)'
+      "
     ></i-button>
     <i-button
       [allowActiveState]="true"
@@ -95,11 +103,10 @@
   </div>
 </div>
 
-<section class="calendar-container" tabindex="0">
+<section class="calendar-container" tabindex="0" [hidden]="!isCalendarVisible">
   <app-calendar-table
     [minFilterDate]="minFilterDate"
     [maxFilterDate]="maxFilterDate"
-    [isCalendarVisible]="isCalendarVisible"
     [games]="games"
     [teamStats]="teamStats"
     [selectedPlayers]="selectedPlayers"

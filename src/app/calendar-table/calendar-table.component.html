@@ -3,11 +3,7 @@
   orientation="horizontal"
   itemSize="70"
 >
-  <table
-    cdk-table
-    [dataSource]="dataSource!"
-    [hidden]="!this.isCalendarVisible"
-  >
+  <table cdk-table [dataSource]="dataSource!">
     <ng-container cdkColumnDef="team" sticky>
       <th cdk-header-cell *cdkHeaderCellDef></th>
       <td cdk-cell *cdkCellDef="let element">

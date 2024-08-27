@@ -106,7 +106,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input() minFilterDate: Date | undefined;
   @Input() maxFilterDate: Date | undefined;
-  @Input() isCalendarVisible: boolean = false;
   @Input() games: GamePredictionDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
 
