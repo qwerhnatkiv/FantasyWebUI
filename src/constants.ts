@@ -118,5 +118,8 @@ export const TEAM_NAME_LOGO_PATH_MAP = {
 export const DEFAULT_WEEK_HEADER_PREFIX = 'w';
 export const DEFAULT_AWAY_GAME_TEAM_PREFIX = '@';
 
+export const WHITE_COLOR = '#fff';
 export const YELLOW_COLOR = '#fef524';
 export const YELLOW_COLOR_ACTIVE = '#e2d90b';
+export const GREEN_COLOR = '#64ff8f'
+export const GREEN_COLOR_ACTIVE = '#2fff68'

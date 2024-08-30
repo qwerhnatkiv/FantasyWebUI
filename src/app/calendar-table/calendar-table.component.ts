@@ -38,9 +38,8 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
 import { Observable, of, ReplaySubject, Subscription } from 'rxjs';
-import { CdkCell, CdkHeaderCell } from '@angular/cdk/table';
+import { CdkHeaderCell } from '@angular/cdk/table';
 import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
-import { ja } from 'date-fns/locale';
 import { CdkVirtualScrollRepeater, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ListRange } from '@angular/cdk/collections';
 
@@ -71,6 +70,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   set showOnlyGamesCount(val: boolean) {
     this._showOnlyGamesCount = val;
   }
+
+  public showOnlyGamesCountExtendedMode: boolean = false;
 
   private _showFullCalendar: boolean = false;
   @Input() set showFullCalendar(value: boolean) {
@@ -120,6 +121,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   >();
 
   private showOnlyGamesCountSubscription: Subscription | undefined;
+  private showOnlyCalendarGamesCountExtendedModeSubscription: Subscription | undefined;
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
   public yesterdayDate: Date = new Date();
@@ -140,9 +142,22 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       this._observablesProxyHandlingService.$hideShowOnlyGamesCountSubject?.subscribe(
         () => {
           this.showOnlyGamesCount = !this.showOnlyGamesCount;
+
+          if (!this.showOnlyGamesCount) {
+            this.showOnlyGamesCountExtendedMode = false;
+          }
+
           this._changeDetectorRef.detectChanges();
         }
       );
+
+    this.showOnlyCalendarGamesCountExtendedModeSubscription =
+      this._observablesProxyHandlingService.$hideShowOnlyCalendarGamesCountExtendedModeSubject?.subscribe(
+        () => {
+          this.showOnlyGamesCountExtendedMode = !this.showOnlyGamesCountExtendedMode;
+          this._changeDetectorRef.detectChanges();
+        }
+      ); 
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
 
     const handler = new ColumnScrollDataHandler(
@@ -156,6 +171,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.showOnlyGamesCountSubscription?.unsubscribe();
+    this.showOnlyCalendarGamesCountExtendedModeSubscription?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

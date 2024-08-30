@@ -56,6 +56,7 @@ export class AppComponent implements OnChanges {
   public areBestPlayersForEachTeamSelected: boolean = false;
   public showFullCalendar: boolean = false;
   public showOnlyCalendarGamesCount: boolean = false;
+  public showOnlyCalendarGamesCountExtendedMode: boolean = false;
 
   public emitHideShowFullCalendar() {
     this.showFullCalendar = !this.showFullCalendar;
@@ -64,6 +65,12 @@ export class AppComponent implements OnChanges {
   public emitHideShowOnlyGamesCount() {
     this._observablesProxyHandlingService.triggerHideShowOnlyGamesCountSubject();
     this.showOnlyCalendarGamesCount = !this.showOnlyCalendarGamesCount;
+    this.showOnlyCalendarGamesCountExtendedMode = false;
+  }
+
+  public emitHideShowOnlyCalendarGamesCountExtendedMode() {
+    this._observablesProxyHandlingService.triggerHideShowOnlyCalendarGamesCountExtendedModeSubject();
+    this.showOnlyCalendarGamesCountExtendedMode = !this.showOnlyCalendarGamesCountExtendedMode;
   }
 
   public emitSelectPlayerById(val: number) {

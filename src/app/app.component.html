@@ -33,6 +33,14 @@
       "
     ></i-button>
     <i-button
+      [hidden]="!showOnlyCalendarGamesCount"
+      [iconPath]="showOnlyCalendarGamesCountExtendedMode ? '/assets/images/switch-on.png' : '/assets/images/switch-off.png'"
+      [iconRelativeSize]="100"
+      (clickEmitter)="emitHideShowOnlyCalendarGamesCountExtendedMode()"
+      [removeBackgroundColor]="true"
+      tooltipText="Включить доп. режим сапера"
+    ></i-button>
+    <i-button
       [allowActiveState]="true"
       iconPath="/assets/images/select-best-players-small.png"
       [iconRelativeSize]="70"

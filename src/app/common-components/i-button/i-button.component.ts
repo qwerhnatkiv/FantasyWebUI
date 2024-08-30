@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { YELLOW_COLOR, YELLOW_COLOR_ACTIVE } from 'src/constants';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { GREEN_COLOR, GREEN_COLOR_ACTIVE, WHITE_COLOR, YELLOW_COLOR, YELLOW_COLOR_ACTIVE } from 'src/constants';
 
 const DEFAULT_ICON_RELATIVE_SIZE: number = 91;
 
@@ -8,7 +8,7 @@ const DEFAULT_ICON_RELATIVE_SIZE: number = 91;
   templateUrl: './i-button.component.html',
   styleUrl: './i-button.component.css'
 })
-export class IButtonComponent {
+export class IButtonComponent implements OnInit {
   /**
    * Relative path to button's background icon
    */
@@ -29,6 +29,8 @@ export class IButtonComponent {
    */
   @Input() tooltipText: string | null = null;
 
+  @Input() removeBackgroundColor: boolean = false;
+
   /**
    * Emits click events to the parent component
    */
@@ -36,9 +38,13 @@ export class IButtonComponent {
 
   private _isActive: boolean = false;
   
-  public readonly YELLOW_COLOR_ACTIVE: string = YELLOW_COLOR_ACTIVE;
-  
-  public backgroundColor: string = YELLOW_COLOR;
+  public backgroundColor: string = WHITE_COLOR;
+  public backgroundColorActive: string = WHITE_COLOR;
+
+  ngOnInit(): void {
+    this.backgroundColor = this.removeBackgroundColor ? WHITE_COLOR : YELLOW_COLOR;
+    this.backgroundColorActive = this.removeBackgroundColor ? WHITE_COLOR : YELLOW_COLOR_ACTIVE;
+  }
 
   /**
    * Emits events to the parent component
@@ -47,7 +53,7 @@ export class IButtonComponent {
     this.clickEmitter.emit();
 
     // If button can have active state, change it background color to "active"
-    if (this.allowActiveState) {
+    if (this.allowActiveState && !this.removeBackgroundColor) {
       this._isActive = !this._isActive;
       this._setBackgroundColor();
     }
@@ -55,10 +61,12 @@ export class IButtonComponent {
 
   private _setBackgroundColor(): void {
     if (this._isActive) {
-      this.backgroundColor = YELLOW_COLOR_ACTIVE;
+      this.backgroundColor = GREEN_COLOR;
+      this.backgroundColorActive = GREEN_COLOR_ACTIVE;
     }
     else {
       this.backgroundColor = YELLOW_COLOR;
+      this.backgroundColorActive = YELLOW_COLOR_ACTIVE;
     }
   }
 }
