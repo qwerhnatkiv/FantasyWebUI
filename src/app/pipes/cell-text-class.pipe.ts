@@ -1,6 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {
+  GREEN_GAMES_WEEK_BOUNDARY,
   GREEN_WIN_LOWER_BOUNDARY,
+  RED_GAMES_WEEK_BOUNDARY,
   VERY_GREEN_WIN_LOWER_BOUNDARY,
   WHITE_WIN_LOWER_BOUNDARY,
 } from 'src/constants';
@@ -14,20 +16,24 @@ export class CellTextClassPipe implements PipeTransform {
     isWeekCell: boolean,
     showFullCalendar: boolean,
     isOldGame: boolean,
-    cellValue: number
+    cellValue: number,
+    showLongTermWeekStyles: boolean,
+    weekMaximumGamesCount: number,
+    weekMinimumGamesCount: number,
+    priorToWeekGamesCount: number | undefined
   ) {
     const numericValue: number = Number(cellValue);
 
     if (isWeekCell) {
-      if (showFullCalendar ? weekGames > 3 : cellValue > 3) {
-        return 'calendar-cell-week-green';
-      }
-
-      if (showFullCalendar ? weekGames < 2 : cellValue < 2) {
-        return 'calendar-cell-week-red';
-      }
-
-      return 'calendar-cell-week';
+      return this._getWeekCellStyle(
+        weekGames, 
+        showFullCalendar, 
+        cellValue, 
+        showLongTermWeekStyles,
+        weekMaximumGamesCount,
+        weekMinimumGamesCount,
+        priorToWeekGamesCount
+      );
     }
 
     if (isOldGame) {
@@ -51,5 +57,45 @@ export class CellTextClassPipe implements PipeTransform {
     }
 
     return 'calendar-cell-red';
+  }
+
+  private _getWeekCellStyle(
+    weekGames: number,
+    showFullCalendar: boolean,
+    cellValue: number,
+    showLongTermWeekStyles: boolean,
+    weekMaximumGamesCount: number,
+    weekMinimumGamesCount: number,
+    priorToWeekGamesCount: number | undefined
+  ): string {
+    if (showLongTermWeekStyles) {
+      if (weekMinimumGamesCount === weekMaximumGamesCount) {
+        return 'calendar-cell-week';
+      }
+
+      if (priorToWeekGamesCount === weekMaximumGamesCount) {
+        return 'calendar-cell-week-very-green';
+      }
+
+      if (priorToWeekGamesCount === weekMaximumGamesCount - 1) {
+        return 'calendar-cell-week-green';
+      }
+
+      if (priorToWeekGamesCount! <= weekMinimumGamesCount + 1) {
+        return 'calendar-cell-week-red';
+      }
+
+      return 'calendar-cell-week';
+    }
+
+    if (showFullCalendar ? weekGames > GREEN_GAMES_WEEK_BOUNDARY : cellValue > GREEN_GAMES_WEEK_BOUNDARY) {
+      return 'calendar-cell-week-green';
+    }
+
+    if (showFullCalendar ? weekGames < RED_GAMES_WEEK_BOUNDARY : cellValue < RED_GAMES_WEEK_BOUNDARY) {
+      return 'calendar-cell-week-red';
+    }
+
+    return 'calendar-cell-week';
   }
 }

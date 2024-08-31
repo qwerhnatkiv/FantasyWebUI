@@ -8,7 +8,7 @@ export class ObservablesProxyHandlingService {
     private _selectPlayerByIdSubject: Subject<number> = new Subject<number>();
 
     public $hideShowOnlyGamesCountSubject: Observable<void> = this._hideShowOnlyGamesCountSubject.asObservable();
-    public $hideShowOnlyCalendarGamesCountExtendedModeSubject: Observable<void> = this._hideShowOnlyGamesCountSubject.asObservable();
+    public $hideShowOnlyCalendarGamesCountExtendedModeSubject: Observable<void> = this._hideShowOnlyCalendarGamesCountExtendedModeSubject.asObservable();
     public $selectPlayerByIdSubject: Observable<number> = this._selectPlayerByIdSubject.asObservable();
   
     triggerHideShowOnlyGamesCountSubject(){

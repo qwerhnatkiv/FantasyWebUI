@@ -73,6 +73,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public showOnlyGamesCountExtendedMode: boolean = false;
 
+  public weekMaximumGamesMap: Map<number, number> = new Map();
+  public weekMinimumGamesMap: Map<number, number> = new Map();
+
   private _showFullCalendar: boolean = false;
   @Input() set showFullCalendar(value: boolean) {
     this._showFullCalendar = value;
@@ -257,6 +260,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             game.weekNumber <= week
         );
 
+        this.addOrUpdateWeekGamesMapValues(week, allGamesPriorToWeek.length);
+
         const lowGamesTeamWeek: TeamWeek | null = this.setLowGamesWeekForTeam(
           weekTeamGames,
           teamName,
@@ -324,6 +329,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     this.columns = allColumns;
     this.columnsToDisplay = displayColumns;
+
+    console.log(this.weekMaximumGamesMap);
+    console.log(this.weekMinimumGamesMap);
   }
 
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
@@ -542,7 +550,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       columnDef: thisWeekMaxDate,
       header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
       isWeekColumn: true,
-      isOldDate: thisWeekMaxDate.getTime() < this.yesterdayDate.getTime()
+      isOldDate: thisWeekMaxDate.getTime() < this.yesterdayDate.getTime(),
+      week
     }];
 
     // Set all other columns with specific week dates
@@ -551,7 +560,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         columnDef: date,
         header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
         isWeekColumn: false,
-        isOldDate: date.getTime() < this.yesterdayDate.getTime()
+        isOldDate: date.getTime() < this.yesterdayDate.getTime(),
+        week
       });
     });
 
@@ -699,7 +709,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       activeGamesForWeekCount,
       weekTeamGames.length,
       undefined,
-      true
+      true,
+      allGamesPriorToWeek.length
     );
   }
 
@@ -710,6 +721,16 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
    */
   private getEmptyCalendarCell(weekGamesCount: number | undefined): TableCell {
     return new TableCell('', -1, weekGamesCount);
+  }
+
+  private addOrUpdateWeekGamesMapValues(weekNumber: number, allGamesPriorToWeek: number) {
+    if (!this.weekMaximumGamesMap.has(weekNumber) || this.weekMaximumGamesMap.get(weekNumber)! < allGamesPriorToWeek) {
+      this.weekMaximumGamesMap.set(weekNumber, allGamesPriorToWeek);
+    }
+
+    if (!this.weekMinimumGamesMap.has(weekNumber) || this.weekMinimumGamesMap.get(weekNumber)! > allGamesPriorToWeek) {
+      this.weekMinimumGamesMap.set(weekNumber, allGamesPriorToWeek);
+    }
   }
 }
 

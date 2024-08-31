@@ -206,6 +206,14 @@ td:nth-child(1) {
   margin: 0;
 }
 
+.calendar-cell-week-very-green {
+  border-radius: 0px;
+  background: #00AA30;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 .calendar-cell-week-green {
   border-radius: 0px;
   background: #64ff8f;

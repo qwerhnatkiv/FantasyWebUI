@@ -32,6 +32,8 @@ export const WHITE_WIN_LOWER_BOUNDARY = 33.49;
 
 export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
+export const GREEN_GAMES_WEEK_BOUNDARY = 3;
+export const RED_GAMES_WEEK_BOUNDARY = 2;
 export const LOW_GAMES_WEEK_BOUNDARY = 1;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([

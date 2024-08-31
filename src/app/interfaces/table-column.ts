@@ -3,4 +3,5 @@ export interface TableColumn {
   header: string;
   isWeekColumn: boolean;
   isOldDate: boolean;
+  week: number;
 }

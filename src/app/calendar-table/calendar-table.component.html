@@ -78,6 +78,10 @@
                 : showFullCalendar
                 : element[column.header].isOldGame
                 : element[column.header].cellValue
+                : showOnlyGamesCountExtendedMode
+                : weekMaximumGamesMap.get(column.week)!
+                : weekMinimumGamesMap.get(column.week)!
+                : element[column.header].priorToWeekGamesCount
           "
           [ngxTippy]="
             generateCellToolTip(
