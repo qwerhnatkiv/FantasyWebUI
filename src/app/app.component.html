@@ -3,123 +3,18 @@
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
   rel="stylesheet"
 />
-<div class="header-controls">
-  <div class="header-calendar-action-buttons">
-    <div
-      class="hideCalendarButton"
-      (click)="this.isCalendarVisible = !this.isCalendarVisible"
-    >
-      {{ this.isCalendarVisible ? "Свернуть" : "Развернуть" }}
-    </div>
-    <i-button
-      [allowActiveState]="true"
-      iconPath="/assets/images/calendar-small.png"
-      (clickEmitter)="emitHideShowFullCalendar()"
-      [tooltipText]="
-        showFullCalendar
-          ? 'Скрыть завершенные недели'
-          : 'Показать завершенные недели'
-      "
-    ></i-button>
-    <i-button
-      [allowActiveState]="true"
-      iconPath="/assets/images/minesweeper-small.png"
-      [iconRelativeSize]="65"
-      (clickEmitter)="emitHideShowOnlyGamesCount()"
-      [tooltipText]="
-        showOnlyCalendarGamesCount
-          ? 'Показать полный календарь'
-          : 'Показать только число игр (режим сапера)'
-      "
-    ></i-button>
-    <i-button
-      [hidden]="!showOnlyCalendarGamesCount"
-      [iconPath]="showOnlyCalendarGamesCountExtendedMode ? '/assets/images/switch-on.png' : '/assets/images/switch-off.png'"
-      [iconRelativeSize]="100"
-      (clickEmitter)="emitHideShowOnlyCalendarGamesCountExtendedMode()"
-      [removeBackgroundColor]="true"
-      tooltipText="Включить доп. режим сапера"
-    ></i-button>
-    <i-button
-      [allowActiveState]="true"
-      iconPath="/assets/images/select-best-players-small.png"
-      [iconRelativeSize]="70"
-      (clickEmitter)="emitSelectBestPlayersForEachTeam()"
-      tooltipText="Отобразить лучших по ОФО игроков"
-    ></i-button>
-  </div>
-  <div class="calendar-filters">
-    <mat-form-field>
-      <mat-label>С: </mat-label>
-      <input
-        matInput
-        [matDatepicker]="pickerFrom"
-        [(ngModel)]="minFilterDate"
-        (dateChange)="handleMinimumDateFilterChange($event)"
-      />
-      <mat-hint class="calendar-hint"></mat-hint>
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="pickerFrom"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #pickerFrom></mat-datepicker>
-    </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>По: </mat-label>
-      <input
-        matInput
-        [matDatepicker]="pickerTo"
-        [(ngModel)]="maxFilterDate"
-        (dateChange)="handleMaximumDateFilterChange($event)"
-      />
-      <mat-hint class="calendar-hint"></mat-hint>
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="pickerTo"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #pickerTo></mat-datepicker>
-    </mat-form-field>
-  </div>
-  <div id="update-log-information">
-    <p>
-      Данные обновлены
-      {{ updateLogInfomation?.generalUpdateDate | date : "dd.MM.yyyy HH:mm" }}
-    </p>
-    <p>
-      Кэфы обновлены
-      {{
-        updateLogInfomation?.bookmakersUpdateDate | date : "dd.MM.yyyy HH:mm"
-      }}
-    </p>
-  </div>
-  <div id="external-links">
-    <a
-      mat-raised-button
-      color="primary"
-      href="https://www.gamedaytweets.com/"
-      target="_blank"
-      >GameDayNews NHL</a
-    >
-    <a
-      mat-raised-button
-      color="primary"
-      href="https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit"
-      target="_blank"
-      >База знаний</a
-    >
-  </div>
-</div>
+<header-menu
+  [updateLogInformation]="updateLogInformation"
+  (calendarVisibilityUpdated)="updateCalendarVisibility($event)"
+>
+</header-menu>
 
-<section class="calendar-container" tabindex="0" [hidden]="!isCalendarVisible">
+<section class="calendar-container" tabindex="0" [hidden]="isCalendarHidden">
   <app-calendar-table
-    [minFilterDate]="minFilterDate"
-    [maxFilterDate]="maxFilterDate"
     [games]="games"
     [teamStats]="teamStats"
-    [selectedPlayers]="selectedPlayers"
     [teamPlayerExpectedOfoMap]="teamPlayerExpectedOfoMap"
-    [showFullCalendar]="showFullCalendar"
   ></app-calendar-table>
 </section>
 
@@ -135,7 +30,6 @@
   (sendPlayersAreNotPlayedDisabled)="playersAreNotPlayedDisabled = $event"
   (sendHideLowGPPlayersEnabled)="hideLowGPPlayersEnabled = $event"
   (sendFormLength)="formLengthChanged($event)"
-  (sendClearAllPlayerSelections)="deselectAllSelectedPlayers()"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -149,17 +43,12 @@
     [teamStats]="teamStats"
     [filteredTeamGames]="filteredTeamGames"
     [playerGamesOfoMap]="playerGamesOfoMap"
-    (sendSelectedPlayers)="selectedPlayers = $event"
     (sendFirstChoiceOfo)="firstChoiceOfo = $event"
     (sendSecondChoiceOfo)="secondChoiceOfo = $event"
     (sendAddedToSquadPlayer)="addedToSquadPlayer = $event"
     [playersAreNotPlayedDisabled]="playersAreNotPlayedDisabled"
     [hideLowGPPlayersEnabled]="hideLowGPPlayersEnabled"
-    [shouldDeselectAllSelectedPlayers]="shouldDeselectAllSelectedPlayers"
-    [minFilterDate]="minFilterDate"
-    [maxFilterDate]="maxFilterDate"
     [positionsInSquadAvailable]="squadAvailableSlots!"
-    [areBestPlayersForEachTeamSelected]="areBestPlayersForEachTeamSelected"
   ></app-players-table>
   <div class="user-team-block">
     <app-players-squad
@@ -171,7 +60,6 @@
       [teamStats]="teamStats"
       [filteredTeamGames]="filteredTeamGames"
       [playerGamesOfoMap]="playerGamesOfoMap"
-      (sendSelectedPlayerId)="emitSelectPlayerById($event)"
     ></app-players-squad>
   </div>
 </section>

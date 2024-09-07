@@ -21,15 +21,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PPToiPipe } from '../pipes/pptoi.pipe';
 import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
-import { Utils } from '../common/utils';
-import {
-  DEFAULT_POSITIONS,
-  GREEN_WIN_LOWER_BOUNDARY,
-  RED_GP_UPPER_BOUNDARY,
-  RED_PIM_LOWER_BOUNDARY,
-  VERY_GREEN_WIN_LOWER_BOUNDARY,
-  WHITE_WIN_LOWER_BOUNDARY,
-} from 'src/constants';
+import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
@@ -39,15 +31,20 @@ import { PositionsAvailableToPick } from '../interfaces/positions-available-to-p
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
 import { Observable, Subscription } from 'rxjs';
-import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
+import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
+import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
+import { DatesRangeModel } from '../interfaces/dates-range.model';
+import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 
 @Component({
   selector: 'app-players-table',
   templateUrl: './players-table.component.html',
   styleUrls: ['./players-table.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
+export class PlayersTableComponent
+  implements AfterViewInit, OnChanges, OnInit, OnDestroy
+{
   displayedColumns: string[] = [
     'firstChoice',
     'secondChoice',
@@ -73,11 +70,11 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
     'sources',
     'addPlayerToSquad',
   ];
-  constructor(private _observablesProxyHandlingService: ObservablesProxyHandlingService, 
-              private _changeDetectorRef: ChangeDetectorRef) {
-      this.dataSource.filterPredicate = this.filter;
-    }
 
+  private selectPlayerByIdSubscription?: Subscription;
+  private showBestPlayersInCalendarEventSubscription?: Subscription;
+  private deselectPlayersFromComparisonComponentSubscription?: Subscription;
+  private _filterDatesRangeSubscription?: Subscription;
   private filterDictionary: Map<string, any> = new Map<string, any>();
 
   @ViewChild(MatSort) sort: MatSort | undefined;
@@ -98,18 +95,9 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
   @Input() playersAreNotPlayedDisabled: boolean = true;
   @Input() hideLowGPPlayersEnabled: boolean = false;
 
-  private _shouldDeselectAllSelectedPlayers: boolean = false;
-  @Input() set shouldDeselectAllSelectedPlayers(value: boolean) {
-    this._shouldDeselectAllSelectedPlayers = value;
-    this.deselectAllPlayersInComparison();
-  }
-
   @Input() playerGamesOfoMap:
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
-
-  @Input() minFilterDate: Date | undefined;
-  @Input() maxFilterDate: Date | undefined;
 
   private _positionsInSquadAvailable: PositionsAvailableToPick | undefined;
   get positionsInSquadAvailable(): PositionsAvailableToPick {
@@ -119,26 +107,10 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
     this._positionsInSquadAvailable = value;
   }
 
-  @Input() set areBestPlayersForEachTeamSelected(value: boolean) {
-    if (value) {
-      this.selectBestPlayersForEachTeamInCalendar();
-    }
-    else {
-      this.deselectAllPlayersInCalendar();
-    }
-  }
-
-  private selectPlayerByIdSubscription: Subscription | undefined;
-
   public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
     string,
     SelectedPlayerModel[]
   >();
-
-
-  @Output() sendSelectedPlayers: EventEmitter<
-    Map<string, SelectedPlayerModel[]>
-  > = new EventEmitter<Map<string, SelectedPlayerModel[]>>();
 
   @Output() sendFirstChoiceOfo: EventEmitter<OfoVariant> =
     new EventEmitter<OfoVariant>();
@@ -153,23 +125,65 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
   private clickedOnCheckboxOrButton: boolean = false;
 
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
-  //#region NG overrides
+
+  protected filterDates: DatesRangeModel = {
+    minDate: new Date(),
+    maxDate: new Date(),
+  };
+
+  constructor(
+    private _playersObservableProxyService: PlayersObservableProxyService,
+    private _filtersObservableProxyService: FiltersObservableProxyService,
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _dateFiltersService: DateFiltersService
+  ) {
+    this.dataSource.filterPredicate = this.filter;
+  }
+
+  //#region LIFECYCLE HOOKS
 
   ngOnInit() {
-    this.selectPlayerByIdSubscription = this._observablesProxyHandlingService.$selectPlayerByIdSubject?.subscribe(
-      (playerId) => {
-          let player: PlayerChooseRecord = this.players.find((x) => x.playerObject.playerID == playerId)!;
+    this.selectPlayerByIdSubscription =
+      this._playersObservableProxyService.$showPlayerInCalendarObservable?.subscribe(
+        (playerId) => {
+          const player: PlayerChooseRecord = this.players.find(
+            (x) => x.playerObject.playerID == playerId
+          )!;
           this.selectPlayerRow(player);
           this._changeDetectorRef.detectChanges();
-      }
-    );
+        }
+      );
+
+    this.showBestPlayersInCalendarEventSubscription =
+      this._playersObservableProxyService.$showBestPlayersInCalendarObservable?.subscribe(
+        () => {
+          this._selectBestPlayersForEachTeamInCalendar();
+        }
+      );
+
+    this.deselectPlayersFromComparisonComponentSubscription =
+      this._filtersObservableProxyService.$deselectPlayersFromComparisonObservable?.subscribe(
+        () => {
+          this._deselectAllPlayersInComparison();
+        }
+      );
+
+    this._filterDatesRangeSubscription =
+      this._dateFiltersService.$dateFiltersObservable.subscribe(
+        (value: DatesRangeModel) => {
+          this.filterDates = value;
+        }
+      );
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.selectPlayerByIdSubscription?.unsubscribe();
+    this.showBestPlayersInCalendarEventSubscription?.unsubscribe();
+    this.deselectPlayersFromComparisonComponentSubscription?.unsubscribe();
+    this._filterDatesRangeSubscription?.unsubscribe();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['playerStats']?.previousValue &&
       changes['playerStats']?.currentValue &&
@@ -246,7 +260,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
           )!;
 
         player.expectedFantasyPoints = ofo;
-          //ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
+        //ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
         player.fantasyPointsPerGame =
           ofo > 0
             ? this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!
@@ -326,7 +340,7 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
 
   public isAddPlayerToSquadButtonHidden(player: PlayerChooseRecord): boolean {
     return (
-      (this.positionsInSquadAvailable == null) ||
+      this.positionsInSquadAvailable == null ||
       (this.positionsInSquadAvailable?.defendersAvailable == 0 &&
         player.position == 'З') ||
       (this.positionsInSquadAvailable?.forwardsAvailable == 0 &&
@@ -342,16 +356,18 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
 
   public deselectAllPlayersInCalendar() {
     this.selectedPlayers = new Map<string, SelectedPlayerModel[]>();
-    this.sendSelectedPlayers.emit(this.selectedPlayers);
+    this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
+      this.selectedPlayers
+    );
   }
 
-  public deselectAllPlayersInComparison() {
+  private _deselectAllPlayersInComparison(): void {
     this.players.forEach((x) => {
       x.firstChoice = false;
       x.secondChoice = false;
     });
 
-    let ofoChoice: OfoVariant = {
+    const ofoChoice: OfoVariant = {
       priceSum: 0,
       expectedFantasyPointsSum: 0,
       priceByExpectedFantasyPointsSum: 0,
@@ -474,10 +490,15 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
   }
 
   public generateCellToolTip(player: PlayerChooseRecord): string | null {
-    return PlayerTooltipBuilder.generatePlayerTooltip(player, this.filteredTeamGames, this.teamStats, this.playerGamesOfoMap);
+    return PlayerTooltipBuilder.generatePlayerTooltip(
+      player,
+      this.filteredTeamGames,
+      this.teamStats,
+      this.playerGamesOfoMap
+    );
   }
 
-  public selectPlayerRow(player: PlayerChooseRecord) {
+  protected selectPlayerRow(player: PlayerChooseRecord): void {
     if (this.clickedOnCheckboxOrButton) {
       this.clickedOnCheckboxOrButton = false;
       return;
@@ -486,61 +507,49 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
       this.selectedPlayers
     );
 
-    let matchingTeamName: string = this.filteredTeamGames.get(
+    const teamName: string = this.filteredTeamGames.get(
       player.teamObject.teamID
     )![0].teamName;
-    let matchingPlayersInfo: PlayerExpectedFantasyPointsDTO[] | undefined =
+    const playerInfo: PlayerExpectedFantasyPointsDTO[] | undefined =
       this.playerGamesOfoMap?.get(player.playerObject.playerID);
-
-    let currentSelectedPlayerForTeam: SelectedPlayerModel[] | undefined =
-      this.selectedPlayers.get(matchingTeamName);
+    const currentSelectedPlayerForTeam: SelectedPlayerModel[] | undefined =
+      this.selectedPlayers.get(teamName);
 
     if (currentSelectedPlayerForTeam != null) {
-      this.selectedPlayers.delete(matchingTeamName);
+      this.selectedPlayers.delete(teamName);
 
       if (
-        currentSelectedPlayerForTeam[0].playerID != player.playerObject.playerID
+        currentSelectedPlayerForTeam[0].playerID ===
+        player.playerObject.playerID
       ) {
-        let teamGame: TeamGameInformation[] = this.filteredTeamGames.get(
-          player.teamObject.teamID
-        )!;
-
-        this.selectedPlayers.set(
-          matchingTeamName,
-          matchingPlayersInfo?.map((x) => ({
-            playerName: player.playerObject.playerName,
-            playerID: player.playerObject.playerID,
-            playerExpectedFantasyPoints: this.numberPipe.transform(
-              x.playerExpectedFantasyPoints,
-              '1.0-1'
-            )!,
-            teamName: matchingTeamName,
-            gameDate: teamGame.find((game) => game.gameID == x.gameID)
-              ?.gameDate!,
-          }))!
+        this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
+          this.selectedPlayers
         );
+        return;
       }
-    } else {
-      let teamGame: TeamGameInformation[] = this.filteredTeamGames.get(
-        player.teamObject.teamID
-      )!;
-
-      this.selectedPlayers.set(
-        matchingTeamName,
-        matchingPlayersInfo?.map((x) => ({
-          playerName: player.playerObject.playerName,
-          playerID: player.playerObject.playerID,
-          playerExpectedFantasyPoints: this.numberPipe.transform(
-            x.playerExpectedFantasyPoints,
-            '1.0-1'
-          )!,
-          teamName: matchingTeamName,
-          gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
-        }))!
-      );
     }
 
-    this.sendSelectedPlayers.emit(this.selectedPlayers);
+    const teamGame: TeamGameInformation[] = this.filteredTeamGames.get(
+      player.teamObject.teamID
+    )!;
+
+    this.selectedPlayers.set(
+      teamName,
+      playerInfo?.map((x) => ({
+        playerName: player.playerObject.playerName,
+        playerID: player.playerObject.playerID,
+        playerExpectedFantasyPoints: this.numberPipe.transform(
+          x.playerExpectedFantasyPoints,
+          '1.0-1'
+        )!,
+        teamName: teamName,
+        gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
+      }))!
+    );
+
+    this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
+      this.selectedPlayers
+    );
   }
 
   public isPlayerSelected(player: PlayerChooseRecord) {
@@ -573,21 +582,24 @@ export class PlayersTableComponent implements AfterViewInit, OnChanges, OnInit, 
 
   //#region Private methods
 
-  private selectBestPlayersForEachTeamInCalendar() {
-    for (let teamStat of this.teamStats) {
-      let teamPlayers: PlayerChooseRecord[] = 
-        this.players.filter((x) => x.teamObject.teamID == teamStat.teamID && x.position != DEFAULT_POSITIONS[0] && x.expectedFantasyPoints != null);
-      
-      let bestTeamPlayer: PlayerChooseRecord = 
-        teamPlayers.sort((n1, n2) => n2.expectedFantasyPoints - n1.expectedFantasyPoints)[0];
-      
+  private _selectBestPlayersForEachTeamInCalendar() {
+    for (const teamStat of this.teamStats) {
+      const teamPlayers: PlayerChooseRecord[] = this.players.filter(
+        (x) =>
+          x.teamObject.teamID == teamStat.teamID &&
+          x.position != DEFAULT_POSITIONS[0] &&
+          x.expectedFantasyPoints != null
+      );
+
+      const bestTeamPlayer: PlayerChooseRecord = teamPlayers.sort(
+        (n1, n2) => n2.expectedFantasyPoints - n1.expectedFantasyPoints
+      )[0];
+
       if (bestTeamPlayer == null || bestTeamPlayer.gamesCount == 0) {
         continue;
       }
-      
 
       this.selectPlayerRow(bestTeamPlayer);
-
     }
   }
 

@@ -5,6 +5,7 @@ import { OfoVariant } from '../interfaces/ofo-variant';
 import { MatSelectChange } from '@angular/material/select';
 import { RED_GP_UPPER_BOUNDARY } from '../../constants'
 import { MatOptionSelectionChange } from '@angular/material/core';
+import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
 
 @Component({
   selector: 'app-players-filters',
@@ -42,7 +43,6 @@ export class PlayersFiltersComponent implements AfterViewInit {
   @Output() sendHideLowGPPlayersEnabled: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output() sendFormLength: EventEmitter<number> = new EventEmitter<number>();
-  @Output() sendClearAllPlayerSelections: EventEmitter<void> = new EventEmitter<void>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum:0,
@@ -57,6 +57,11 @@ export class PlayersFiltersComponent implements AfterViewInit {
     expectedFantasyPointsSum: 0,
     playersCount: 0
   };
+
+  constructor(
+    private _filtersObservableProxyService: FiltersObservableProxyService,
+  ) {
+  }
 
   ngAfterViewInit() {
     this.setDefaultPositions();
@@ -186,13 +191,17 @@ export class PlayersFiltersComponent implements AfterViewInit {
       this.sendFormLength.emit(this.formLength);
     }
 
-    this.sendClearAllPlayerSelections.emit();
+    this.clearAllPlayersSelection();
 
     this.playersAreNotPlayedDisabled = true;
     this.playersAreNotPlayedDisabledChanged();
 
     this.hideLowGPPlayersEnabled = false;
     this.hideLowGPPlayersEnabledChanged();
+  }
+
+  protected clearAllPlayersSelection() {
+    this._filtersObservableProxyService.triggerDeselectPlayersFromComparisonSubject();
   }
 
   /**

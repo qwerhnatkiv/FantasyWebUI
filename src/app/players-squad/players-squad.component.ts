@@ -14,6 +14,7 @@ import { TeamGameInformation } from '../interfaces/team-game-information';
 import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
+import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
@@ -43,12 +44,15 @@ export class PlayersSquadComponent {
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.substitutionsLeft =
-      value.length == this.substitutionsLeft 
-      ? this.substitutionsValue 
-      : this.substitutionsValue - this._squadPlayers.filter((x) => x.isNew).length;
+      value.length == this.substitutionsLeft
+        ? this.substitutionsValue
+        : this.substitutionsValue -
+          this._squadPlayers.filter((x) => x.isNew).length;
   }
 
-  @Output('squadPlayersChange') squadPlayersChange:EventEmitter<PlayerSquadRecord[]> = new EventEmitter<PlayerSquadRecord[]>();
+  @Output('squadPlayersChange') squadPlayersChange: EventEmitter<
+    PlayerSquadRecord[]
+  > = new EventEmitter<PlayerSquadRecord[]>();
 
   public dataSource = new MatTableDataSource(this.squadPlayers);
 
@@ -67,15 +71,18 @@ export class PlayersSquadComponent {
   private substitutionsValue: number = 0;
   @Input() set substitutions(value: number) {
     this.substitutionsLeft =
-      this._squadPlayers.length == value ? value : value + 17 - this._squadPlayers.length;
+      this._squadPlayers.length == value
+        ? value
+        : value + 17 - this._squadPlayers.length;
     this.substitutionsValue = value;
   }
 
   @Output() sendAvailableSlots: EventEmitter<PositionsAvailableToPick> =
     new EventEmitter<PositionsAvailableToPick>();
 
-    @Output() sendSelectedPlayerId: EventEmitter<number> =
-    new EventEmitter<number>();
+  constructor(
+    private _playersObservableProxyService: PlayersObservableProxyService
+  ) {}
 
   public getTotalOFO() {
     if (this.squadPlayers == null) {
@@ -115,7 +122,7 @@ export class PlayersSquadComponent {
   }
 
   public sendSelectedPlayer(row: PlayerSquadRecord): void {
-    this.sendSelectedPlayerId.emit(row.playerObject.playerID);
+    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(row.playerObject.playerID);
   }
 
   public removeRestoreRow(row: PlayerSquadRecord): void {
@@ -149,13 +156,20 @@ export class PlayersSquadComponent {
 
   public clearAllSquadChanges() {
     this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
-    this.squadPlayers.filter((x) => x.isRemoved).forEach((x) => x.isRemoved = false);
+    this.squadPlayers
+      .filter((x) => x.isRemoved)
+      .forEach((x) => (x.isRemoved = false));
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
   }
 
   public generateCellToolTip(player: PlayerSquadRecord): string | null {
-    return PlayerTooltipBuilder.generatePlayerTooltip(player, this.filteredTeamGames, this.teamStats, this.playerGamesOfoMap);
+    return PlayerTooltipBuilder.generatePlayerTooltip(
+      player,
+      this.filteredTeamGames,
+      this.teamStats,
+      this.playerGamesOfoMap
+    );
   }
 
   public isClearAllSquadChangesButtonHidden() {

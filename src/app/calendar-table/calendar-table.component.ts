@@ -22,6 +22,7 @@ import {
   DEFAULT_AWAY_GAME_TEAM_PREFIX,
   DEFAULT_DATE_FORMAT,
   DEFAULT_WEEK_HEADER_PREFIX,
+  EFP_LABEL,
   GREEN_TEAM_GF_BOUNDARY,
   GREEN_WIN_LOWER_BOUNDARY,
   LOW_GAMES_WEEK_BOUNDARY,
@@ -37,11 +38,16 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
-import { Observable, of, ReplaySubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { CdkHeaderCell } from '@angular/cdk/table';
-import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
-import { CdkVirtualScrollRepeater, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ListRange } from '@angular/cdk/collections';
+import {
+  CdkVirtualScrollViewport,
+} from '@angular/cdk/scrolling';
+import { CalendarObservableProxyService } from 'src/services/observable-proxy/calendar-observable-proxy.service';
+import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
+import { ColumnScrollDataHandlerService } from 'src/services/cdk-components/column-scroll-data-handler.service';
+import { DateFiltersService } from 'src/services/filtering/date-filters.service';
+import { DatesRangeModel } from '../interfaces/dates-range.model';
 
 @Component({
   selector: 'app-calendar-table',
@@ -55,6 +61,12 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private datepipe: DatePipe = new DatePipe('en-US');
   private numberPipe: DecimalPipe = new DecimalPipe('en-US');
 
+  private _calendarGamesRangeSubscription?: Subscription;
+  private _calendarSimplifiedModeSubscription?: Subscription;
+  private _simplifiedCalendarDrawingModeSubscription?: Subscription;
+  private _selectedPlayersSubscription?: Subscription;
+  private _filterDatesRangeSubscription?: Subscription;
+
   public columns: Array<TableColumn> = [];
   public columnsToDisplay: string[] = [];
   public dataSource: MatTableDataSource<any> = new MatTableDataSource(
@@ -63,21 +75,16 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   public teamNameLogoPathMap: any = TEAM_NAME_LOGO_PATH_MAP;
 
-  private _showOnlyGamesCount: boolean = false;
-  get showOnlyGamesCount(): boolean {
-    return this._showOnlyGamesCount;
-  }
-  set showOnlyGamesCount(val: boolean) {
-    this._showOnlyGamesCount = val;
-  }
+  protected isSimplifiedCalendarModeEnabled: boolean = false;
+  protected isSimplifiedCalendarAdvancedDrawingModeEnabled: boolean = false;
 
-  public showOnlyGamesCountExtendedMode: boolean = false;
+  protected EFP_LABEL: string = EFP_LABEL;
 
   public weekMaximumGamesMap: Map<number, number> = new Map();
   public weekMinimumGamesMap: Map<number, number> = new Map();
 
   private _showFullCalendar: boolean = false;
-  @Input() set showFullCalendar(value: boolean) {
+  protected set showFullCalendar(value: boolean) {
     this._showFullCalendar = value;
 
     let dayOfScrolling: Date = Utils.addDateDays(
@@ -104,12 +111,15 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       }, 300);
     }
   }
-  get showFullCalendar(): boolean {
+  protected get showFullCalendar(): boolean {
     return this._showFullCalendar;
   }
 
-  @Input() minFilterDate: Date | undefined;
-  @Input() maxFilterDate: Date | undefined;
+  protected filterDates: DatesRangeModel = {
+    minDate: new Date(),
+    maxDate: new Date(),
+  };
+
   @Input() games: GamePredictionDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
 
@@ -118,14 +128,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     Map<Date, PlayerExpectedFantasyPointsInfo[]>
   > = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
-  @Input() selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
-    string,
-    SelectedPlayerModel[]
-  >();
-
-  private showOnlyGamesCountSubscription: Subscription | undefined;
-  private showOnlyCalendarGamesCountExtendedModeSubscription: Subscription | undefined;
-
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
   public yesterdayDate: Date = new Date();
 
@@ -133,48 +135,37 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     ElementRef<HTMLTableRowElement>
   >;
 
-  @ViewChild(CdkVirtualScrollViewport, { static: true }) _viewPort!: CdkVirtualScrollViewport;
+  @ViewChild(CdkVirtualScrollViewport, { static: true })
+  _viewPort!: CdkVirtualScrollViewport;
 
   constructor(
-    private _observablesProxyHandlingService: ObservablesProxyHandlingService,
-    private _changeDetectorRef: ChangeDetectorRef
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _calendarObservableProxyService: CalendarObservableProxyService,
+    private _playersObservableProxyService: PlayersObservableProxyService,
+    private _dateFiltersService: DateFiltersService
   ) {}
 
   ngOnInit() {
-    this.showOnlyGamesCountSubscription =
-      this._observablesProxyHandlingService.$hideShowOnlyGamesCountSubject?.subscribe(
-        () => {
-          this.showOnlyGamesCount = !this.showOnlyGamesCount;
+    this.subscribeToCalendarModeObservables();
+    this.subscribeToPlayerObservables();
 
-          if (!this.showOnlyGamesCount) {
-            this.showOnlyGamesCountExtendedMode = false;
-          }
-
-          this._changeDetectorRef.detectChanges();
-        }
-      );
-
-    this.showOnlyCalendarGamesCountExtendedModeSubscription =
-      this._observablesProxyHandlingService.$hideShowOnlyCalendarGamesCountExtendedModeSubject?.subscribe(
-        () => {
-          this.showOnlyGamesCountExtendedMode = !this.showOnlyGamesCountExtendedMode;
-          this._changeDetectorRef.detectChanges();
-        }
-      ); 
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
 
-    const handler = new ColumnScrollDataHandler(
-      this._viewPort,
-      this.columns
+    const handler = new ColumnScrollDataHandlerService(
+      this.columns,
+      this._viewPort
     );
     handler.columnsToDisplayStream.subscribe(
-      (columns) => (this.columnsToDisplay = columns.map(x => x.header))
+      (columns) => (this.columnsToDisplay = columns.map((x) => x.header))
     );
   }
 
-  ngOnDestroy() {
-    this.showOnlyGamesCountSubscription?.unsubscribe();
-    this.showOnlyCalendarGamesCountExtendedModeSubscription?.unsubscribe();
+  ngOnDestroy(): void {
+    this._calendarGamesRangeSubscription?.unsubscribe();
+    this._calendarSimplifiedModeSubscription?.unsubscribe();
+    this._simplifiedCalendarDrawingModeSubscription?.unsubscribe();
+    this._selectedPlayersSubscription?.unsubscribe();
+    this._filterDatesRangeSubscription?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -185,43 +176,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         changes['games'].currentValue.length
     ) {
       this.setUpDataSourceAndColumns(this.games);
-    }
-
-    if (changes['selectedPlayers']?.currentValue) {
-      for (let [key, valueRow] of this.savedCalendarRows) {
-        if (this.selectedPlayers.has(valueRow.team.displayValue)) {
-          continue;
-        }
-
-        var index = this.dataSourceArray.findIndex(
-          (x) => x.team.cellValue == valueRow.team.cellValue
-        );
-        let concreteRow: any = this.dataSourceArray[index];
-
-        for (const key in valueRow) {
-          concreteRow[key].displayValue = valueRow[key].displayValue;
-        }
-      }
-
-      for (let [key, value] of this.selectedPlayers) {
-        let rowToReplace: any = this.dataSourceArray.find(
-          (x) => x.team.cellValue == key
-        );
-
-        if (!this.savedCalendarRows.has(key)) {
-          this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
-        }
-
-        rowToReplace.team.displayValue = value[0].playerName + ' (ОФО)';
-        for (let game of value) {
-          let gameDateStr: string = this.datepipe.transform(
-            game.gameDate,
-            DEFAULT_DATE_FORMAT
-          )!;
-          rowToReplace[gameDateStr].displayValue =
-            game.playerExpectedFantasyPoints;
-        }
-      }
     }
   }
 
@@ -281,9 +235,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         for (let k = 0, l = weekColumns.length; k < l; ++k) {
           const column: TableColumn = weekColumns[k];
 
-          if (
-            displayColumns.findIndex((x) => x == column.header) === -1
-          ) {
+          if (displayColumns.findIndex((x) => x == column.header) === -1) {
             allColumns.push(column);
             displayColumns.push(column.header);
           }
@@ -319,24 +271,18 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
       this.dataSourceArray.push(
         Object.fromEntries(
-          displayColumns.map((_, i) => [
-            displayColumns[i],
-            teamSpecificRow[i],
-          ])
+          displayColumns.map((_, i) => [displayColumns[i], teamSpecificRow[i]])
         )
       );
     }
 
     this.columns = allColumns;
     this.columnsToDisplay = displayColumns;
-
-    console.log(this.weekMaximumGamesMap);
-    console.log(this.weekMinimumGamesMap);
   }
 
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
     return (
-      element['team'].displayValue.includes('ОФО') &&
+      element['team'].displayValue.includes(EFP_LABEL) &&
       cell.game != null &&
       !isNaN(+cell.displayValue)
     );
@@ -377,7 +323,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       teamStat?.teamGoalsForm! <= GREEN_TEAM_GF_BOUNDARY ? 'white' : '#64ff8f';
 
     let gaForecastPimColor: string =
-      teamStat?.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY ? 'white' : '#ff7e7e';
+      teamStat?.teamGoalsAwayForm! <= RED_TEAM_GA_BOUNDARY
+        ? 'white'
+        : '#ff7e7e';
 
     let averageTeamStat: string = `
           <div>
@@ -476,7 +424,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       playersMap.forEach((x) => {
         playersToolTip += `${x.playerName} (${x.price}), ${
           x.powerPlayNumber
-        }, ${x.playerExpectedFantasyPoints.toFixed(0)} ОФО <br>`;
+        }, ${x.playerExpectedFantasyPoints.toFixed(0)} ${EFP_LABEL} <br>`;
       });
     }
 
@@ -546,13 +494,15 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     );
 
     // Set initial column value with just week and it's number
-    const weekColumns: Array<TableColumn> = [{
-      columnDef: thisWeekMaxDate,
-      header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
-      isWeekColumn: true,
-      isOldDate: thisWeekMaxDate.getTime() < this.yesterdayDate.getTime(),
-      week
-    }];
+    const weekColumns: Array<TableColumn> = [
+      {
+        columnDef: thisWeekMaxDate,
+        header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
+        isWeekColumn: true,
+        isOldDate: thisWeekMaxDate.getTime() < this.yesterdayDate.getTime(),
+        week,
+      },
+    ];
 
     // Set all other columns with specific week dates
     weekDates.forEach((date) => {
@@ -561,7 +511,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
         isWeekColumn: false,
         isOldDate: date.getTime() < this.yesterdayDate.getTime(),
-        week
+        week,
       });
     });
 
@@ -633,7 +583,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     columnHeaderText: string,
     weekGamesCount: number | undefined
   ): TableCell | null {
-
     // get home game based on column date value
     const homeGame: GamePredictionDTO | undefined = weekTeamGames.find(
       (x) =>
@@ -687,7 +636,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     weekTeamGames: GamePredictionDTO[],
     allGamesPriorToWeek: GamePredictionDTO[]
   ): TableCell | null {
-
     // If it's not week column -> return null
     if (!columnHeaderText.includes(DEFAULT_WEEK_HEADER_PREFIX)) {
       return null;
@@ -699,9 +647,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     ).length;
 
     // Choose between normal and simplified calendar view
-    const cellTextValue = activeGamesForWeekCount == allGamesPriorToWeek.length 
-      ? activeGamesForWeekCount.toString()
-      : GamesUtils.getSimplifiedCalendarViewCellText(activeGamesForWeekCount, allGamesPriorToWeek.length);
+    const cellTextValue =
+      activeGamesForWeekCount == allGamesPriorToWeek.length
+        ? activeGamesForWeekCount.toString()
+        : GamesUtils.getSimplifiedCalendarViewCellText(
+            activeGamesForWeekCount,
+            allGamesPriorToWeek.length
+          );
 
     // Create table cell
     return new TableCell(
@@ -723,41 +675,102 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return new TableCell('', -1, weekGamesCount);
   }
 
-  private addOrUpdateWeekGamesMapValues(weekNumber: number, allGamesPriorToWeek: number) {
-    if (!this.weekMaximumGamesMap.has(weekNumber) || this.weekMaximumGamesMap.get(weekNumber)! < allGamesPriorToWeek) {
+  private addOrUpdateWeekGamesMapValues(
+    weekNumber: number,
+    allGamesPriorToWeek: number
+  ) {
+    if (
+      !this.weekMaximumGamesMap.has(weekNumber) ||
+      this.weekMaximumGamesMap.get(weekNumber)! < allGamesPriorToWeek
+    ) {
       this.weekMaximumGamesMap.set(weekNumber, allGamesPriorToWeek);
     }
 
-    if (!this.weekMinimumGamesMap.has(weekNumber) || this.weekMinimumGamesMap.get(weekNumber)! > allGamesPriorToWeek) {
+    if (
+      !this.weekMinimumGamesMap.has(weekNumber) ||
+      this.weekMinimumGamesMap.get(weekNumber)! > allGamesPriorToWeek
+    ) {
       this.weekMinimumGamesMap.set(weekNumber, allGamesPriorToWeek);
     }
   }
-}
 
-export class ColumnScrollDataHandler
-  implements CdkVirtualScrollRepeater<TableColumn>
-{
-  private columnsToDisplaySubject = new ReplaySubject<TableColumn[]>(1);
-  readonly columnsToDisplayStream = this.columnsToDisplaySubject.asObservable();
-
-  constructor(
-    private viewPort: CdkVirtualScrollViewport,
-    private allColumns: TableColumn[]
-  ) {
-    this.dataStream = of(this.allColumns);
-    viewPort.renderedRangeStream.subscribe((range) => {
-      this.columnsToDisplaySubject.next(
-        allColumns.slice(range.start, range.end)
+  private subscribeToCalendarModeObservables(): void {
+    this._calendarGamesRangeSubscription =
+      this._calendarObservableProxyService.$calendarGamesRangeObservable?.subscribe(
+        (value: boolean) => {
+          this.showFullCalendar = value;
+          this._changeDetectorRef.detectChanges();
+        }
       );
-    });
-    viewPort.attach(this);
+
+    this._calendarSimplifiedModeSubscription =
+      this._calendarObservableProxyService.$calendarSimplifiedModeObservable?.subscribe(
+        (value: boolean) => {
+          this.isSimplifiedCalendarModeEnabled = value;
+          if (!value) {
+            this.isSimplifiedCalendarAdvancedDrawingModeEnabled = false;
+          }
+          this._changeDetectorRef.detectChanges();
+        }
+      );
+
+    this._simplifiedCalendarDrawingModeSubscription =
+      this._calendarObservableProxyService.$simplifiedCalendarDrawingModeObservable?.subscribe(
+        (value: boolean) => {
+          this.isSimplifiedCalendarAdvancedDrawingModeEnabled = value;
+          this._changeDetectorRef.detectChanges();
+        }
+      );
+    this._filterDatesRangeSubscription =
+      this._dateFiltersService.$dateFiltersObservable.subscribe(
+        (value: DatesRangeModel) => {
+          this.filterDates = value;
+          this._changeDetectorRef.detectChanges();
+        }
+      );
   }
-  readonly dataStream: Observable<readonly TableColumn[]>;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  measureRangeSize(
-    range: ListRange,
-    orientation: 'horizontal' | 'vertical'
-  ): number {
-    return 0;
+
+  private subscribeToPlayerObservables() {
+    this._selectedPlayersSubscription =
+      this._playersObservableProxyService.$selectedPlayersObservable?.subscribe(
+        (playersMap: Map<string, SelectedPlayerModel[]>) => {
+          for (const [_, valueRow] of this.savedCalendarRows) {
+            if (playersMap.has(valueRow.team.displayValue)) {
+              continue;
+            }
+
+            const index = this.dataSourceArray.findIndex(
+              (x) => x.team.cellValue == valueRow.team.cellValue
+            );
+            const concreteRow: any = this.dataSourceArray[index];
+
+            for (const key in valueRow) {
+              concreteRow[key].displayValue = valueRow[key].displayValue;
+            }
+          }
+
+          for (const [key, value] of playersMap) {
+            const rowToReplace: any = this.dataSourceArray.find(
+              (x) => x.team.cellValue == key
+            );
+
+            if (!this.savedCalendarRows.has(key)) {
+              this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
+            }
+
+            rowToReplace.team.displayValue =
+              value[0].playerName + ` (${EFP_LABEL})`;
+            for (const game of value) {
+              const gameDateStr: string = this.datepipe.transform(
+                game.gameDate,
+                DEFAULT_DATE_FORMAT
+              )!;
+              rowToReplace[gameDateStr].displayValue =
+                game.playerExpectedFantasyPoints;
+            }
+          }
+          this._changeDetectorRef.detectChanges();
+        }
+      );
   }
 }

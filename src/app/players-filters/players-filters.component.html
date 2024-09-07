@@ -199,6 +199,7 @@
     <div>
       <div class="choice-row">
         <img
+          loading="lazy"
           src="/assets/images/player-selected-first.png"
           class="selectedChoiceIcon"
         />
@@ -235,6 +236,7 @@
       </div>
       <div class="choice-row">
         <img
+          loading="lazy"
           src="/assets/images/player-selected-second.png"
           class="selectedChoiceIcon"
         />
@@ -279,7 +281,7 @@
         [hidden]="
           firstChoiceOfo!.playersCount! + secondChoiceOfo!.playersCount! == 0
         "
-        (click)="sendClearAllPlayerSelections.emit()"
+        (click)="clearAllPlayersSelection()"
       >
         <mat-icon>cancel</mat-icon>
       </button>

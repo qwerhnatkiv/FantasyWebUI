@@ -3,6 +3,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnChanges,
+  OnDestroy,
+  OnInit,
   SimpleChanges,
 } from '@angular/core';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
@@ -12,12 +14,9 @@ import { Utils } from './common/utils';
 import { GamesDTO } from './interfaces/games-dto';
 import { TeamStatsDTO } from './interfaces/team-stats-dto';
 import { PlayerStatsDTO } from './interfaces/player-stats-dto';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { Moment } from 'moment';
 import { TeamGameInformation } from './interfaces/team-game-information';
 import { PlayerExpectedFantasyPointsDTO } from './interfaces/player-expected-fantasy-points-dto';
 import { PlayerExpectedFantasyPointsInfo } from './interfaces/player-efp-info';
-import { SelectedPlayerModel } from './interfaces/selected-player-model';
 import { SportsSquadDTO } from './interfaces/sports-squad-dto';
 import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import {
@@ -28,7 +27,10 @@ import {
 import { OfoVariant } from './interfaces/ofo-variant';
 import { PositionsAvailableToPick } from './interfaces/positions-available-to-pick';
 import { UpdateLogInformation } from './interfaces/update-log-information';
-import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
+import { DateFiltersService } from 'src/services/filtering/date-filters.service';
+import { DatesRangeModel } from './interfaces/dates-range.model';
+import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -36,51 +38,24 @@ import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnChanges {
+export class AppComponent implements OnInit, OnChanges, OnDestroy {
   title = 'Fantasy Web';
+  private _updatePlayersEfpDataByDateRangeSubscription?: Subscription;
+  private _filterDatesRangeSubscription?: Subscription;
 
-  public isCalendarVisible = true;
-  public minFilterDate: Date | undefined = undefined;
-  public maxFilterDate: Date | undefined = undefined;
+  protected _filterDates?: DatesRangeModel;
+
+  protected isCalendarHidden: boolean = false;
+  protected updateLogInformation?: UpdateLogInformation;
 
   public games: GamePredictionDTO[] = [];
   public teamStats: TeamStatsDTO[] = [];
-  public updateLogInfomation: UpdateLogInformation | undefined = undefined;
 
   public playerStats: PlayerStatsDTO[] = [];
   public squadPlayers: PlayerSquadRecord[] = [];
   public balanceValue: number = 0;
   public substitutionsLeft: number = 0;
   public squadAvailableSlots: PositionsAvailableToPick | undefined;
-
-  public areBestPlayersForEachTeamSelected: boolean = false;
-  public showFullCalendar: boolean = false;
-  public showOnlyCalendarGamesCount: boolean = false;
-  public showOnlyCalendarGamesCountExtendedMode: boolean = false;
-
-  public emitHideShowFullCalendar() {
-    this.showFullCalendar = !this.showFullCalendar;
-  }
-
-  public emitHideShowOnlyGamesCount() {
-    this._observablesProxyHandlingService.triggerHideShowOnlyGamesCountSubject();
-    this.showOnlyCalendarGamesCount = !this.showOnlyCalendarGamesCount;
-    this.showOnlyCalendarGamesCountExtendedMode = false;
-  }
-
-  public emitHideShowOnlyCalendarGamesCountExtendedMode() {
-    this._observablesProxyHandlingService.triggerHideShowOnlyCalendarGamesCountExtendedModeSubject();
-    this.showOnlyCalendarGamesCountExtendedMode = !this.showOnlyCalendarGamesCountExtendedMode;
-  }
-
-  public emitSelectPlayerById(val: number) {
-    this._observablesProxyHandlingService.triggerSelectPlayerByIdSubject(val);
-  }
-
-  public emitSelectBestPlayersForEachTeam() {
-    this.areBestPlayersForEachTeamSelected =
-      !this.areBestPlayersForEachTeamSelected;
-  }
 
   set addedToSquadPlayer(value: PlayerSquadRecord) {
     if (this.squadPlayers.length <= 0) {
@@ -110,7 +85,6 @@ export class AppComponent implements OnChanges {
   public powerPlayUnits: string[] | undefined = [];
   public playersAreNotPlayedDisabled: boolean = true;
   public hideLowGPPlayersEnabled: boolean = false;
-  public shouldDeselectAllSelectedPlayers: boolean = false;
 
   public teamPlayerExpectedOfoMap: Map<
     number,
@@ -144,11 +118,6 @@ export class AppComponent implements OnChanges {
     | Map<number, PlayerExpectedFantasyPointsDTO[]>
     | undefined;
 
-  public selectedPlayers: Map<string, SelectedPlayerModel[]> = new Map<
-    string,
-    SelectedPlayerModel[]
-  >();
-
   public filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
     number,
     TeamGameInformation[]
@@ -157,25 +126,42 @@ export class AppComponent implements OnChanges {
   constructor(
     private http: HttpClient,
     private ngxLoader: NgxUiLoaderService,
-    private _observablesProxyHandlingService: ObservablesProxyHandlingService
+    private _dateFiltersService: DateFiltersService,
+    private _playersObservableProxyService: PlayersObservableProxyService
   ) {
     this.getCalendarData(true);
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnInit(): void {
+    this._filterDatesRangeSubscription =
+    this._dateFiltersService.$dateFiltersObservable.subscribe(
+      (value: DatesRangeModel) => {
+        this._filterDates = value;
+      }
+    );
+    this._updatePlayersEfpDataByDateRangeSubscription =
+      this._playersObservableProxyService.$updatePlayersEfpDataByDateRangeObservable.subscribe(
+        () => {
+          this.updateFilteredTeamsGamesMap();
+          this.setOfoDataForPlayers();
+        }
+      );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedUser']?.currentValue) {
       this.getUserSquad();
     }
   }
 
+  ngOnDestroy(): void {
+    this._updatePlayersEfpDataByDateRangeSubscription?.unsubscribe();
+    this._filterDatesRangeSubscription?.unsubscribe();
+  }
+
   public formLengthChanged(event: any) {
     this.formLength = event;
     this.getCalendarData(false);
-  }
-
-  public deselectAllSelectedPlayers() {
-    this.shouldDeselectAllSelectedPlayers =
-      !this.shouldDeselectAllSelectedPlayers;
   }
 
   private getCalendarData(setDefaultDates: boolean) {
@@ -192,7 +178,7 @@ export class AppComponent implements OnChanges {
           //this.games = this.games.filter((x) => x.weekNumber < 4);
           this.teamStats = result.teamsStats;
           this.playerStats = result.playerStats;
-          this.updateLogInfomation = result.updateLogInformation;
+          this.updateLogInformation = result.updateLogInformation;
           this.setUpFilters(setDefaultDates);
         },
         error: (err) => {
@@ -210,7 +196,7 @@ export class AppComponent implements OnChanges {
       .sort((n1, n2) => n1 - n2);
 
     if (setDefaultDates) {
-      this.setFiltersDefaultDates(
+      this._dateFiltersService.setFiltersDefaultDates(
         upcomingWeeks,
         this.games.filter((x) => !x.isOldGame)
       );
@@ -219,89 +205,20 @@ export class AppComponent implements OnChanges {
     this.setOfoDataForPlayers();
   }
 
-  public handleMinimumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
-    this.minFilterDate = event.value?.toDate();
-    this.updateFilteredTeamsGamesMap();
-    this.setOfoDataForPlayers();
-  }
-
-  public handleMaximumDateFilterChange(event: MatDatepickerInputEvent<Moment>) {
-    this.maxFilterDate = event.value?.toDate();
-    this.updateFilteredTeamsGamesMap();
-    this.setOfoDataForPlayers();
-  }
-
-  private setFiltersDefaultDates(
-    weeks: number[],
-    games: GamePredictionDTO[]
-  ): void {
-    const minDate: Date = Utils.getMonday(
-      GamesUtils.getExtremumDateForGames(games, false),
-      0
-    );
-    this.minFilterDate = new Date(minDate.getTime());
-
-    if (weeks.length === 0) {
-      this.minFilterDate = new Date();
-      this.maxFilterDate = new Date();
-      return;
-    }
-
-    for(const week of weeks) {
-      const weekGames: GamePredictionDTO[] = games.filter(
-        (game) => game.weekNumber == week
-      );
-
-      const nextWeekGames: GamePredictionDTO[] = games.filter(
-        (game) => game.weekNumber == week + 1
-      );
-
-      const thisWeekMinDate: Date = Utils.getMonday(
-        GamesUtils.getExtremumDateForGames(weekGames, false),
-        0
-      );
-
-      const nextWeekMinDate: Date | undefined =
-        nextWeekGames?.length > 0
-          ? Utils.getMonday(GamesUtils.getExtremumDateForGames(nextWeekGames, false), 0)
-          : undefined;
-
-      const thisWeekMaxDate =
-        nextWeekMinDate != null
-          ? Utils.addDateDays(nextWeekMinDate, -1)
-          : GamesUtils.getExtremumDateForGames(weekGames, true);
-
-      const nextWeekMaxDate: Date =
-        nextWeekGames.length > 0
-          ? GamesUtils.getExtremumDateForGames(nextWeekGames, true)
-          : thisWeekMaxDate;
-
-      if (
-        thisWeekMinDate.getTime() <= minDate.getTime()! &&
-        thisWeekMaxDate.getTime() >= minDate.getTime()!
-      ) {
-        const today: Date = new Date();
-        this.minFilterDate =
-          today.getDay() != 0 || today.getTime() < this.minFilterDate?.getTime()! ? this.minFilterDate : nextWeekMinDate;
-        this.maxFilterDate =
-          today.getDay() != 0 || today.getTime() < this.minFilterDate?.getTime()! ? thisWeekMaxDate : nextWeekMaxDate;
-        break;
-      }
-    }
-  }
-
   private updateFilteredTeamsGamesMap() {
-    let newMap: Map<number, TeamGameInformation[]> = new Map<
+    const newMap: Map<number, TeamGameInformation[]> = new Map<
       number,
       TeamGameInformation[]
     >();
     for (var i = 0, n = this.teamStats?.length!; i < n; ++i) {
-      let teamStats: TeamStatsDTO = this.teamStats![i];
+      const teamStats: TeamStatsDTO = this.teamStats![i];
 
-      let gamesByDateRange: GamePredictionDTO[] = this.games.filter(
+      const gamesByDateRange: GamePredictionDTO[] = this.games.filter(
         (x) =>
-          new Date(x.gameDate).getTime() <= this.maxFilterDate?.getTime()! &&
-          new Date(x.gameDate).getTime() >= this.minFilterDate?.getTime()! &&
+          new Date(x.gameDate).getTime() <=
+            this._filterDates?.maxDate?.getTime()! &&
+          new Date(x.gameDate).getTime() >=
+            this._filterDates?.minDate?.getTime()! &&
           (x.awayTeamId == teamStats.teamID || x.homeTeamId == teamStats.teamID)
       );
 
@@ -341,12 +258,12 @@ export class AppComponent implements OnChanges {
 
   private setOfoDataForPlayers() {
     this.ngxLoader.start();
-    let minDate: string = this.minFilterDate
+    const minDate: string = this._filterDates?.minDate
       ?.toISOString()
       .replace(':', '%3A')
       .split('.')[0]!;
 
-    let maxDate: string = Utils.addDateDays(this.maxFilterDate!, 1)
+    const maxDate: string = Utils.addDateDays(this._filterDates?.maxDate!, 1)
       .toISOString()
       .replace(':', '%3A')
       .split('.')[0]!;
@@ -553,5 +470,9 @@ export class AppComponent implements OnChanges {
 
       gameOfoMap.get(game.gameDate)?.push(modelInfo);
     });
+  }
+
+  protected updateCalendarVisibility(isCalendarHidden: boolean) {
+    this.isCalendarHidden = isCalendarHidden;
   }
 }

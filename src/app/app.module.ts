@@ -34,7 +34,6 @@ import { PlayersFiltersComponent } from './players-filters/players-filters.compo
 
 import { NgFor } from '@angular/common';
 import {
-  MAT_SELECT_SCROLL_STRATEGY,
   MatSelectModule,
 } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
@@ -51,11 +50,16 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CustomDateAdapter } from './common/custom-date-adapter';
 import { PositionsMapPipe } from './pipes/positions-map.pipe';
-import { ObservablesProxyHandlingService } from 'src/services/observables-proxy-handling';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CellClassPipe } from './pipes/cell-class.pipe';
 import { CellTextClassPipe } from './pipes/cell-text-class.pipe';
 import { IButtonComponent } from './common-components/i-button/i-button.component';
+import { SimpleSelectComponent } from './common-components/simple-select/simple-select.component';
+import { HeaderMenuComponent } from './header-menu/header-menu.component';
+import { CalendarObservableProxyService } from 'src/services/observable-proxy/calendar-observable-proxy.service';
+import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
+import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
+import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -72,12 +76,14 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PositionsMapPipe,
     ToiPipe,
     CalendarTableComponent,
+    HeaderMenuComponent,
     PlayersTableComponent,
     PlayersFiltersComponent,
     PlayersSquadComponent,
     CellClassPipe,
     CellTextClassPipe,
-    IButtonComponent
+    IButtonComponent,
+    SimpleSelectComponent
   ],
   imports: [
     BrowserModule,
@@ -113,7 +119,10 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
-    ObservablesProxyHandlingService,
+    PlayersObservableProxyService,
+    CalendarObservableProxyService,
+    FiltersObservableProxyService,
+    DateFiltersService
   ],
   bootstrap: [AppComponent],
 })

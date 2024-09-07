@@ -1,0 +1,123 @@
+<div class="header-menu">
+  <div class="header-calendar-action-buttons">
+    <div
+      class="update-calendar-visibility-button"
+      [style.--background-color]="YELLOW_COLOR"
+      [style.--background-color-active]="YELLOW_COLOR_ACTIVE"
+      (click)="updateCalendarVisibility()"
+    >
+      {{
+        this.isCalendarHidden ? EXPAND_CALENDAR_LABEL : COLLAPSE_CALENDAR_LABEL
+      }}
+    </div>
+
+    <i-button
+      [allowActiveState]="true"
+      iconPath="/assets/images/calendar-small.png"
+      (clickEmitter)="updateCalendarGamesRangeMode()"
+      [tooltipText]="
+        hasPastCalendarGames
+          ? DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL
+          : ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL
+      "
+    ></i-button>
+
+    <i-button
+      [allowActiveState]="true"
+      iconPath="/assets/images/minesweeper-small.png"
+      [iconRelativeSize]="65"
+      (clickEmitter)="updateCalendarSimplifiedMode()"
+      [tooltipText]="
+        isCalendarSimplifiedModeEnabled
+          ? ENABLE_FULL_CALENDAR_MODE_LABEL
+          : ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL
+      "
+    ></i-button>
+
+    <i-button
+      [hidden]="!isCalendarSimplifiedModeEnabled"
+      [iconPath]="
+        isSimplifiedCalendarAdvancedDrawingModeEnabled
+          ? '/assets/images/switch-on.png'
+          : '/assets/images/switch-off.png'
+      "
+      [iconRelativeSize]="100"
+      (clickEmitter)="updateSimplifiedCalendarDrawingMode()"
+      [removeBackgroundColor]="true"
+      [tooltipText]="ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL"
+    ></i-button>
+    <i-button
+      [allowActiveState]="true"
+      iconPath="/assets/images/select-best-players-small.png"
+      [iconRelativeSize]="70"
+      (clickEmitter)="showMostValuablePlayersInCalendar()"
+      [tooltipText]="SHOW_BEST_PLAYERS_BY_EFP"
+    ></i-button>
+  </div>
+  <div class="header-date-filters">
+    <mat-form-field>
+      <mat-label>{{ FROM_DATE_CALENDAR_FILTER }}</mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerFrom"
+        [(ngModel)]="filterDates.minDate"
+        (dateChange)="handleMinimumDateFilterChange($event)"
+      />
+      <mat-hint></mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="pickerFrom"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerFrom></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{ TO_DATE_CALENDAR_FILTER }}</mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerTo"
+        [(ngModel)]="filterDates.maxDate"
+        (dateChange)="handleMaximumDateFilterChange($event)"
+      />
+      <mat-hint></mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="pickerTo"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerTo></mat-datepicker>
+    </mat-form-field>
+  </div>
+  <div class="header-update-log-container">
+    <p>
+      {{ DATA_UPDATED_LOG_INFO }}
+      {{
+        updateLogInformation?.generalUpdateDate
+          | date : DEFAULT_DATE_TIME_FORMAT
+      }}
+    </p>
+    <p>
+      {{ COEFS_UPDATED_LOG_INFO }}
+      {{
+        updateLogInformation?.bookmakersUpdateDate
+          | date : DEFAULT_DATE_TIME_FORMAT
+      }}
+    </p>
+  </div>
+
+  <div class="header-external-links">
+    <a
+      mat-raised-button
+      color="primary"
+      [href]="GAME_DAY_TWEETS_URL"
+      target="_blank"
+      >GameDayNews NHL</a
+    >
+    <a
+      mat-raised-button
+      color="primary"
+      [href]="KNOWLEDGE_BASE_URL"
+      target="_blank"
+      >База знаний</a
+    >
+  </div>
+</div>

@@ -2,11 +2,11 @@
   <div class="players-table-section-headers">
     <div class="date-filter-labels">
       <label>
-        {{ minFilterDate | date : "dd.MM.yyyy" }}
+        {{ filterDates.minDate| date : "dd.MM.yyyy" }}
       </label>
       <label>&nbsp;—&nbsp;</label>
       <label>
-        {{ maxFilterDate | date : "dd.MM.yyyy" }}
+        {{ filterDates.maxDate | date : "dd.MM.yyyy" }}
       </label>
     </div>
     <i-button
