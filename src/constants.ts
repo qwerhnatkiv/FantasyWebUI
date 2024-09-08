@@ -142,6 +142,7 @@ export const DATA_UPDATED_LOG_INFO: string = 'Данные обновлены';
 export const COEFS_UPDATED_LOG_INFO: string = 'Кэфы обновлены';
 export const FROM_DATE_CALENDAR_FILTER: string = 'С: '
 export const TO_DATE_CALENDAR_FILTER: string = 'По: '
+export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 
 
 // EXTERNAL SOURCES

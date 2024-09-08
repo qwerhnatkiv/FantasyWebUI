@@ -60,6 +60,8 @@ import { CalendarObservableProxyService } from 'src/services/observable-proxy/ca
 import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
 import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
+import { CancelButtonComponent } from './common-components/cancel-button/cancel-button.component';
+import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week-games-map.service';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -83,7 +85,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CellClassPipe,
     CellTextClassPipe,
     IButtonComponent,
-    SimpleSelectComponent
+    SimpleSelectComponent,
+    CancelButtonComponent
   ],
   imports: [
     BrowserModule,
@@ -122,7 +125,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PlayersObservableProxyService,
     CalendarObservableProxyService,
     FiltersObservableProxyService,
-    DateFiltersService
+    DateFiltersService,
+    CalendarWeekGamesMapService
   ],
   bootstrap: [AppComponent],
 })

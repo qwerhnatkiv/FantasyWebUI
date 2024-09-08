@@ -1,8 +1,24 @@
 .header-menu {
   height: fit-content;
   display: flex;
+  flex-direction: column;
+}
+
+.header-submenu {
+  height: fit-content;
+  display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: var(--justify-content);
+}
+
+.header-border {
+  height: 1px;
+  width: 100%;
+
+  border-bottom: 1px solid #bbb;
+
+  margin: 5px 0 7px 0;
+  
 }
 
 .header-calendar-action-buttons {
@@ -47,4 +63,10 @@
   display: flex;
   gap: 20px;
   margin-right: 10%;
+}
+
+.header-simplified-calendar-mode-sub-actions {
+  display: flex;
+  gap: 30px;
+  margin-left: 100px;
 }

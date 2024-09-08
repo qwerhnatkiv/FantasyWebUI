@@ -21,6 +21,7 @@ import {
   GAME_DAY_TWEETS_URL,
   KNOWLEDGE_BASE_URL,
   SHOW_BEST_PLAYERS_BY_EFP,
+  START_DATE_CALENDAR_FILTER,
   TO_DATE_CALENDAR_FILTER,
   YELLOW_COLOR,
   YELLOW_COLOR_ACTIVE,
@@ -67,6 +68,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected COEFS_UPDATED_LOG_INFO: string = COEFS_UPDATED_LOG_INFO;
   protected FROM_DATE_CALENDAR_FILTER: string = FROM_DATE_CALENDAR_FILTER;
   protected TO_DATE_CALENDAR_FILTER: string = TO_DATE_CALENDAR_FILTER;
+  protected START_DATE_CALENDAR_FILTER: string = START_DATE_CALENDAR_FILTER;
 
   // CONSTS
   protected DEFAULT_DATE_TIME_FORMAT: string = DEFAULT_DATE_TIME_FORMAT;
@@ -76,6 +78,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected KNOWLEDGE_BASE_URL: string = KNOWLEDGE_BASE_URL;
 
   // FIELDS FOR HTML
+  protected isSecondLevelSubMenuHidden: boolean = true;
   protected isCalendarHidden: boolean = false;
   protected hasPastCalendarGames: boolean = false;
   protected isCalendarSimplifiedModeEnabled: boolean = false;
@@ -84,6 +87,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     minDate: new Date(),
     maxDate: new Date(),
   };
+  protected simplifiedModeDatePickerStartDate: Date = new Date();
 
   //#region CTOR
 
@@ -140,6 +144,11 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     this.isCalendarSimplifiedModeEnabled =
       !this.isCalendarSimplifiedModeEnabled;
     this.isSimplifiedCalendarAdvancedDrawingModeEnabled = false;
+    this.isSecondLevelSubMenuHidden = this.shouldSecondLevelSubMenuBeHidden();
+
+    if (!this.isCalendarSimplifiedModeEnabled) {
+      this.resetSimplifiedModeStartDateFilterValue();
+    }
 
     this._calendarObservableProxyService.triggerCalendarInSimplifiedModeSubject(
       this.isCalendarSimplifiedModeEnabled
@@ -183,7 +192,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
    * Reacts to MatDatepickerInputEvent for upper bound date filter and sends the update to dependent components
    * @param event DatePicker value change event
    */
-  public handleMaximumDateFilterChange(
+  protected handleMaximumDateFilterChange(
     event: MatDatepickerInputEvent<Moment>
   ): void {
     const maxFilterDate: Date | undefined = event.value?.toDate();
@@ -193,5 +202,33 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     );
   }
 
-  //#endregion Protected Methods for HTML Template
+  /**
+   * Reacts to MatDatepickerInputEvent for simplified mode start date filter
+   * @param event DatePicker value change event
+   */
+  protected updateSimplifiedModeStartDateFilterValue(
+    event: MatDatepickerInputEvent<Moment>
+  ): void {
+    const date: Date = event.value?.toDate()!;
+    this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(date);
+  }
+
+  /**
+   * Resets simplified mode start date filter
+   */
+  protected resetSimplifiedModeStartDateFilterValue() {
+    const todayDate: Date = new Date();
+    this.simplifiedModeDatePickerStartDate = todayDate;
+    this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(todayDate);
+  }
+
+  //#endregion PROTECTED METHODS for HTML Template
+
+  //#region PRIVATE METHODS
+
+  private shouldSecondLevelSubMenuBeHidden(): boolean {
+    return !this.isCalendarSimplifiedModeEnabled
+  }
+
+  //#endregion PRIVATE METHODS
 }

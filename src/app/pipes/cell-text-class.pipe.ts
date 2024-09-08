@@ -26,9 +26,9 @@ export class CellTextClassPipe implements PipeTransform {
 
     if (isWeekCell) {
       return this._getWeekCellStyle(
-        weekGames, 
-        showFullCalendar, 
-        cellValue, 
+        weekGames,
+        showFullCalendar,
+        cellValue,
         showLongTermWeekStyles,
         weekMaximumGamesCount,
         weekMinimumGamesCount,
@@ -69,7 +69,7 @@ export class CellTextClassPipe implements PipeTransform {
     priorToWeekGamesCount: number | undefined
   ): string {
     if (showLongTermWeekStyles) {
-      if (weekMinimumGamesCount === weekMaximumGamesCount) {
+      if (weekMaximumGamesCount - weekMinimumGamesCount <= 1) {
         return 'calendar-cell-week';
       }
 
@@ -88,11 +88,19 @@ export class CellTextClassPipe implements PipeTransform {
       return 'calendar-cell-week';
     }
 
-    if (showFullCalendar ? weekGames > GREEN_GAMES_WEEK_BOUNDARY : cellValue > GREEN_GAMES_WEEK_BOUNDARY) {
+    if (
+      showFullCalendar
+        ? weekGames > GREEN_GAMES_WEEK_BOUNDARY
+        : cellValue > GREEN_GAMES_WEEK_BOUNDARY
+    ) {
       return 'calendar-cell-week-green';
     }
 
-    if (showFullCalendar ? weekGames < RED_GAMES_WEEK_BOUNDARY : cellValue < RED_GAMES_WEEK_BOUNDARY) {
+    if (
+      showFullCalendar
+        ? weekGames < RED_GAMES_WEEK_BOUNDARY
+        : cellValue < RED_GAMES_WEEK_BOUNDARY
+    ) {
       return 'calendar-cell-week-red';
     }
 
