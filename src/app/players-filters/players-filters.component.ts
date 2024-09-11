@@ -28,7 +28,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
 
-  playersAreNotPlayedDisabled: boolean = true;
+  playersAreNotPlayedDisabled: boolean = false;
   hideLowGPPlayersEnabled: boolean = false;
   public formLength: number = DEFAULT_FORM_LENGTH;
   public formLengthCount: Array<number> = new Array(DEFAULT_FORM_LENGTH_COUNT);
@@ -106,7 +106,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
         this.playersAreNotPlayedDisabledChanged();
       }
       else {
-        this.playersAreNotPlayedDisabled = true;
+        this.playersAreNotPlayedDisabled = false;
         this.playersAreNotPlayedDisabledChanged();
       }
     }
@@ -193,7 +193,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
     this.clearAllPlayersSelection();
 
-    this.playersAreNotPlayedDisabled = true;
+    this.playersAreNotPlayedDisabled = false;
     this.playersAreNotPlayedDisabledChanged();
 
     this.hideLowGPPlayersEnabled = false;

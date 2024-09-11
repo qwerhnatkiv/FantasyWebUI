@@ -83,7 +83,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
-  public playersAreNotPlayedDisabled: boolean = true;
+  public playersAreNotPlayedDisabled: boolean = false;
   public hideLowGPPlayersEnabled: boolean = false;
 
   public teamPlayerExpectedOfoMap: Map<
@@ -189,7 +189,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setUpFilters(setDefaultDates: boolean) {
-    let upcomingWeeks: number[] = this.games
+    const upcomingWeeks: number[] = this.games
       ?.filter((x) => !x.isOldGame)
       .map((x) => x.weekNumber)
       .filter(Utils.onlyUnique)

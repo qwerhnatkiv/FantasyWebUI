@@ -92,7 +92,7 @@ export class PlayersTableComponent
     TeamGameInformation[]
   >();
 
-  @Input() playersAreNotPlayedDisabled: boolean = true;
+  @Input() playersAreNotPlayedDisabled: boolean = false;
   @Input() hideLowGPPlayersEnabled: boolean = false;
 
   @Input() playerGamesOfoMap:
