@@ -37,6 +37,18 @@
   background: #64ff8f;
 }
 
+.red-cell {
+  background: #ff7e7e;
+}
+
+.green-text {
+  color: #00AA30
+}
+
+.red-text {
+  color: red;
+}
+
 .removed-cell {
   text-decoration: line-through;
   color: #878787;
@@ -78,8 +90,4 @@
 .clear-squad-changes-button[hidden] {
   visibility: hidden;
   display: block !important;
-}
-
-.is-out-of-limit {
-  color: red;
 }

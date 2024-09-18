@@ -29,6 +29,7 @@ export class PlayersSquadComponent {
     'price',
     'gamesCount',
     'expectedFantasyPoints',
+    'expectedFantasyPointsDifference',
   ];
 
   @ViewChild(MatTable)
@@ -48,6 +49,7 @@ export class PlayersSquadComponent {
         ? this.substitutionsValue
         : this.substitutionsValue -
           this._squadPlayers.filter((x) => x.isNew).length;
+    this._handleNewPlayers();
   }
 
   @Output('squadPlayersChange') squadPlayersChange: EventEmitter<
@@ -121,8 +123,25 @@ export class PlayersSquadComponent {
       .reduce((sum, current) => sum + current.gamesCount, 0);
   }
 
+  /**
+   * Returns total sum of the expected fantasy points difference for each new player
+   * @returns EFP sum
+   */
+  protected getTotalExpectedFantasyPointsDifference(): number {
+    if (this.squadPlayers == null) {
+      return 0;
+    }
+
+    return this.squadPlayers
+      .filter((item) => item.isNew)
+      .map((t) => t.expectedFantasyPointsDifference!)
+      .reduce((acc, value) => acc + (value == null ? 0 : value), 0);
+  }
+
   public sendSelectedPlayer(row: PlayerSquadRecord): void {
-    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(row.playerObject.playerID);
+    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(
+      row.playerObject.playerID
+    );
   }
 
   public removeRestoreRow(row: PlayerSquadRecord): void {
@@ -131,15 +150,16 @@ export class PlayersSquadComponent {
       if (index > -1) {
         this.squadPlayers.splice(index, 1);
       }
-
+      
       this.dataSource = new MatTableDataSource(this.squadPlayers);
+      this._handleNewPlayers();
       this.substitutionsLeft++;
-      let availableSlots: PositionsAvailableToPick = this.getAvailableSlots();
+      const availableSlots: PositionsAvailableToPick = this.getAvailableSlots();
       this.sendAvailableSlots.emit(availableSlots);
       return;
     }
 
-    let availableSlots: PositionsAvailableToPick = this.getAvailableSlots();
+    const availableSlots: PositionsAvailableToPick = this.getAvailableSlots();
     if (
       row.isRemoved &&
       ((availableSlots.defendersAvailable == 0 && row.position == 'З') ||
@@ -150,6 +170,7 @@ export class PlayersSquadComponent {
     }
 
     row.isRemoved = !row.isRemoved;
+    this._handleNewPlayers();
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
   }
@@ -205,5 +226,24 @@ export class PlayersSquadComponent {
       forwardsAvailable: forwardsAvailable,
       selectedPlayerIds: selectedPlayersIds,
     };
+  }
+
+  /**
+   * Handles newly added players and 
+   * calculates the difference between their EFP and removed player EFP
+   */
+  private _handleNewPlayers(): void {
+    const addedPlayers: PlayerSquadRecord[] = this.squadPlayers
+      .filter((x) => x.isNew)
+      .sort((n1, n2) => n1.price - n2.price);
+    const removedPlayers: PlayerSquadRecord[] = this.squadPlayers
+      .filter((x) => x.isRemoved)
+      .sort((n1, n2) => n1.price - n2.price);
+
+    for (let i = 0, n = addedPlayers.length; i < n; ++i) {
+      addedPlayers[i].expectedFantasyPointsDifference =
+        addedPlayers[i].expectedFantasyPoints -
+        removedPlayers[i].expectedFantasyPoints;
+    }
   }
 }

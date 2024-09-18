@@ -21,7 +21,7 @@
       mat-cell
       *matCellDef="let element"
       class="left-column"
-      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
     >
       <span class="position-span">
         {{ element.position | positionsMap }}
@@ -36,7 +36,7 @@
       mat-cell
       *matCellDef="let element"
       class="left-align"
-      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
       [class.removed-cell]="element.isRemoved"
       (click)="sendSelectedPlayer(element)"
       [ngxTippy]="generateCellToolTip(element)"
@@ -68,16 +68,16 @@
       *matCellDef="let element"
       [class.removed-cell]="element.isRemoved"
       (click)="sendSelectedPlayer(element)"
-      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
     >
       {{ element.price }}
     </td>
     <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      <span [class.is-out-of-limit]="getTotalBalance() < 0">{{
+      <span [class.red-text]="getTotalBalance() < 0">{{
         getTotalBalance() | number : "1.0-1"
       }}</span>
       <br />
-      <span [class.is-out-of-limit]="substitutionsLeft < 0">
+      <span [class.red-text]="substitutionsLeft < 0">
         {{ substitutionsLeft }}
       </span>
     </td>
@@ -89,7 +89,7 @@
       mat-cell
       *matCellDef="let element"
       class="right-column"
-      [ngClass]="element.isNew ? 'green-cell' : 'silver-cell'"
+      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
       (click)="sendSelectedPlayer(element)"
       [class.removed-cell]="element.isRemoved"
     >
@@ -112,6 +112,28 @@
     </td>
     <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
       {{ getTotalOFO() | number : "1.0-1" }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expectedFantasyPointsDifference">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      style="font-weight: 700"
+      [class.green-text]="element.expectedFantasyPointsDifference >= 0"
+      [class.red-text]="element.expectedFantasyPointsDifference < 0"
+    >
+      {{ element.expectedFantasyPointsDifference | number : "1.0-1" }}
+    </td>
+    <td
+      mat-footer-cell
+      *matFooterCellDef
+      style="font-weight: 700"
+      [class.green-text]="getTotalExpectedFantasyPointsDifference() > 0"
+      [class.red-text]="getTotalExpectedFantasyPointsDifference() < 0"
+    >
+      {{ getTotalExpectedFantasyPointsDifference() | number : "1.0-1" }}
     </td>
   </ng-container>
 

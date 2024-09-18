@@ -62,6 +62,7 @@ import { FiltersObservableProxyService } from 'src/services/observable-proxy/fil
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 import { CancelButtonComponent } from './common-components/cancel-button/cancel-button.component';
 import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week-games-map.service';
+import { SquadPlayerPipe } from './pipes/squad-player.pipe';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -84,6 +85,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     PlayersSquadComponent,
     CellClassPipe,
     CellTextClassPipe,
+    SquadPlayerPipe,
     IButtonComponent,
     SimpleSelectComponent,
     CancelButtonComponent
