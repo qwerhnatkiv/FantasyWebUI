@@ -404,7 +404,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       (x) => x.teamID == game.awayTeamId
     )!;
 
-    let currentTeam: TeamStatsDTO = opponentTeamAcronym.endsWith(
+    const currentTeam: TeamStatsDTO = opponentTeamAcronym.endsWith(
       homeTeamStats.teamAcronym
     )
       ? awayTeamStats
@@ -608,7 +608,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         homeGame.awayTeamAcronym,
         homeGame.homeTeamWinChance,
         weekGamesCount,
-        homeGame
+        homeGame,
+        undefined,
+        undefined,
+        homeGame.awayTeamAcronym
       );
     }
 
@@ -626,7 +629,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym,
         awayGame.awayTeamWinChance,
         weekGamesCount,
-        awayGame
+        awayGame,
+        undefined,
+        undefined,
+        awayGame.homeTeamAcronym
       );
     }
 
