@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
-import { DEFAULT_SUBSTITUTION_VALUE } from 'src/constants';
+import { DEFAULT_POSITIONS, DEFAULT_SUBSTITUTION_VALUE, POSITIONS_SORT_MAP } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { TeamGameInformation } from '../interfaces/team-game-information';
@@ -211,11 +211,11 @@ export class PlayersSquadComponent {
       (item) => !item.isRemoved
     );
     const goaliesAvailable: number =
-      2 - notRemovedPlayers.filter((item) => item.position == 'В').length;
+      2 - notRemovedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[0]).length;
     const defendersAvailable: number =
-      6 - notRemovedPlayers.filter((item) => item.position == 'З').length;
+      6 - notRemovedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[1]).length;
     const forwardsAvailable: number =
-      9 - notRemovedPlayers.filter((item) => item.position == 'Н').length;
+      9 - notRemovedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[2]).length;
     const selectedPlayersIds: Array<number> = notRemovedPlayers.map(
       (item) => item.playerObject.playerID
     );
@@ -235,10 +235,11 @@ export class PlayersSquadComponent {
   private _handleNewPlayers(): void {
     const addedPlayers: PlayerSquadRecord[] = this.squadPlayers
       .filter((x) => x.isNew)
-      .sort((n1, n2) => n1.price - n2.price);
+      .sort((n1, n2) => POSITIONS_SORT_MAP.get(n1.position)! - POSITIONS_SORT_MAP.get(n2.position)! || n1.price - n2.price);
+
     const removedPlayers: PlayerSquadRecord[] = this.squadPlayers
       .filter((x) => x.isRemoved)
-      .sort((n1, n2) => n1.price - n2.price);
+      .sort((n1, n2) => POSITIONS_SORT_MAP.get(n1.position)! - POSITIONS_SORT_MAP.get(n2.position)! || n1.price - n2.price);
 
     for (let i = 0, n = addedPlayers.length; i < n; ++i) {
       addedPlayers[i].expectedFantasyPointsDifference =

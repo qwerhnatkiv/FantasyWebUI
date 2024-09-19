@@ -10,6 +10,12 @@ export const DEFAULT_POSITIONS = [
   'В', 'З', 'Н'
 ]
 
+export const POSITIONS_SORT_MAP: Map<string, number> = new Map<string, number>([
+  [DEFAULT_POSITIONS[0], 0],
+  [DEFAULT_POSITIONS[1], 1],
+  [DEFAULT_POSITIONS[2], 2]
+]);
+
 export const DEFAULT_SUBSTITUTION_VALUE = 5;
 
 export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string>([
