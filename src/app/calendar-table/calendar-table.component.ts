@@ -705,7 +705,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       this._calendarObservableProxyService.$calendarSimplifiedModeObservable?.subscribe(
         (value: boolean) => {
           this.isSimplifiedCalendarModeEnabled = value;
-          this.isSimplifiedCalendarAdvancedDrawingModeEnabled = value;
           this._changeDetectorRef.detectChanges();
         }
       );
@@ -727,7 +726,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     this._simplifiedCalendarModeStartDateSubscription =
       this._calendarObservableProxyService.$simplifiedCalendarModeStartDateObservable?.subscribe(
-        (value: Date) => {
+        (value: Date | undefined) => {
           this._calendarWeekGamesMapService.setUpdatedWeeksGamesCount(
             this.dataSourceArray,
             this.games,

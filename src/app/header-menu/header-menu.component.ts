@@ -87,7 +87,6 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     minDate: new Date(),
     maxDate: new Date(),
   };
-  protected simplifiedModeDatePickerStartDate: Date = new Date();
 
   //#region CTOR
 
@@ -143,12 +142,6 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected updateCalendarSimplifiedMode(): void {
     this.isCalendarSimplifiedModeEnabled =
       !this.isCalendarSimplifiedModeEnabled;
-    this.isSimplifiedCalendarAdvancedDrawingModeEnabled = this.isCalendarSimplifiedModeEnabled;
-    this.isSecondLevelSubMenuHidden = this.shouldSecondLevelSubMenuBeHidden();
-
-    if (!this.isCalendarSimplifiedModeEnabled) {
-      this.resetSimplifiedModeStartDateFilterValue();
-    }
 
     this._calendarObservableProxyService.triggerCalendarInSimplifiedModeSubject(
       this.isCalendarSimplifiedModeEnabled
@@ -186,6 +179,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
       minFilterDate,
       this.filterDates.maxDate
     );
+
+    this.updateSimplifiedModeStartDateFilterValue(minFilterDate);
   }
 
   /**
@@ -207,28 +202,11 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
    * @param event DatePicker value change event
    */
   protected updateSimplifiedModeStartDateFilterValue(
-    event: MatDatepickerInputEvent<Moment>
+    startDate: Date | undefined
   ): void {
-    const date: Date = event.value?.toDate()!;
-    this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(date);
-  }
-
-  /**
-   * Resets simplified mode start date filter
-   */
-  protected resetSimplifiedModeStartDateFilterValue() {
-    const todayDate: Date = new Date();
-    this.simplifiedModeDatePickerStartDate = todayDate;
-    this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(todayDate);
+    this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(startDate);
   }
 
   //#endregion PROTECTED METHODS for HTML Template
 
-  //#region PRIVATE METHODS
-
-  private shouldSecondLevelSubMenuBeHidden(): boolean {
-    return !this.isCalendarSimplifiedModeEnabled
-  }
-
-  //#endregion PRIVATE METHODS
 }

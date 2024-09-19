@@ -8,7 +8,7 @@ export class CalendarObservableProxyService {
   private _calendarGamesRangeSubject: Subject<boolean> = new Subject<boolean>();
   private _simplifiedCalendarDrawingModeSubject: Subject<boolean> =
     new Subject<boolean>();
-  private _simplifiedCalendarModeStartDateSubject: Subject<Date> = new Subject<Date>();
+  private _simplifiedCalendarModeStartDateSubject: Subject<Date | undefined> = new Subject<Date | undefined>();
 
   /**
    * Observable for the event of clicking on "minesweeper" button.
@@ -35,7 +35,7 @@ export class CalendarObservableProxyService {
    * Observable for the event of changing the start date of simplified calendar mode button.
    * This will result in another set of rules for week cells painting and calculation
    */
-  public $simplifiedCalendarModeStartDateObservable: Observable<Date> =
+  public $simplifiedCalendarModeStartDateObservable: Observable<Date | undefined> =
     this._simplifiedCalendarModeStartDateSubject.asObservable();
 
   /**
@@ -66,7 +66,7 @@ export class CalendarObservableProxyService {
    * Triggers the subject of changing the start date of simplified calendar mode button
    * @param value New filter start date
    */
-  public triggerSimplifiedCalendarModeStartDateSubject(value: Date): void {
+  public triggerSimplifiedCalendarModeStartDateSubject(value: Date | undefined): void {
     this._simplifiedCalendarModeStartDateSubject.next(value);
   }
 }

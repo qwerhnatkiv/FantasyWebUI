@@ -30,14 +30,14 @@ export class CalendarWeekGamesMapService {
     games: GamePredictionDTO[],
     teamName: string,
     week: number,
-    startDate: Date
+    startDate: Date | undefined
   ): number {
     const allGamesPriorToWeekCount: number = games.filter(
       (game) =>
         (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
         !game.isOldGame &&
         game.weekNumber <= week &&
-        new Date(game.gameDate).getTime() > startDate.getTime()
+        (startDate == null || new Date(game.gameDate).getTime() > startDate!.getTime())
     ).length;
 
     this._addOrUpdateWeekGamesMapValues(week, allGamesPriorToWeekCount);
@@ -54,7 +54,7 @@ export class CalendarWeekGamesMapService {
   public setUpdatedWeeksGamesCount(
     dataSourceArray: any[],
     games: GamePredictionDTO[],
-    startDate: Date
+    startDate: Date | undefined
   ): void {
     this._resetWeekGameMapValues();
     for (let i = 0, n = dataSourceArray.length; i < n; ++i) {

@@ -36,6 +36,19 @@
             : ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL
         "
       ></i-button>
+
+      <i-button
+        [iconPath]="
+          isSimplifiedCalendarAdvancedDrawingModeEnabled
+            ? '/assets/images/switch-on.png'
+            : '/assets/images/switch-off.png'
+        "
+        [iconRelativeSize]="100"
+        (clickEmitter)="updateSimplifiedCalendarDrawingMode()"
+        [removeBackgroundColor]="true"
+        [tooltipText]="ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL"
+      ></i-button>
+
       <i-button
         [allowActiveState]="true"
         iconPath="/assets/images/select-best-players-small.png"
@@ -115,35 +128,6 @@
     *ngIf="!isSecondLevelSubMenuHidden"
     [style.--justify-content]="'flex-start'"
   >
-    <div class="header-simplified-calendar-mode-sub-actions" *ngIf="isCalendarSimplifiedModeEnabled">
-      <i-button
-        [iconPath]="
-          isSimplifiedCalendarAdvancedDrawingModeEnabled
-            ? '/assets/images/switch-on.png'
-            : '/assets/images/switch-off.png'
-        "
-        [iconRelativeSize]="100"
-        (clickEmitter)="updateSimplifiedCalendarDrawingMode()"
-        [removeBackgroundColor]="true"
-        [tooltipText]="ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL"
-      ></i-button>
-
-      <mat-form-field>
-        <mat-label>{{ START_DATE_CALENDAR_FILTER }}</mat-label>
-        <input
-          matInput
-          [matDatepicker]="simplifiedModeDatePickerStartDateFor"
-          [(ngModel)]="simplifiedModeDatePickerStartDate"
-          (dateChange)="updateSimplifiedModeStartDateFilterValue($event)"
-        />
-        <mat-hint></mat-hint>
-        <mat-datepicker-toggle
-          matIconSuffix
-          [for]="simplifiedModeDatePickerStartDateFor"
-        ></mat-datepicker-toggle>
-        <mat-datepicker #simplifiedModeDatePickerStartDateFor></mat-datepicker>
-      </mat-form-field>
-    </div>
   </div>
   <div class="header-border"></div>
 </div>
