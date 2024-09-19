@@ -143,7 +143,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected updateCalendarSimplifiedMode(): void {
     this.isCalendarSimplifiedModeEnabled =
       !this.isCalendarSimplifiedModeEnabled;
-    this.isSimplifiedCalendarAdvancedDrawingModeEnabled = false;
+    this.isSimplifiedCalendarAdvancedDrawingModeEnabled = this.isCalendarSimplifiedModeEnabled;
     this.isSecondLevelSubMenuHidden = this.shouldSecondLevelSubMenuBeHidden();
 
     if (!this.isCalendarSimplifiedModeEnabled) {
