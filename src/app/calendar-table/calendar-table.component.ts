@@ -705,6 +705,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       this._calendarObservableProxyService.$calendarSimplifiedModeObservable?.subscribe(
         (value: boolean) => {
           this.isSimplifiedCalendarModeEnabled = value;
+          this.isSimplifiedCalendarAdvancedDrawingModeEnabled = value;
           this._changeDetectorRef.detectChanges();
         }
       );

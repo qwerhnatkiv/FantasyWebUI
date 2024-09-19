@@ -43,6 +43,7 @@
             ? '/assets/images/switch-on.png'
             : '/assets/images/switch-off.png'
         "
+        *ngIf="isCalendarSimplifiedModeEnabled"
         [iconRelativeSize]="100"
         (clickEmitter)="updateSimplifiedCalendarDrawingMode()"
         [removeBackgroundColor]="true"

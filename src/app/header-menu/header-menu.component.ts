@@ -142,6 +142,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected updateCalendarSimplifiedMode(): void {
     this.isCalendarSimplifiedModeEnabled =
       !this.isCalendarSimplifiedModeEnabled;
+    this.isSimplifiedCalendarAdvancedDrawingModeEnabled = this.isCalendarSimplifiedModeEnabled;
 
     this._calendarObservableProxyService.triggerCalendarInSimplifiedModeSubject(
       this.isCalendarSimplifiedModeEnabled
