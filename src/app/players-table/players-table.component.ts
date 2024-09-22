@@ -538,10 +538,11 @@ export class PlayersTableComponent
       playerInfo?.map((x) => ({
         playerName: player.playerObject.playerName,
         playerID: player.playerObject.playerID,
-        playerExpectedFantasyPoints: this.numberPipe.transform(
+        playerExpectedFantasyPointsFormatted: this.numberPipe.transform(
           x.playerExpectedFantasyPoints,
           '1.0-1'
         )!,
+        playerExpectedFantasyPoints: x.playerExpectedFantasyPoints,
         teamName: teamName,
         gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
       }))!

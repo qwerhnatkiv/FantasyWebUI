@@ -24,6 +24,8 @@ export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string
   ['Н', 'FW']
 ]);
 
+export const ONE_DIGIT_NUMBER_FORMAT: string = '1.0-1'
+
 export const DEFAULT_FORM_LENGTH = 5;
 export const DEFAULT_FORM_LENGTH_COUNT = 12;
 

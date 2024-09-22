@@ -28,6 +28,7 @@ import {
   LOW_GAMES_WEEK_BOUNDARY,
   RED_TEAM_GA_BOUNDARY,
   TEAM_NAME_LOGO_PATH_MAP,
+  ONE_DIGIT_NUMBER_FORMAT,
   VERY_GREEN_WIN_LOWER_BOUNDARY,
   WHITE_WIN_LOWER_BOUNDARY,
 } from 'src/constants';
@@ -770,15 +771,17 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
               this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
             }
 
+
+            const playerEfpSum: number = value.reduce((sum, x) => sum + x.playerExpectedFantasyPoints, 0);
             rowToReplace.team.displayValue =
-              value[0].playerName + ` (${EFP_LABEL})`;
+              value[0].playerName + `: ${this.numberPipe.transform(playerEfpSum, ONE_DIGIT_NUMBER_FORMAT)} ${EFP_LABEL}`;
             for (const game of value) {
               const gameDateStr: string = this.datepipe.transform(
                 game.gameDate,
                 DEFAULT_DATE_FORMAT
               )!;
               rowToReplace[gameDateStr].displayValue =
-                game.playerExpectedFantasyPoints;
+                game.playerExpectedFantasyPointsFormatted;
             }
           }
           this._changeDetectorRef.detectChanges();

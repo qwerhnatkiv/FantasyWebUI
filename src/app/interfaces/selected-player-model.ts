@@ -1,7 +1,8 @@
 export interface SelectedPlayerModel {
     playerName: string;
     playerID: number;
-    playerExpectedFantasyPoints: string;
+    playerExpectedFantasyPointsFormatted: string;
+    playerExpectedFantasyPoints: number;
     teamName: string;
     gameDate: Date;
 }
