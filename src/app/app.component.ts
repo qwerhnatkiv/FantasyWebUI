@@ -201,8 +201,6 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
         this.games.filter((x) => !x.isOldGame)
       );
     }
-    this.updateFilteredTeamsGamesMap();
-    this.setOfoDataForPlayers();
   }
 
   private updateFilteredTeamsGamesMap() {

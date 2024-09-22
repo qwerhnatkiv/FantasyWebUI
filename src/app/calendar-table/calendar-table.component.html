@@ -24,6 +24,7 @@
           }"
         >
           <img
+            loading="lazy"
             [src]="
               '/assets/images/logo/' +
               teamNameLogoPathMap[element['team'].cellValue]
@@ -123,6 +124,7 @@
           </span>
           <div class="bookmakers-mark-div">
             <img
+              loading="lazy"
               *ngIf="areOddsFromBookmakers(element[column.header])"
               src="/assets/images/bookmakers_mark.png"
               class="bookmakers-mark-logo"
