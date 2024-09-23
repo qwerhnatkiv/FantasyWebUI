@@ -8,6 +8,7 @@ export class TableCell {
   public isWeekCell: boolean;
   public priorToWeekGamesCount: number | undefined;
   public opponentTeamName: string | undefined;
+  public playerId: number | undefined;
 
   constructor(
     pDisplayValue: string,
@@ -16,7 +17,8 @@ export class TableCell {
     pGame: GamePredictionDTO | undefined = undefined,
     isWeekCell: boolean = false,
     priorToWeekGamesCount: number | undefined = undefined,
-    opponentTeamName: string | undefined = undefined
+    opponentTeamName: string | undefined = undefined,
+    playerId: number | undefined = undefined
   ) {
     this.displayValue = pDisplayValue;
     this.cellValue = pCellValue;
@@ -25,5 +27,6 @@ export class TableCell {
     this.isWeekCell = isWeekCell;
     this.priorToWeekGamesCount = priorToWeekGamesCount;
     this.opponentTeamName = opponentTeamName;
+    this.playerId = playerId;
   }
 }

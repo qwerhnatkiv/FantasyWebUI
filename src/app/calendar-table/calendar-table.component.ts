@@ -476,6 +476,14 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return '#ff7e7e';
   }
 
+  protected deselectPlayerRow(teamNameCell: TableCell) {
+    if (!teamNameCell.displayValue.includes(EFP_LABEL)) {
+      return;
+    }
+
+    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(teamNameCell.playerId!)
+  }
+
   /**
    * Returns all columns for specific game week in calendar
    * @param weekGames All games for specific week
@@ -775,6 +783,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
             const playerEfpSum: number = value.reduce((sum, x) => sum + x.playerExpectedFantasyPoints, 0);
             rowToReplace.team.displayValue =
               value[0].playerName + `: ${this.numberPipe.transform(playerEfpSum, ONE_DIGIT_NUMBER_FORMAT)} ${EFP_LABEL}`;
+            rowToReplace.team.playerId = value[0].playerID;
+            
             for (const game of value) {
               const gameDateStr: string = this.datepipe.transform(
                 game.gameDate,
