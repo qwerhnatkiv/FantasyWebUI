@@ -118,6 +118,20 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="projectedGamesCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by projectedGamesCount"
+      >
+        PGP
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.projectedGamesCount | number : "1.0-1" }}
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="position">
       <th
         mat-header-cell
