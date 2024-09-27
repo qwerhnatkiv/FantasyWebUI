@@ -46,14 +46,14 @@ export const RED_GAMES_WEEK_BOUNDARY = 2;
 export const LOW_GAMES_WEEK_BOUNDARY = 1;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
-  ["RaisingTheBar", 534753],
-  ["A-N-O N-I-M", 534946],
-  ["o_kai", 536668],
-  ["AntonovAC", 535080],
-  ["Александр_Ронни", 534791],
-  ["Regys", 536129],
-  ["Wolski", 534799],
-  ['graf_007', 535451]
+  ["RaisingTheBar", 551339],
+  // ["A-N-O N-I-M", 534946],
+  // ["o_kai", 536668],
+  // ["AntonovAC", 535080],
+  // ["Александр_Ронни", 534791],
+  // ["Regys", 536129],
+  // ["Wolski", 534799],
+  // ['graf_007', 535451]
 ]);
 
 export const TEAMS = [
