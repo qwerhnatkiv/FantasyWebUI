@@ -58,7 +58,6 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
 
 export const TEAMS = [
   'ANA',
-  'ARI',
   'BOS',
   'BUF',
   'CAR',
@@ -85,6 +84,7 @@ export const TEAMS = [
   'STL',
   'TBL',
   'TOR',
+  'UTA',
   'VAN',
   'VGK',
   'WPG',
