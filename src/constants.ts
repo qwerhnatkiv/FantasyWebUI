@@ -47,13 +47,13 @@ export const LOW_GAMES_WEEK_BOUNDARY = 1;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["RaisingTheBar", 551339],
-  // ["A-N-O N-I-M", 534946],
+  ["A-N-O N-I-M", 552044],
   // ["o_kai", 536668],
   // ["AntonovAC", 535080],
-  // ["Александр_Ронни", 534791],
-  // ["Regys", 536129],
+  ["Александр_Ронни", 551324],
+  ["Regys", 552388],
   // ["Wolski", 534799],
-  // ['graf_007', 535451]
+  ['Graf_007', 551516]
 ]);
 
 export const TEAMS = [
@@ -93,7 +93,7 @@ export const TEAMS = [
 
 export const TEAM_NAME_LOGO_PATH_MAP = {
   'Anaheim Ducks': 'anaheim-ducks-logo.svg',
-  'Utah Hockey Club': 'utah-hockey-club-logo.svg',
+  'Utah HC': 'utah-hockey-club-logo.svg',
   'Boston Bruins': 'boston-bruins-logo.svg',
   'Buffalo Sabres': 'buffalo-sabres-logo.svg',
   'Calgary Flames': 'calgary-flames-logo.svg',
