@@ -78,12 +78,12 @@
               | cellTextClass
                 : element[column.header].isWeekCell
                 : showFullCalendar
-                : element[column.header].isOldGame
                 : element[column.header].cellValue
                 : isSimplifiedCalendarAdvancedDrawingModeEnabled
                 : weekMaximumGamesMap.get(column.week)!
                 : weekMinimumGamesMap.get(column.week)!
                 : element[column.header].priorToWeekGamesCount
+                : element[column.header].game?.isOldGame
           "
           [ngxTippy]="
             generateCellToolTip(
@@ -112,6 +112,14 @@
             "
             class="team-logo"
           />
+          <img
+            loading="lazy"
+            *ngIf="element[column.header].game?.isOldGame"
+            [src]="
+              '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.homeTeamName]
+            "
+            class="small-team-logo"
+          />
           <span>
             {{
               !element[column.header].isWeekCell || !showFullCalendar
@@ -123,6 +131,14 @@
                 : element[column.header].weekGames
             }}
           </span>
+          <img
+            loading="lazy"
+            *ngIf="element[column.header].game?.isOldGame"
+            [src]="
+              '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.awayTeamName]
+            "
+            class="small-team-logo"
+          />
           <div class="bookmakers-mark-div">
             <img
               loading="lazy"

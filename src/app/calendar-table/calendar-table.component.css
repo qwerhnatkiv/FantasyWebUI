@@ -279,6 +279,11 @@ mat-form-field {
   height: 27px;
 }
 
+.small-team-logo {
+  width: 23px;
+  height: 23px;
+}
+
 .bookmakers-mark-div {
   position: absolute;
   width: 0px;

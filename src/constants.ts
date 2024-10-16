@@ -50,10 +50,10 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["A-N-O N-I-M", 552044],
   // ["o_kai", 536668],
   // ["AntonovAC", 535080],
-  ["Александр_Ронни", 551324],
-  ["Regys", 552388],
+  // ["Александр_Ронни", 551324],
+  // ["Regys", 552388],
   // ["Wolski", 534799],
-  ['Graf_007', 551516]
+  // ['Graf_007', 551516]
 ]);
 
 export const TEAMS = [

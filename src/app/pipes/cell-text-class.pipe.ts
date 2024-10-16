@@ -15,12 +15,12 @@ export class CellTextClassPipe implements PipeTransform {
     weekGames: number,
     isWeekCell: boolean,
     showFullCalendar: boolean,
-    isOldGame: boolean,
     cellValue: number,
     showLongTermWeekStyles: boolean,
     weekMaximumGamesCount: number,
     weekMinimumGamesCount: number,
-    priorToWeekGamesCount: number | undefined
+    priorToWeekGamesCount: number | undefined,
+    isOldGame?: boolean
   ) {
     const numericValue: number = Number(cellValue);
 

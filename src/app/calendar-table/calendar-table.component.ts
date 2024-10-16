@@ -308,7 +308,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     element: any,
     cell: TableCell
   ): string {
-    let playersTeamName: string = element['team'].cellValue;
+    const playersTeamName: string = element['team'].cellValue;
 
     if (playersTeamName == cell.game?.homeTeamName) {
       return cell.game?.awayTeamName!;
@@ -613,8 +613,14 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     // if it's home game for team -> return new cell object
     if (homeGame != null) {
+      let displayValue: string = homeGame.awayTeamAcronym;
+      if (homeGame.isOldGame) {
+
+        displayValue = `${homeGame.homeTeamGoals ?? '-'}:${homeGame.awayTeamGoals ?? '-'}`;
+      }
+
       return new TableCell(
-        homeGame.awayTeamAcronym,
+        displayValue,
         homeGame.homeTeamWinChance,
         weekGamesCount,
         homeGame,
@@ -634,8 +640,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     // if it's away game for team -> return new cell object
     if (awayGame != null) {
+      let displayValue: string = DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym;
+      if (awayGame.isOldGame) {
+        displayValue = `${awayGame.homeTeamGoals ?? '-'}:${awayGame.awayTeamGoals ?? '-'}`;
+      }
+
       return new TableCell(
-        DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym,
+        displayValue,
         awayGame.awayTeamWinChance,
         weekGamesCount,
         awayGame,
