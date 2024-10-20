@@ -25,10 +25,7 @@ export class DateFiltersService {
     weeks: number[],
     games: GamePredictionDTO[]
   ): void {
-    const minDate: Date = Utils.getMonday(
-      GamesUtils.getExtremumDateForGames(games, false),
-      0
-    );
+    const minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
 
     let minFilterDate: Date | undefined = new Date(minDate.getTime());
     let maxFilterDate: Date | undefined;
@@ -78,14 +75,15 @@ export class DateFiltersService {
         thisWeekMaxDate.getTime() >= minDate.getTime()!
       ) {
         const today: Date = new Date();
-        minFilterDate =
-          today.getDay() != 0 || today.getTime() < minFilterDate?.getTime()!
-            ? minFilterDate
-            : nextWeekMinDate;
         maxFilterDate =
           today.getDay() != 0 || today.getTime() < minFilterDate?.getTime()!
             ? thisWeekMaxDate
             : nextWeekMaxDate;
+
+        minFilterDate =
+          today.getDay() != 0 || today.getTime() < minFilterDate?.getTime()!
+            ? minFilterDate
+            : nextWeekMinDate;
         break;
       }
     }

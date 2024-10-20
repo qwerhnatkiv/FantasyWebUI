@@ -114,7 +114,7 @@
           />
           <img
             loading="lazy"
-            *ngIf="element[column.header].game?.isOldGame"
+            *ngIf="element[column.header].game?.isOldGame && !isPlayerSelectedCell(element, element[column.header])"
             [src]="
               '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.homeTeamName]
             "
@@ -133,7 +133,7 @@
           </span>
           <img
             loading="lazy"
-            *ngIf="element[column.header].game?.isOldGame"
+            *ngIf="element[column.header].game?.isOldGame && !isPlayerSelectedCell(element, element[column.header])"
             [src]="
               '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.awayTeamName]
             "

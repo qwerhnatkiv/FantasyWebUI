@@ -25,6 +25,9 @@ export interface PlayerStatsDTO {
     forecastPIM?: number
     forecastPlusMinus?: number
     forecastSources: string
+    forecastWins?: number
+    forecastLosses?: number
+    forecastShutouts?: number
   }
   
   export interface ExpectedFpforGame {}

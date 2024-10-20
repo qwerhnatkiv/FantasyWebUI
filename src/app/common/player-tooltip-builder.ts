@@ -40,6 +40,9 @@ export module PlayerTooltipBuilder {
           <th>A</th>
           <th style="color:${forecastPimColor}">PIM</th>
           <th>+-</th>
+          <th>W</th>
+          <th>L</th>
+          <th>CS</th>
         </tr>
       </thead>
       <tbody>
@@ -64,6 +67,24 @@ export module PlayerTooltipBuilder {
           <td style="text-align: center; vertical-align: middle;">${
             numberPipe.transform(
               player.playerObject.forecastPlusMinus,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastWins,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastLosses,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastShutouts,
               '1.0-0'
             ) ?? '-'
           }</td>
