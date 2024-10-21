@@ -138,6 +138,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
   public yesterdayDate: Date = new Date();
+  public yesterdayDateStart: Date = new Date();
 
   @ViewChildren(CdkHeaderCell, { read: ElementRef }) cells!: QueryList<
     ElementRef<HTMLTableRowElement>
@@ -159,7 +160,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this._subscribeToPlayerObservables();
 
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
-    this.yesterdayDate.setHours(0, 0, 0, 0);
+    this.yesterdayDateStart.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
+    this.yesterdayDateStart.setHours(0, 0, 0, 0);
 
     const handler = new ColumnScrollDataHandlerService(
       this.columns,
@@ -547,8 +549,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private isCalendarDateOld(calendarDate: Date): boolean {
     const datetimeNowHour: number = new Date().getHours();
 
-    return calendarDate.getTime() < this.yesterdayDate.getTime() || 
-           calendarDate.getTime() === this.yesterdayDate.getTime() && datetimeNowHour >= DAY_CHANGE_HOUR;
+    return calendarDate.getTime() < this.yesterdayDateStart.getTime() || 
+           calendarDate.getTime() === this.yesterdayDateStart.getTime() && datetimeNowHour >= DAY_CHANGE_HOUR;
   }
 
   /**

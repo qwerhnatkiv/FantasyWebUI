@@ -162,6 +162,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   public formLengthChanged(event: any) {
     this.formLength = event;
     this.getCalendarData(false);
+    this._playersObservableProxyService.triggerUpdatePlayersEfpDataByDateRangeEvent();
   }
 
   private getCalendarData(setDefaultDates: boolean) {
