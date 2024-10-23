@@ -160,8 +160,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this._subscribeToPlayerObservables();
 
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
-    this.yesterdayDateStart.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
-    this.yesterdayDateStart.setHours(0, 0, 0, 0);
+    this.yesterdayDate.setHours(0, 0, 0, 0);
 
     const handler = new ColumnScrollDataHandlerService(
       this.columns,
@@ -523,7 +522,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         columnDef: thisWeekMaxDate,
         header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
         isWeekColumn: true,
-        isOldDate: this.isCalendarDateOld(thisWeekMaxDate),
+        isOldDate: GamesUtils.isCalendarDateOld(thisWeekMaxDate, this.yesterdayDate),
         week,
       },
     ];
@@ -534,23 +533,11 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         columnDef: date,
         header: this.datepipe.transform(date, DEFAULT_DATE_FORMAT)!,
         isWeekColumn: false,
-        isOldDate: this.isCalendarDateOld(date),
+        isOldDate: GamesUtils.isCalendarDateOld(date, this.yesterdayDate),
         week,
       });
     });
     return weekColumns;
-  }
-
-  /**
-   * Determines whether provided calendar date is old or not
-   * @param calendarDate Datetime of the game, expected precisely at the start of day, 00:00:00 hh:MM:ss
-   * @returns true if calendar date should be considered as old
-   */
-  private isCalendarDateOld(calendarDate: Date): boolean {
-    const datetimeNowHour: number = new Date().getHours();
-
-    return calendarDate.getTime() < this.yesterdayDateStart.getTime() || 
-           calendarDate.getTime() === this.yesterdayDateStart.getTime() && datetimeNowHour >= DAY_CHANGE_HOUR;
   }
 
   /**

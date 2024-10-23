@@ -15,7 +15,7 @@ export class CellClassPipe implements PipeTransform {
     weekGamesCount: number,
     targetOldDateBoundary: Date
   ) {
-    if (GamesUtils.isOldDate(column.columnDef, targetOldDateBoundary)) {
+    if (GamesUtils.isCalendarDateOld(column.columnDef, targetOldDateBoundary)) {
       return 'calendar-cell-old';
     }
 

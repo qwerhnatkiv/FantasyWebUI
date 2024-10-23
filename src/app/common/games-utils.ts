@@ -1,4 +1,4 @@
-import { GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
+import { DAY_CHANGE_HOUR, GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { TeamGameInformation } from '../interfaces/team-game-information';
 
@@ -144,6 +144,23 @@ export module GamesUtils {
    * @returns True/False result
    */
   export function isOldDate(sourceDate: Date | undefined, targetDate: Date): boolean {
+    const result: boolean = sourceDate?.getTime()! < targetDate.getTime();
+    if (result) {
+      console.log(sourceDate, targetDate);
+    }
+
     return sourceDate?.getTime()! < targetDate.getTime();
+  }
+
+  /**
+   * Determines whether provided calendar date is old or not
+   * @param calendarDate Datetime of the game, expected precisely at the start of day, 00:00:00 hh:MM:ss
+   * @returns true if calendar date should be considered as old
+   */
+  export function isCalendarDateOld(sourceDate: Date | undefined, targetDate: Date): boolean {
+    const datetimeNowHour: number = new Date().getHours();
+
+    return sourceDate?.getTime()! < targetDate?.getTime()! || 
+           sourceDate?.getTime()! === targetDate?.getTime()! && datetimeNowHour >= DAY_CHANGE_HOUR;
   }
 }

@@ -197,6 +197,8 @@ export class PlayersTableComponent
           (team) => team.teamID == player.teamID
         )!;
 
+        const teamGames: TeamGameInformation[] | undefined = this.filteredTeamGames.get(player.teamID);
+
         this.players.push({
           firstChoice: false,
           secondChoice: false,
@@ -204,10 +206,12 @@ export class PlayersTableComponent
           team: matchingTeam.teamAcronym,
           position: player.position,
           price: player.price,
-          gamesCount: this.filteredTeamGames.get(player.teamID)?.length!,
+          gamesCount: teamGames?.length!,
           projectedGamesCount: player.forecastGamesPlayed != null ? player.forecastGamesPlayed : 0,
           b2bGamesCount: 0,
-          easyGamesCount: this.filteredTeamGames.get(player.teamID)?.length!,
+          easyGamesCount: teamGames?.filter((x) =>
+            GamesUtils.isEasyGame(x.winChance)
+          )?.length!,
           b2bEasyGamesCount: 0,
           winPercentage: matchingTeam.teamFormWinPercentage,
           powerPlayTime: this.pptoiPipe.transform(
