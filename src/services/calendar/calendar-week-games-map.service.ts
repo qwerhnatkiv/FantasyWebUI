@@ -37,7 +37,7 @@ export class CalendarWeekGamesMapService {
         (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
         !game.isOldGame &&
         game.weekNumber <= week &&
-        (startDate == null || new Date(game.gameDate).getTime() > startDate!.getTime())
+        (startDate == null || new Date(game.gameDate).getTime() >= startDate!.getTime())
     ).length;
 
     this._addOrUpdateWeekGamesMapValues(week, allGamesPriorToWeekCount);
