@@ -21,7 +21,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PPToiPipe } from '../pipes/pptoi.pipe';
 import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
-import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY } from 'src/constants';
+import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY, SQUAD_PLAYERS_COUNT } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
@@ -328,7 +328,7 @@ export class PlayersTableComponent
   public addPlayerToSquad(player: PlayerChooseRecord) {
     this.clickedOnCheckboxOrButton = true;
 
-    let playerSquadRecord: PlayerSquadRecord = {
+    const playerSquadRecord: PlayerSquadRecord = {
       playerName: player.playerObject.playerName,
       position: player.playerObject.position,
       price: player.playerObject.price,
@@ -339,6 +339,7 @@ export class PlayersTableComponent
       playerObject: player.playerObject,
       teamObject: player.teamObject,
       powerPlayNumber: player.powerPlayNumber,
+      sortOrder: 0
     };
 
     this.sendAddedToSquadPlayer.emit(playerSquadRecord);

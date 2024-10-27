@@ -1,6 +1,7 @@
-import { DAY_CHANGE_HOUR, GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
+import { DAY_CHANGE_HOUR, DEFAULT_POSITIONS, GREEN_WIN_LOWER_BOUNDARY, VERY_GREEN_WIN_LOWER_BOUNDARY, WHITE_WIN_LOWER_BOUNDARY } from 'src/constants';
 import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
 import { TeamGameInformation } from '../interfaces/team-game-information';
+import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 
 export module GamesUtils {
   export function getExtremumDateForGames(
@@ -162,5 +163,19 @@ export module GamesUtils {
 
     return sourceDate?.getTime()! < targetDate?.getTime()! || 
            sourceDate?.getTime()! === targetDate?.getTime()! && datetimeNowHour >= DAY_CHANGE_HOUR;
+  }
+
+  /**
+   * Sorts squad players array by position and sort order within each position
+   * @param a Left record
+   * @param b Right record
+   * @returns Numeric result based on expected sorting behavior
+   */
+  export function sortSquadPlayers(a: PlayerSquadRecord, b: PlayerSquadRecord): number {
+    if (a.position !== b.position) {
+      return DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position);
+    }
+
+    return a.sortOrder - b.sortOrder;
   }
 }

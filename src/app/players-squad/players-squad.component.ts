@@ -49,7 +49,6 @@ export class PlayersSquadComponent {
         ? this.substitutionsValue
         : this.substitutionsValue -
           this._squadPlayers.filter((x) => x.isNew).length;
-    this._handleNewPlayers();
   }
 
   @Output('squadPlayersChange') squadPlayersChange: EventEmitter<
@@ -152,7 +151,6 @@ export class PlayersSquadComponent {
       }
       
       this.dataSource = new MatTableDataSource(this.squadPlayers);
-      this._handleNewPlayers();
       this.substitutionsLeft++;
       const availableSlots: PositionsAvailableToPick = this.getAvailableSlots();
       this.sendAvailableSlots.emit(availableSlots);
@@ -170,7 +168,6 @@ export class PlayersSquadComponent {
     }
 
     row.isRemoved = !row.isRemoved;
-    this._handleNewPlayers();
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
   }
@@ -226,25 +223,5 @@ export class PlayersSquadComponent {
       forwardsAvailable: forwardsAvailable,
       selectedPlayerIds: selectedPlayersIds,
     };
-  }
-
-  /**
-   * Handles newly added players and 
-   * calculates the difference between their EFP and removed player EFP
-   */
-  private _handleNewPlayers(): void {
-    const addedPlayers: PlayerSquadRecord[] = this.squadPlayers
-      .filter((x) => x.isNew)
-      .sort((n1, n2) => POSITIONS_SORT_MAP.get(n1.position)! - POSITIONS_SORT_MAP.get(n2.position)! || n1.price - n2.price);
-
-    const removedPlayers: PlayerSquadRecord[] = this.squadPlayers
-      .filter((x) => x.isRemoved)
-      .sort((n1, n2) => POSITIONS_SORT_MAP.get(n1.position)! - POSITIONS_SORT_MAP.get(n2.position)! || n1.price - n2.price);
-
-    for (let i = 0, n = addedPlayers.length; i < n; ++i) {
-      addedPlayers[i].expectedFantasyPointsDifference =
-        addedPlayers[i].expectedFantasyPoints -
-        removedPlayers[i].expectedFantasyPoints;
-    }
   }
 }

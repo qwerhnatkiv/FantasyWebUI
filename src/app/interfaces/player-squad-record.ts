@@ -4,5 +4,6 @@ export interface PlayerSquadRecord extends PlayerCommonRecord {
     isRemoved: boolean;
     isNew: boolean;
     expectedFantasyPointsDifference?: number;
+    sortOrder: number;
 }
   

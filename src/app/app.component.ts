@@ -22,6 +22,7 @@ import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import {
   DEFAULT_FORM_LENGTH,
   DEFAULT_POSITIONS,
+  SQUAD_PLAYERS_COUNT,
   USER_ID_NAME,
 } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
@@ -61,17 +62,18 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     if (this.squadPlayers.length <= 0) {
       return;
     }
-    let matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
+    const matchedPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
       (x) => x.playerObject.playerID == value.playerObject.playerID
     );
     if (matchedPlayer != null) {
       matchedPlayer.isRemoved = false;
-    } else {
+    } 
+    else {
       this.squadPlayers.push(value);
+
+      this.setSquadPlayersSortOrder();
       this.squadPlayers.sort(
-        (a, b) =>
-          DEFAULT_POSITIONS.indexOf(a.position) -
-            DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price
+        (a, b) => GamesUtils.sortSquadPlayers(a, b)
       );
     }
 
@@ -368,6 +370,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
               powerPlayNumber: GamesUtils.GetPPText(
                 matchingPlayerInfo.formPowerPlayNumber
               ),
+              sortOrder: matchingPlayerInfo.price
             });
           }
 
@@ -401,6 +404,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
               powerPlayNumber: GamesUtils.GetPPText(
                 matchingPlayerInfo.formPowerPlayNumber
               ),
+              sortOrder: matchingPlayerInfo.price
             });
           }
 
@@ -473,5 +477,73 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
 
   protected updateCalendarVisibility(isCalendarHidden: boolean) {
     this.isCalendarHidden = isCalendarHidden;
+  }
+
+  private setSquadPlayersSortOrder() {
+    this.squadPlayers.forEach((existingPlayer, index) => {
+      existingPlayer.sortOrder = index * SQUAD_PLAYERS_COUNT;
+    });
+
+    const matchingPlayersMap: Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>> = new Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>>();
+
+    this.squadPlayers.forEach((addedPlayer) => {
+      if (!addedPlayer.isNew) {
+        return;
+      }
+      matchingPlayersMap.set(addedPlayer, new Map<PlayerSquadRecord, number>());
+      this.squadPlayers.forEach((existingPlayer) => {
+        if (!existingPlayer.isRemoved) {
+          return;
+        }
+        matchingPlayersMap.get(addedPlayer)?.set(existingPlayer, Math.abs(addedPlayer.price - existingPlayer.price));
+      });
+    });
+
+    // Helper function to generate all possible pairings
+    function generatePairings(
+      addedPlayers: PlayerSquadRecord[],
+      removedPlayers: PlayerSquadRecord[],
+      index: number,
+      currentPairing: { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[],
+      bestPairing: { pairing: { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[]; totalDifference: number }
+    ) {
+      if (index === addedPlayers.length) {
+        // Calculate the sum of price differences for the current pairing
+        const totalDifference = currentPairing.reduce((sum, pair) => {
+          return sum + (matchingPlayersMap.get(pair.addedPlayer)?.get(pair.removedPlayer) || 0);
+        }, 0);
+
+        // Update the best pairing if this one has a lower total difference
+        if (totalDifference < bestPairing.totalDifference) {
+          bestPairing.pairing = [...currentPairing];
+          bestPairing.totalDifference = totalDifference;
+        }
+        return;
+      }
+
+      // Try pairing the current added player with each removed player
+      const addedPlayer = addedPlayers[index];
+      for (const removedPlayer of removedPlayers) {
+        if (!currentPairing.some((pair) => pair.removedPlayer === removedPlayer)) {
+          currentPairing.push({ addedPlayer, removedPlayer });
+          generatePairings(addedPlayers, removedPlayers, index + 1, currentPairing, bestPairing);
+          currentPairing.pop(); // Backtrack
+        }
+      }
+    }
+
+    // Initialize variables for finding the optimal pairing
+    const addedPlayers = Array.from(matchingPlayersMap.keys());
+    const removedPlayers = Array.from(new Set(addedPlayers.flatMap((addedPlayer) => Array.from(matchingPlayersMap.get(addedPlayer)?.keys() || []))));
+
+    // Start backtracking to find the best pairing
+    const bestPairing = { pairing: [] as { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[], totalDifference: Infinity };
+    generatePairings(addedPlayers, removedPlayers, 0, [], bestPairing);
+
+    // Set the sortOrder for each added player based on the best pairing
+    bestPairing.pairing.forEach(({ addedPlayer, removedPlayer }) => {
+      addedPlayer.sortOrder = removedPlayer.sortOrder + 1;
+      addedPlayer.expectedFantasyPointsDifference = addedPlayer.expectedFantasyPoints - removedPlayer.expectedFantasyPoints;
+    });
   }
 }
