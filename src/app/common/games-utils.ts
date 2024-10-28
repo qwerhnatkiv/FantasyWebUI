@@ -178,4 +178,38 @@ export module GamesUtils {
 
     return a.sortOrder - b.sortOrder;
   }
+
+  // Helper function to generate all possible pairings
+  export function generatePairings(
+    addedPlayers: PlayerSquadRecord[],
+    removedPlayers: PlayerSquadRecord[],
+    index: number,
+    matchingPlayersMap: Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>>,
+    currentPairing: { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[],
+    bestPairing: { pairing: { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[]; totalDifference: number }
+  ) {
+    if (index === addedPlayers.length) {
+      // Calculate the sum of price differences for the current pairing
+      const totalDifference = currentPairing.reduce((sum, pair) => {
+        return sum + (matchingPlayersMap.get(pair.addedPlayer)?.get(pair.removedPlayer) || 0);
+      }, 0);
+
+      // Update the best pairing if this one has a lower total difference
+      if (totalDifference < bestPairing.totalDifference) {
+        bestPairing.pairing = [...currentPairing];
+        bestPairing.totalDifference = totalDifference;
+      }
+      return;
+    }
+
+    // Try pairing the current added player with each removed player
+    const addedPlayer = addedPlayers[index];
+    for (const removedPlayer of removedPlayers) {
+      if (!currentPairing.some((pair) => pair.removedPlayer === removedPlayer)) {
+        currentPairing.push({ addedPlayer, removedPlayer });
+        generatePairings(addedPlayers, removedPlayers, index + 1, matchingPlayersMap, currentPairing, bestPairing);
+        currentPairing.pop(); // Backtrack
+      }
+    }
+  }
 }

@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
-import { DEFAULT_POSITIONS, DEFAULT_SUBSTITUTION_VALUE, POSITIONS_SORT_MAP } from 'src/constants';
+import { DEFAULT_POSITIONS, DEFAULT_SUBSTITUTION_VALUE, POSITIONS_SORT_MAP, SQUAD_PLAYERS_COUNT } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { TeamGameInformation } from '../interfaces/team-game-information';
@@ -15,6 +15,7 @@ import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
+import { GamesUtils } from '../common/games-utils';
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
@@ -41,6 +42,12 @@ export class PlayersSquadComponent {
   }
   @Input('squadPlayers') set squadPlayers(value: PlayerSquadRecord[]) {
     this._squadPlayers = value;
+
+    this.setSquadPlayersSortOrder();
+    this._squadPlayers.sort(
+      (a, b) => GamesUtils.sortSquadPlayers(a, b)
+    );
+
     this.dataSource = new MatTableDataSource(this.squadPlayers);
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
@@ -168,6 +175,12 @@ export class PlayersSquadComponent {
     }
 
     row.isRemoved = !row.isRemoved;
+
+    this.setSquadPlayersSortOrder();
+    this.squadPlayers.sort(
+      (a, b) => GamesUtils.sortSquadPlayers(a, b)
+    );
+
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
   }
@@ -223,5 +236,40 @@ export class PlayersSquadComponent {
       forwardsAvailable: forwardsAvailable,
       selectedPlayerIds: selectedPlayersIds,
     };
+  }
+
+  private setSquadPlayersSortOrder() {
+    this._squadPlayers.forEach((existingPlayer, index) => {
+      existingPlayer.sortOrder = index * SQUAD_PLAYERS_COUNT;
+    });
+
+    const matchingPlayersMap: Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>> = new Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>>();
+
+    this._squadPlayers.forEach((addedPlayer) => {
+      if (!addedPlayer.isNew) {
+        return;
+      }
+      matchingPlayersMap.set(addedPlayer, new Map<PlayerSquadRecord, number>());
+      this._squadPlayers.forEach((existingPlayer) => {
+        if (!existingPlayer.isRemoved) {
+          return;
+        }
+        matchingPlayersMap.get(addedPlayer)?.set(existingPlayer, Math.abs(addedPlayer.price - existingPlayer.price));
+      });
+    });
+
+    // Initialize variables for finding the optimal pairing
+    const addedPlayers = Array.from(matchingPlayersMap.keys());
+    const removedPlayers = Array.from(new Set(addedPlayers.flatMap((addedPlayer) => Array.from(matchingPlayersMap.get(addedPlayer)?.keys() || []))));
+
+    // Start backtracking to find the best pairing
+    const bestPairing = { pairing: [] as { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[], totalDifference: Infinity };
+    GamesUtils.generatePairings(addedPlayers, removedPlayers, 0, matchingPlayersMap, [], bestPairing);
+
+    // Set the sortOrder for each added player based on the best pairing
+    bestPairing.pairing.forEach(({ addedPlayer, removedPlayer }) => {
+      addedPlayer.sortOrder = removedPlayer.sortOrder + 1;
+      addedPlayer.expectedFantasyPointsDifference = addedPlayer.expectedFantasyPoints - removedPlayer.expectedFantasyPoints;
+    });
   }
 }
