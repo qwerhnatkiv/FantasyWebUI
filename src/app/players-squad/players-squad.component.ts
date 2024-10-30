@@ -175,7 +175,7 @@ export class PlayersSquadComponent {
 
     this.setSquadPlayersSortOrder();
 
-    this.sendAvailableSlots.emit(availableSlots);
+    this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
   }
 
