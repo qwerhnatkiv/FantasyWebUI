@@ -443,7 +443,14 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       });
     }
 
-    let generatedTooltip: string = `<b>${homeTeamWinChance}</b> | ${homeTeamStats.teamGoalsForm.toFixed(
+    if (game.isOldGame) {
+      return `<b>${homeTeamWinChance}</b><br>
+      <b>${awayTeamWinChance}</b><br><br>
+      ${homeTeamStats.teamAcronym} ${game.homeTeamGoals}:${game.awayTeamGoals} ${awayTeamStats.teamAcronym}
+      `;
+    }
+
+    return `<b>${homeTeamWinChance}</b> | ${homeTeamStats.teamGoalsForm.toFixed(
       1
     )} GF | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${
       homeTeamStats.teamForm
@@ -455,12 +462,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     }<br>
     ${playersToolTip}
     `;
-
-    if (game.isOldGame) {
-      generatedTooltip += `<br>${homeTeamStats.teamAcronym} ${game.homeTeamGoals}:${game.awayTeamGoals} ${awayTeamStats.teamAcronym}`;
-    }
-
-    return generatedTooltip;
   }
 
   private getTooltipWinChanceSectionClass(winChance: number) {
