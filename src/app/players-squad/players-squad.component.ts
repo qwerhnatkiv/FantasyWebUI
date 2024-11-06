@@ -168,6 +168,7 @@ export class PlayersSquadComponent {
         (availableSlots.forwardsAvailable == 0 && row.position == 'Н') ||
         (availableSlots.goaliesAvailable == 0 && row.position == 'В'))
     ) {
+      this.setSquadPlayersSortOrder();
       return;
     }
 

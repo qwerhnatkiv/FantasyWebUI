@@ -36,6 +36,10 @@
   background: #2413ff40;
 }
 
+.inactive-player-cell {
+  color: #878787;
+}
+
 .right-column {
   padding-right: 5px;
   border-radius: 0 10px 10px 0;

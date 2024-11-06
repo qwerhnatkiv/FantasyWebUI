@@ -93,6 +93,8 @@ export class PlayersTableComponent
     TeamGameInformation[]
   >();
 
+  @Input() formLength: number = 0;
+
   @Input() playersAreNotPlayedDisabled: boolean = false;
   @Input() hideLowGPPlayersEnabled: boolean = false;
 
@@ -481,19 +483,27 @@ export class PlayersTableComponent
   }
 
   getPlayerSelectedClassByRow(row: PlayerChooseRecord): string {
+    let cellClass: string = '';
+    if (row.playerObject.formGamesPlayed < this.formLength) {
+      cellClass = 'inactive-player-cell ';
+    }
+
     if (row.firstChoice) {
-      return 'first-choice-selected-cell';
+      cellClass += 'first-choice-selected-cell';
+      return cellClass;
     }
 
     if (row.secondChoice) {
-      return 'second-choice-selected-cell';
+      cellClass += 'second-choice-selected-cell';
+      return cellClass;
     }
 
     if (this.isPlayerSelected(row)) {
-      return 'player-is-selected';
+      cellClass += 'player-is-selected';
+      return cellClass;
     }
 
-    return '';
+    return cellClass;
   }
 
   public generateCellToolTip(player: PlayerChooseRecord): string | null {

@@ -88,7 +88,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     Map<Date, PlayerExpectedFantasyPointsInfo[]>
   > = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
-  private formLength: number = DEFAULT_FORM_LENGTH;
+  protected formLength: number = DEFAULT_FORM_LENGTH;
 
   public _selectedUser: string | undefined = undefined;
   set selectedUser(value: string | undefined) {
