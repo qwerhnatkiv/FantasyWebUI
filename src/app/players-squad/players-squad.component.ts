@@ -173,11 +173,11 @@ export class PlayersSquadComponent {
     }
 
     row.isRemoved = !row.isRemoved;
-
     this.setSquadPlayersSortOrder();
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
+
   }
 
   public clearAllSquadChanges() {
@@ -234,18 +234,18 @@ export class PlayersSquadComponent {
   }
 
   private setSquadPlayersSortOrder() {
-    this._squadPlayers.forEach((existingPlayer, index) => {
+    this.squadPlayers.forEach((existingPlayer, index) => {
       existingPlayer.sortOrder = index * SQUAD_PLAYERS_COUNT;
     });
 
     const matchingPlayersMap: Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>> = new Map<PlayerSquadRecord, Map<PlayerSquadRecord, number>>();
 
-    this._squadPlayers.forEach((addedPlayer) => {
+    this.squadPlayers.forEach((addedPlayer) => {
       if (!addedPlayer.isNew) {
         return;
       }
       matchingPlayersMap.set(addedPlayer, new Map<PlayerSquadRecord, number>());
-      this._squadPlayers.forEach((existingPlayer) => {
+      this.squadPlayers.forEach((existingPlayer) => {
         if (!existingPlayer.isRemoved) {
           return;
         }
@@ -267,8 +267,9 @@ export class PlayersSquadComponent {
       addedPlayer.expectedFantasyPointsDifference = addedPlayer.expectedFantasyPoints - removedPlayer.expectedFantasyPoints;
     });
 
-    this._squadPlayers.sort(
+    this.squadPlayers.sort(
       (a, b) => GamesUtils.sortSquadPlayers(a, b)
     );
+    this.dataSource = new MatTableDataSource(this.squadPlayers);
   }
 }
