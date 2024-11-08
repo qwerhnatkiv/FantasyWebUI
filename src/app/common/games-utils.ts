@@ -205,7 +205,7 @@ export module GamesUtils {
     // Try pairing the current added player with each removed player
     const addedPlayer = addedPlayers[index];
     for (const removedPlayer of removedPlayers) {
-      if (!currentPairing.some((pair) => pair.removedPlayer === removedPlayer)) {
+      if (!currentPairing.some((pair) => pair.removedPlayer === removedPlayer) && removedPlayer.position == addedPlayer.position) {
         currentPairing.push({ addedPlayer, removedPlayer });
         generatePairings(addedPlayers, removedPlayers, index + 1, matchingPlayersMap, currentPairing, bestPairing);
         currentPairing.pop(); // Backtrack
