@@ -179,6 +179,20 @@ export module GamesUtils {
     return a.sortOrder - b.sortOrder;
   }
 
+  /**
+   * Sorts squad players array by position and price within each position
+   * @param a Left record
+   * @param b Right record
+   * @returns Numeric result based on expected sorting behavior
+   */
+  export function sortSquadPlayersByPrice(a: PlayerSquadRecord, b: PlayerSquadRecord): number {
+    if (a.position !== b.position) {
+      return DEFAULT_POSITIONS.indexOf(a.position) - DEFAULT_POSITIONS.indexOf(b.position);
+    }
+
+    return a.price - b.price;
+  }
+
   // Helper function to generate all possible pairings
   export function generatePairings(
     addedPlayers: PlayerSquadRecord[],

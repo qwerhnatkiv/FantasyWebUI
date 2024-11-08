@@ -254,8 +254,34 @@ export class PlayersSquadComponent {
     });
 
     // Initialize variables for finding the optimal pairing
-    const addedPlayers = Array.from(matchingPlayersMap.keys());
-    const removedPlayers = Array.from(new Set(addedPlayers.flatMap((addedPlayer) => Array.from(matchingPlayersMap.get(addedPlayer)?.keys() || []))));
+    let addedPlayers = Array.from(matchingPlayersMap.keys());
+    let removedPlayers = Array.from(new Set(addedPlayers.flatMap((addedPlayer) => Array.from(matchingPlayersMap.get(addedPlayer)?.keys() || []))));
+
+    const addedGoalies = addedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[0]);
+    const addedDefenders = addedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[1]);
+    const addedForwards = addedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[2]);
+
+    const removedGoalies = removedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[0]);
+    const removedDefenders = removedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[1]);
+    const removedForwards = removedPlayers.filter((item) => item.position == DEFAULT_POSITIONS[2]);
+    
+    if (addedGoalies.length === removedGoalies.length) {
+      this.sortEqualPlayers(addedGoalies, removedGoalies);
+      addedPlayers = addedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[0]);
+      removedPlayers = removedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[0]);
+    }
+
+    if (addedDefenders.length === removedDefenders.length) {
+      this.sortEqualPlayers(addedDefenders, removedDefenders);
+      addedPlayers = addedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[1]);
+      removedPlayers = removedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[1]);
+    }
+
+    if (addedForwards.length === removedForwards.length) {
+      this.sortEqualPlayers(addedForwards, removedForwards);
+      addedPlayers = addedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[2]);
+      removedPlayers = removedPlayers.filter(x => x.position !== DEFAULT_POSITIONS[2]);
+    }
 
     // Start backtracking to find the best pairing
     const bestPairing = { pairing: [] as { addedPlayer: PlayerSquadRecord; removedPlayer: PlayerSquadRecord }[], totalDifference: Infinity };
@@ -271,5 +297,15 @@ export class PlayersSquadComponent {
       (a, b) => GamesUtils.sortSquadPlayers(a, b)
     );
     this.dataSource = new MatTableDataSource(this.squadPlayers);
+  }
+
+  private sortEqualPlayers(addedPlayers: PlayerSquadRecord[], removedPlayers: PlayerSquadRecord[]) {
+    addedPlayers.sort((a, b) => GamesUtils.sortSquadPlayersByPrice(a, b));
+    removedPlayers.sort((a, b) => GamesUtils.sortSquadPlayersByPrice(a, b));
+
+    for(let i = 0, n = addedPlayers.length; i < n; ++i) {
+      addedPlayers[i].sortOrder = removedPlayers[i].sortOrder + 1;
+      addedPlayers[i].expectedFantasyPointsDifference = addedPlayers[i].expectedFantasyPoints - removedPlayers[i].expectedFantasyPoints;
+    }
   }
 }
