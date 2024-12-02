@@ -1,0 +1,119 @@
+.players-table {
+  margin-left: 20px;
+  border-collapse: separate !important;
+  border-spacing: 0 4px !important;
+}
+
+.players-table .mat-mdc-header-cell {
+  padding: 3px;
+  border-bottom-style: none;
+}
+
+.mat-mdc-cell {
+  padding: 3px;
+  border-bottom-style: none;
+  height: 20px;
+}
+
+.mat-mdc-row {
+  height: 20px;
+}
+
+.first-choice-cell,
+.second-choice-cell {
+  padding: 0px;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.first-choice-selected-cell {
+  background: #df730080;
+}
+
+.second-choice-selected-cell {
+  background: #2413ff40;
+}
+
+.inactive-player-cell {
+  color: #878787;
+}
+
+.right-column {
+  padding-right: 5px;
+  border-radius: 0 10px 10px 0;
+}
+
+.left-column {
+  border-radius: 10px 0 0 10px;
+}
+
+.player-selected:hover {
+  background: #fef524;
+  border-radius: 10px;
+}
+
+.first-choice-selected-cell.player-selected:hover,.second-choice-selected-cell.player-selected:hover{
+  background: #fef524;
+  border-radius: 0px;
+}
+
+.tooltip-title {
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+}
+
+.tooltip-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.player-is-selected {
+  background: #fef524;
+  border-radius: 0px;
+}
+
+.first-choice-cell,.second-choice-cell,.add-player-to-squad {
+  background: white;
+}
+
+.players-table-section-headers {
+  display: flex;
+}
+
+.clear-table-calendar-button {
+  align-self: flex-end;
+  margin-right: 25px;
+  margin-left: auto;
+}
+
+.date-filter-labels {
+  align-self: center;
+  display: flex;
+  position: relative;
+  left: 50%;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.add-player-to-squad-button {
+  height: 26px;
+  width: 26px;
+  padding: 3px 0px 3px 0px;
+}
+
+.add-player-to-squad-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}
+
+.add-player-to-squad-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 26px;
+
+  background: #fef524;
+  border-radius: 26px;
+}

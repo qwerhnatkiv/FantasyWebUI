@@ -1,0 +1,298 @@
+table {
+  width: 100%;
+  margin-left: 10px;
+}
+
+.scroll-view-port {
+  height: 990px;
+  width: 100%;
+}
+
+.virtual-horizontal-cell {
+  width: 70px;
+}
+
+
+.team-cell {
+  color: black;
+  font-weight: 400;
+  background-color: #e1e1e1;
+  border-radius: 10px;
+  height:25px;
+
+  display:flex;
+  gap: 13px;
+  line-height: 25px;
+}
+
+.team-cell.replaced-by-player {
+  background: #fef524;
+}
+
+td:nth-child(1) {
+  width: 225px;
+  min-width: 225px;
+  max-width: 225px;
+  padding: 0 5px 0 5px;
+}
+
+.cdk-table thead,
+.cdk-header-row,
+.cdk-header-cell,
+.cdk-footer-row,
+.cdk-footer-cell {
+  background: #00c2ff;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21.78px;
+  height: 24px;
+}
+
+.cdk-header-cell,.cdk-footer-cell {
+  width: 96px;
+  border-right: 1px dashed rgba(128, 128, 128);
+  text-align: center;
+}
+
+.cdk-column-team {
+  background: white;
+}
+
+.cdk-header-cell:first-child,.cdk-footer-cell:first-child {
+  background: white;
+}
+
+.cdk-cell,
+.cdk-row {
+  height: 25px;
+  border-right: 1px dashed rgba(128, 128, 128);
+  border-bottom: 1px dashed rgba(128, 128, 128);
+
+  padding: 0;
+}
+
+
+.calendar-cell-not-selected {
+  background: white;
+}
+
+.calendar-cell-selected {
+  background: #dfdfdf;
+}
+
+.calendar-cell-old {
+  background: white;
+  background-image: radial-gradient(black #9C9C9C, transparent 0);
+  background-size: 40px 40px;
+  background-position: -19px -19px;
+
+  background: repeating-linear-gradient(
+    45deg,
+    #adadad,
+    #adadad 10px,
+    #9C9C9C 10px,
+    #9C9C9C 20px
+  );
+}
+
+.calendar-cell {
+  font-weight: 600;
+  width: 70px;
+  height: 25px;
+  font-family: Inter;
+  line-height: 25px;
+  letter-spacing: 0em;
+  text-align: center;
+
+  margin: 0 16px 0 16px;
+
+  border-radius: 10px;
+
+  display:flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.calendar-cell-old-content {
+  background: black;
+  color: white;
+}
+
+.calendar-cell-not-selected > .calendar-cell-empty {
+  background: white;
+}
+
+.calendar-cell-selected > .calendar-cell-empty {
+  background: #dfdfdf;
+}
+
+.calendar-cell-normal {
+  background: white;
+}
+
+.calendar-cell-green {
+  background: #64ff8f;
+}
+
+.calendar-cell-very-green {
+  background: #00AA30;
+}
+
+.calendar-cell-red {
+  background: #ff7e7e;
+}
+
+.calendar-cell-normal:hover {
+  background: linear-gradient(
+    to top,
+    #fef524 0%,
+    #fef524 40%,
+    white 40%,
+    white 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-green:hover {
+  background: linear-gradient(
+    to top,
+    #fef524 0%,
+    #fef524 40%,
+    #64ff8f 40%,
+    #64ff8f 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-very-green:hover {
+  background: linear-gradient(
+    to top,
+    #fef524 0%,
+    #fef524 40%,
+    #00AA30 40%,
+    #00AA30 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-red:hover {
+  background: linear-gradient(
+    to top,
+    #fef524 0%,
+    #fef524 40%,
+    #ff7e7e 40%,
+    #ff7e7e 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-old-content:hover {
+  background: linear-gradient(
+    to top,
+    #606060 0%,
+    #606060 40%,
+    black 40%,
+    black 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+.calendar-cell-week {
+  border-radius: 0px;
+  background: #00c2ff;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.calendar-cell-week-very-green {
+  border-radius: 0px;
+  background: #00AA30;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.calendar-cell-week-green {
+  border-radius: 0px;
+  background: #64ff8f;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.calendar-cell-week-red {
+  border-radius: 0px;
+  background: #ff7e7e;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+td {
+  position: relative;
+}
+
+td.strike {
+  position: relative;
+}
+td.strike:before {
+  content: " ";
+  position: absolute;
+  top: 49%;
+  left: 0;
+  border-bottom: 3px solid #ff7e7e;
+  width: 100%;
+}
+
+mat-form-field {
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+.filter-form {
+  height: 30px;
+}
+
+::ng-deep .cdk-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.tooltip-green-text {
+  color: #64ff8f;
+}
+
+.tooltip-white-text {
+  color: white;
+}
+
+.tooltip-red-text {
+  color: #ff7e7e;
+}
+
+.team-logo {
+  width: 27px;
+  height: 27px;
+}
+
+.small-team-logo {
+  width: 23px;
+  height: 23px;
+}
+
+.bookmakers-mark-div {
+  position: absolute;
+  width: 0px;
+}
+
+.bookmakers-mark-logo {
+  position:absolute;
+  width: 12px;
+  height: 12px;
+  top: -15px;
+  right: -40px;
+}

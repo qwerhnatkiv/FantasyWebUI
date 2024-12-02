@@ -1,0 +1,408 @@
+<div style="display: flex; flex-direction: column">
+  <div class="players-table-section-headers">
+    <div class="date-filter-labels">
+      <label>
+        {{ filterDates.minDate| date : "dd.MM.yyyy" }}
+      </label>
+      <label>&nbsp;—&nbsp;</label>
+      <label>
+        {{ filterDates.maxDate | date : "dd.MM.yyyy" }}
+      </label>
+    </div>
+    <i-button
+      class="clear-table-calendar-button"
+      iconPath="/assets/images/clear-list-small.png"
+      [iconRelativeSize]="65"
+      (clickEmitter)="deselectAllPlayersInCalendar()"
+      tooltipText="Відмінити вибір гравців"
+    ></i-button>
+  </div>
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    class="players-table"
+    matSort
+    matSortDisableClear="true"
+    matSortActive="expectedFantasyPoints"
+    matSortDirection="desc"
+    matSortStart="desc"
+  >
+    <ng-container matColumnDef="firstChoice">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by firstChoice"
+      >
+        1
+      </th>
+      <td mat-cell *matCellDef="let element" class="first-choice-cell">
+        <mat-checkbox
+          [(ngModel)]="element.firstChoice"
+          (change)="ofoPlayersFirstChoiceChanged(element)"
+        ></mat-checkbox>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="secondChoice">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by secondChoice"
+      >
+        2
+      </th>
+      <td mat-cell *matCellDef="let element" class="second-choice-cell">
+        <mat-checkbox
+          [(ngModel)]="element.secondChoice"
+          (change)="ofoPlayersSecondChoiceChanged(element)"
+        ></mat-checkbox>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="№">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by number"
+      >
+        №
+      </th>
+      <td mat-cell *matCellDef="let element; let i = index" class="left-column">
+        {{
+          this.paginator?.pageIndex == 0
+            ? i + 1
+            : 1 + i + this.paginator?.pageIndex! * this.paginator?.pageSize!
+        }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="playerName">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by playerName"
+      >
+        Гравець
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [ngxTippy]="generateCellToolTip(element)"
+        [class.player-is-selected]="isPlayerSelected(element)"
+        tippyClassName="tooltip-general"
+        [tippyProps]="{
+          allowHTML: true,
+          placement: 'right',
+          arrow: false
+        }"
+      >
+        {{ element.playerName }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="team">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by team"
+      >
+        Ком
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.team }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="position">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by position"
+      >
+        Поз
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.position }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="price">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by price"
+      >
+        Ціна
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.price }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="gamesCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by gamesCount"
+      >
+        {{ isSelectedOnlyGoalies() ? "Ігор (B2B)" : "Ігор" }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{
+          isSelectedOnlyGoalies()
+            ? element.gamesCount + "(" + element.b2bGamesCount + ")"
+            : element.gamesCount
+        }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="easyGamesCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by easyGamesCount"
+      >
+        {{ isSelectedOnlyGoalies() ? "ЛІ (B2B)" : "ЛІ" }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{
+          isSelectedOnlyGoalies()
+            ? element.easyGamesCount + "(" + element.b2bEasyGamesCount + ")"
+            : element.easyGamesCount
+        }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="winPercentage">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by winPercentage"
+      >
+        %Очок
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.winPercentage }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="powerPlayTime">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by powerPlayTime"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        ЧвБ
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.powerPlayTime }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="powerPlayNumber">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by powerPlayNumber"
+        [hidden]="isSelectedOnlyGoalies()"
+        start="asc"
+      >
+        PP
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.powerPlayNumber }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="toi">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by toi"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        TOI
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.toi | TOI }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="shotsOnGoal">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by shotsOnGoal"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        КВ
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.shotsOnGoal }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="iXG">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by iXG"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        ixG
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.iXG }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="iCF">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by iCF"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        iCF
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.iCF }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="iHDCF">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by iHDCF"
+        [hidden]="isSelectedOnlyGoalies()"
+      >
+        iHDCF
+      </th>
+      <td mat-cell *matCellDef="let element" [hidden]="isSelectedOnlyGoalies()">
+        {{ element.iHDCF }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expectedFantasyPoints">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by expectedFantasyPoints"
+      >
+        ОФО
+      </th>
+      <td mat-cell *matCellDef="let element" class="bold">
+        {{ element.expectedFantasyPoints | number : "1.0-1" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="fantasyPointsPerGame">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by fantasyPointsPerGame"
+      >
+        ОФОГ
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.fantasyPointsPerGame }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="priceByExpectedFantasyPoints">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by priceByExpectedFantasyPoints"
+        start="asc"
+      >
+        Ц/ОФО
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.priceByExpectedFantasyPoints | number : "1.0-1" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="priceByExpectedFantasyPointsPerGame">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by priceByExpectedFantasyPointsPerGame"
+        start="asc"
+      >
+        Ц/ОФОГ
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.priceByExpectedFantasyPointsPerGame | number : "1.0-1" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="sources">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by sources"
+      >
+        Джерела
+      </th>
+      <td mat-cell *matCellDef="let element" class="right-column">
+        {{ element.forecastSources }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="addPlayerToSquad">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element" class="add-player-to-squad">
+        <button
+          class="add-player-to-squad-button"
+          mat-icon-button
+          (click)="addPlayerToSquad(element)"
+          [hidden]="isAddPlayerToSquadButtonHidden(element)"
+        >
+          <mat-icon class="add-player-to-squad-icon">add_circle</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr
+      class="player-selected"
+      (click)="selectPlayerRow(row)"
+      [ngClass]="getPlayerSelectedClassByRow(row)"
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+    ></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="4">No data matching the filters</td>
+    </tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[50, 150, 500]" showFirstLastButtons>
+  </mat-paginator>
+</div>

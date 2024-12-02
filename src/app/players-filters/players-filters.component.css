@@ -1,0 +1,94 @@
+.player-filters-block {
+  margin-left: 20px;
+  margin-top: 30px;
+}
+
+.filters-row {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.player-filters-block ::ng-deep .mat-mdc-form-field {
+    height: 55px;
+}
+
+.filter-label {
+  line-height: 60px;
+}
+
+::ng-deep .mat-mdc-select-min-line {
+  font-weight: 550;
+}
+
+.vl {
+  border-left: 2px solid black;
+  width: 2px;
+  height: 55px;
+}
+
+.clear-filter-button {
+  position: relative;
+  left: -1%;
+  top: -15px;
+  margin-right: 0px;
+}
+
+.clear-selected-players-button {
+  position: relative;
+  left: -15%;
+  top: -10px;
+  margin-right: 0px;
+}
+
+.clear-filter-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}
+
+.clear-selected-players-button[hidden] {
+  visibility: hidden;
+  display: inline-block !important;
+}
+
+.choice-row {
+  display:flex;
+  align-items: center;
+}
+
+.selectedChoiceIcon {
+  width: 54px;
+  height: 54px;
+}
+
+.choice-table {
+  border-spacing: 20px;
+}
+
+.filter-form {
+  width: 100px;
+}
+
+.wider-filter-form {
+  width: 150px;
+}
+
+.the-widest-filter-form {
+  width: 200px;
+}
+
+.sports-icon {
+  background: url('../../assets/images/sports-icon.png');
+  /* Other styles here */
+  width: 35px; 
+  height: 38px;
+}
+
+#open-sports-account-button {
+  margin: 0 100px 0 20px;
+}
+
+#open-sports-account-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}

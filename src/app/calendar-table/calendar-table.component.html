@@ -1,0 +1,176 @@
+<cdk-virtual-scroll-viewport
+  class="scroll-view-port"
+  orientation="horizontal"
+  itemSize="70"
+>
+  <table cdk-table [dataSource]="dataSource!">
+    <ng-container cdkColumnDef="team" sticky>
+      <th cdk-header-cell *cdkHeaderCellDef></th>
+      <td cdk-cell *cdkCellDef="let element">
+        <div
+          class="team-cell"
+          [class.replaced-by-player]="
+            element['team'].displayValue.includes(EFP_LABEL)
+          "
+          [ngxTippy]="generateTeamCellToolTip(element['team'])"
+          tippyClassName="tooltip-general"
+          [tippyProps]="{
+            allowHTML: true,
+            placement: 'auto-end',
+            trigger: 'click',
+            hideOnClick: 'toggle',
+            maxWidth: 'none',
+            arrow: false
+          }"
+          (click)="deselectPlayerRow(element['team'])"
+        >
+          <img
+            loading="lazy"
+            [src]="
+              '/assets/images/logo/' +
+              teamNameLogoPathMap[element['team'].cellValue]
+            "
+            class="team-logo"
+          />
+          <span>
+            {{ element["team"].displayValue }}
+          </span>
+        </div>
+      </td>
+      <td cdk-footer-cell *cdkFooterCellDef></td>
+    </ng-container>
+
+    @for (column of columns; track column) {
+    <ng-container [cdkColumnDef]="column.header">
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        [hidden]="
+          (isSimplifiedCalendarModeEnabled && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
+        "
+        class="virtual-horizontal-cell"
+      >
+        {{ column.header }}
+      </th>
+      <td
+        cdk-cell
+        *cdkCellDef="let element"
+        [ngClass]="
+          column
+            | cellClass
+              : filterDates.minDate
+              : filterDates.maxDate
+              : element[column.header].isWeekCell
+              : element[column.header].weekGames
+              : yesterdayDate
+        "
+        [hidden]="
+          (isSimplifiedCalendarModeEnabled && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
+        "
+        class="virtual-horizontal-cell"
+      >
+        <div
+          class="calendar-cell"
+          [ngClass]="
+            element[column.header].weekGames
+              | cellTextClass
+                : element[column.header].isWeekCell
+                : showFullCalendar
+                : element[column.header].cellValue
+                : isSimplifiedCalendarAdvancedDrawingModeEnabled
+                : weekMaximumGamesMap.get(column.week)!
+                : weekMinimumGamesMap.get(column.week)!
+                : element[column.header].priorToWeekGamesCount
+                : element[column.header].game?.isOldGame
+          "
+          [ngxTippy]="
+            generateCellToolTip(
+              element[column.header].game,
+              element[column.header].opponentTeamName
+            )
+          "
+          tippyClassName="tooltip-green-text tooltip-white-text tooltip-red-text"
+          [tippyProps]="{
+            allowHTML: true,
+            placement: 'bottom',
+            arrow: false,
+          }"
+        >
+          <img
+            loading="lazy"
+            *ngIf="isPlayerSelectedCell(element, element[column.header])"
+            [src]="
+              '/assets/images/logo/' +
+              teamNameLogoPathMap[
+                getSelectedPlayerCellOpponentName(
+                  element,
+                  element[column.header]
+                )
+              ]
+            "
+            class="team-logo"
+          />
+          <img
+            loading="lazy"
+            *ngIf="element[column.header].game?.isOldGame && !isPlayerSelectedCell(element, element[column.header])"
+            [src]="
+              '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.homeTeamName]
+            "
+            class="small-team-logo"
+          />
+          <span>
+            {{
+              !element[column.header].isWeekCell || !showFullCalendar
+                ? element[column.header].isWeekCell
+                  ? isSimplifiedCalendarModeEnabled
+                    ? element[column.header].displayValue
+                    : element[column.header].cellValue
+                  : element[column.header].displayValue
+                : element[column.header].weekGames
+            }}
+          </span>
+          <img
+            loading="lazy"
+            *ngIf="element[column.header].game?.isOldGame && !isPlayerSelectedCell(element, element[column.header])"
+            [src]="
+              '/assets/images/logo/' + teamNameLogoPathMap[element[column.header].game?.awayTeamName]
+            "
+            class="small-team-logo"
+          />
+          <div class="bookmakers-mark-div">
+            <img
+              loading="lazy"
+              *ngIf="areOddsFromBookmakers(element[column.header])"
+              src="/assets/images/bookmakers_mark.png"
+              class="bookmakers-mark-logo"
+            />
+          </div>
+        </div>
+      </td>
+      <td
+        cdk-footer-cell
+        *cdkFooterCellDef
+        [hidden]="
+          (isSimplifiedCalendarModeEnabled && !column.isWeekColumn) ||
+          (!showFullCalendar && column.isOldDate)
+        "
+      >
+        {{ column.header }}
+      </td>
+    </ng-container>
+    }
+
+    <tr cdk-header-row *cdkHeaderRowDef="columnsToDisplay"></tr>
+    <tr cdk-row *cdkRowDef="let row; columns: columnsToDisplay"></tr>
+    <tr cdk-footer-row *cdkFooterRowDef="columnsToDisplay"></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr class="cdk-row" *cdkNoDataRow>
+      <td class="cdk-cell" colspan="4">
+        No calendar games were received from the server
+      </td>
+    </tr>
+  </table>
+</cdk-virtual-scroll-viewport>

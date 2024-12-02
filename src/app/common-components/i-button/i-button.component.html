@@ -1,0 +1,15 @@
+<button
+  class="i-button"
+  [style.--icon-path]="'url(' + iconPath + ')'"
+  [style.--icon-size]="iconRelativeSize + '%'"
+  [style.--background-color]="backgroundColor"
+  [style.--background-color-active]="backgroundColorActive"
+  (click)="emitClickEvent()"
+  [ngxTippy]="tooltipText"
+  [tippyProps]="{
+    allowHTML: true,
+    placement: 'bottom',
+    arrow: false,
+  }"
+  [title]=""
+></button>
