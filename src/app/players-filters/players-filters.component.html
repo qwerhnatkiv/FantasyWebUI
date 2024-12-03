@@ -1,6 +1,6 @@
 <div class="player-filters-block">
   <div class="filters-row">
-    <label class="filter-label">Ціна з:</label>
+    <label class="filter-label">Цена от:</label>
     <mat-form-field class="filter-form">
       <mat-label>Price</mat-label>
       <mat-select
@@ -51,7 +51,7 @@
 
     <div class="vl"></div>
 
-    <label class="filter-label" style="margin-left: 10px">Команди:</label>
+    <label class="filter-label" style="margin-left: 10px">Команды:</label>
     <mat-form-field class="wider-filter-form">
       <mat-label>Teams</mat-label>
       <mat-select
@@ -89,7 +89,7 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label" style="margin-left: 10px">Позиції:</label>
+    <label class="filter-label" style="margin-left: 10px">Позиции:</label>
     <mat-form-field class="filter-form">
       <mat-label>Positions</mat-label>
       <mat-select
@@ -117,7 +117,7 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label" style="margin-left: 10px">PP:</label>
+    <label class="filter-label" style="margin-left: 10px">ПП:</label>
     <mat-form-field class="filter-form">
       <mat-label>PP</mat-label>
       <mat-select
@@ -141,7 +141,7 @@
     </button>
 
     <div class="vl"></div>
-    <label class="filter-label">Довжина форми:</label>
+    <label class="filter-label">Длина формы:</label>
     <mat-form-field class="filter-form">
       <mat-label>Форма: </mat-label>
       <mat-select
@@ -156,12 +156,43 @@
       </mat-select>
     </mat-form-field>
 
+    <label class="filter-label" style="margin-left: auto">УЗ:</label>
+    <mat-form-field class="the-widest-filter-form">
+      <mat-label>User</mat-label>
+      <mat-select
+        [(value)]="selectedUser"
+        (selectionChange)="selectedUserChanged()"
+      >
+        <mat-option *ngFor="let user of selectUsers" [value]="user">{{
+          user
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button
+      (click)="resetSelectedUserFilter()"
+      [hidden]="selectedUser == null"
+      class="clear-filter-button"
+      mat-icon-button
+      aria-label="Clear user filter"
+    >
+      <mat-icon>cancel</mat-icon>
+    </button>
+
     <i-button
       [style.margin-left.px]="20"
       iconPath="/assets/images/reset-filter-small.png"
       [iconRelativeSize]="82"
       (clickEmitter)="resetAllFilters()"
-      tooltipText="Скинути всі фільтри"
+      tooltipText="Сбросить все фильтры"
+    ></i-button>
+
+    <i-button
+      id="open-sports-account-button"
+      [hidden]="selectedUserId == null"
+      iconPath="/assets/images/sports-icon-small.png"
+      [iconRelativeSize]="82"
+      (clickEmitter)="openSportsRuProfile()"
+      tooltipText="Перейти в фентези-команду"
     ></i-button>
   </div>
   <div style="display: flex">
@@ -175,8 +206,8 @@
         <table class="choice-table">
           <thead>
             <tr>
-              <th>Варіант 1:</th>
-              <th>Ціна</th>
+              <th>Вариант 1:</th>
+              <th>Цена</th>
               <th>ОФО</th>
               <th>Ц/ОФО</th>
             </tr>
@@ -212,8 +243,8 @@
         <table class="choice-table">
           <thead>
             <tr>
-              <th>Варіант 2:</th>
-              <th>Ціна</th>
+              <th>Вариант 2:</th>
+              <th>Цена</th>
               <th>ОФО</th>
               <th>Ц/ОФО</th>
             </tr>
@@ -258,14 +289,14 @@
       <mat-checkbox
         [(ngModel)]="playersAreNotPlayedDisabled"
         (change)="playersAreNotPlayedDisabledChanged()"
-        >Приховати гравців без ігор в {{ formLength }}
-        {{ formLength != 1 ? "останніх іграх" : "останній грі" }}
+        >Скрыть игроков без игр в {{ formLength }}
+        {{ formLength != 1 ? "последних матчах" : "последнем матче" }}
       </mat-checkbox>
       <br />
       <mat-checkbox
         [(ngModel)]="hideLowGPPlayersEnabled"
         (change)="hideLowGPPlayersEnabledChanged()"
-        >Приховати гравців з менш ніж {{ RED_GP_UPPER_BOUNDARY }} ігор в прогнозі
+        >Скрыть игроков с менее {{ RED_GP_UPPER_BOUNDARY }} прогнозных GP
       </mat-checkbox>
     </div>
   </div>

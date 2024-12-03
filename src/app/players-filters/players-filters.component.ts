@@ -203,4 +203,11 @@ export class PlayersFiltersComponent implements AfterViewInit {
   protected clearAllPlayersSelection() {
     this._filtersObservableProxyService.triggerDeselectPlayersFromComparisonSubject();
   }
+
+  /**
+   * Opens user's profile on SPORTS.RU resource
+   */
+  public openSportsRuProfile(): void {
+    window.open(`https://www.sports.ru/fantasy/hockey/team/${this.selectedUserId}.html`);
+  }
 }

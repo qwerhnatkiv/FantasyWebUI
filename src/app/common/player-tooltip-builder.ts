@@ -31,18 +31,18 @@ export module PlayerTooltipBuilder {
         : '#ff7e7e';
 
     let forecast: string = `
-    <div>Сезонний прогноз:<div>
+    <div>Прогноз на сезон:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th style="color:${forecastGPColor}">І</th>
-          <th>Г</th>
-          <th>А</th>
-          <th style="color:${forecastPimColor}">ШХ</th>
+          <th style="color:${forecastGPColor}">GP</th>
+          <th>G</th>
+          <th>A</th>
+          <th style="color:${forecastPimColor}">PIM</th>
           <th>+-</th>
-          <th>Пер</th>
-          <th>Пор</th>
-          <th>СІ</th>
+          <th>W</th>
+          <th>L</th>
+          <th>CS</th>
         </tr>
       </thead>
       <tbody>
@@ -98,12 +98,12 @@ export module PlayerTooltipBuilder {
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>І</th>
-          <th>Г</th>
-          <th>А</th>
-          <th>ШХ</th>
+          <th>GP</th>
+          <th>G</th>
+          <th>A</th>
+          <th>PIM</th>
           <th>+-</th>
-          <th>PP</th>
+          <th>ПП</th>
         </tr>
       </thead>
       <tbody>
@@ -132,11 +132,11 @@ export module PlayerTooltipBuilder {
     `;
 
     let teamForm: string = `
-    <div>Форма команди:<div>
+    <div>Форма команды:<div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Очок</th>
+          <th>%Очк</th>
           <th>СрЗаб</th>
         </tr>
       </thead>
@@ -173,15 +173,15 @@ export module PlayerTooltipBuilder {
       ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
 
     let opponentInfo: string = `
-    <div>Найближчий суперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Пер: ${Math.round(
+    <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
       teamGame?.winChance!
     )}%</span><div>
     <table class="tooltip-table">
       <thead>
         <tr>
-          <th>%Очок</th>
+          <th>%Очк</th>
           <th>СрЗаб</th>
-          <th> ОФО Гравця</th>
+          <th> ОФО Игрока</th>
         </tr>
       </thead>
       <tbody>

@@ -455,8 +455,8 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
 
       let powerPlayInfo: string =
         playerStat.formPowerPlayNumber > 0
-          ? `PP${playerStat.formPowerPlayNumber}`
-          : '-';
+          ? `ПП${playerStat.formPowerPlayNumber}`
+          : 'нет';
 
       let modelInfo: PlayerExpectedFantasyPointsInfo = {
         playerName: playerStat.playerName,

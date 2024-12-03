@@ -44,6 +44,7 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 
 import { CdkTableModule } from '@angular/cdk/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { PlayersSquadComponent } from './players-squad/players-squad.component';
 import { MatRadioModule } from '@angular/material/radio';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -81,6 +82,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     HeaderMenuComponent,
     PlayersTableComponent,
     PlayersFiltersComponent,
+    PlayersSquadComponent,
     CellClassPipe,
     CellTextClassPipe,
     SquadPlayerPipe,

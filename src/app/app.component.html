@@ -51,6 +51,18 @@
     [formLength]="formLength"
     [positionsInSquadAvailable]="squadAvailableSlots!"
   ></app-players-table>
+  <div class="user-team-block">
+    <app-players-squad
+      style="display: flex"
+      [(squadPlayers)]="squadPlayers"
+      [balanceValue]="balanceValue"
+      [substitutions]="substitutionsLeft"
+      (sendAvailableSlots)="squadAvailableSlots = $event"
+      [teamStats]="teamStats"
+      [filteredTeamGames]="filteredTeamGames"
+      [playerGamesOfoMap]="playerGamesOfoMap"
+    ></app-players-squad>
+  </div>
 </section>
 
 <ngx-ui-loader></ngx-ui-loader>

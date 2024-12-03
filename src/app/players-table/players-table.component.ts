@@ -50,6 +50,7 @@ export class PlayersTableComponent
     'secondChoice',
     '№',
     'playerName',
+    'projectedGamesCount',
     'team',
     'position',
     'price',

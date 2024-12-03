@@ -39,7 +39,7 @@ export const VERY_GREEN_WIN_LOWER_BOUNDARY = 59;
 export const GREEN_WIN_LOWER_BOUNDARY = 49;
 export const WHITE_WIN_LOWER_BOUNDARY = 33.49;
 
-export const POWER_PLAY_UNITS = ['-', 'PP1', 'PP2']
+export const POWER_PLAY_UNITS = ['нет', 'ПП1', 'ПП2']
 
 export const GREEN_GAMES_WEEK_BOUNDARY = 3;
 export const RED_GAMES_WEEK_BOUNDARY = 2;
@@ -50,6 +50,7 @@ export const DAY_CHANGE_HOUR: number = 3;
 export const SQUAD_PLAYERS_COUNT: number = 17;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
+  ["RaisingTheBar", 551339],
   ["A-N-O N-I-M", 552044],
   // ["o_kai", 536668],
   // ["AntonovAC", 535080],
@@ -140,18 +141,18 @@ export const GREEN_COLOR_ACTIVE = '#2fff68'
 
 
 // TEXT
-export const EXPAND_CALENDAR: string = 'Розгорнути';
-export const COLLAPSE_CALENDAR: string = 'Згорнути';
-export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показати завершені тижні';
-export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Приховати завершені тижні';
-export const ENABLE_FULL_CALENDAR_MODE_LABEL: string = 'Відобразити повний календар';
-export const ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL: string = 'Відобразити лише число ігор';
-export const ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL: string = 'Включити лише число ігор (розширений режим)';
+export const EXPAND_CALENDAR: string = 'Развернуть';
+export const COLLAPSE_CALENDAR: string = 'Свернуть';
+export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показать завершенные недели';
+export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Скрыть завершенные недели';
+export const ENABLE_FULL_CALENDAR_MODE_LABEL: string = 'Показать полный календарь';
+export const ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL: string = 'Показать только число игр (режим сапера)';
+export const ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL: string = 'Включить доп. режим сапера';
 export const EFP_LABEL: string = 'ОФО'
-export const SHOW_BEST_PLAYERS_BY_EFP: string = 'Відобразити найкращих гравців по ОФО';
-export const DATA_UPDATED_LOG_INFO: string = 'Дані оновлено:';
-export const COEFS_UPDATED_LOG_INFO: string = 'Коефіцієнти оновлено:';
-export const FROM_DATE_CALENDAR_FILTER: string = 'З: '
+export const SHOW_BEST_PLAYERS_BY_EFP: string = 'Отобразить лучших по ОФО игроков';
+export const DATA_UPDATED_LOG_INFO: string = 'Данные обновлены:';
+export const COEFS_UPDATED_LOG_INFO: string = 'Кэфы обновлены:';
+export const FROM_DATE_CALENDAR_FILTER: string = 'С: '
 export const TO_DATE_CALENDAR_FILTER: string = 'По: '
 export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 

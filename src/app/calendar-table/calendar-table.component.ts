@@ -423,10 +423,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     let homeTeamWinChance: string = `<span style="color:${homeTeamColor}">${
       game.homeTeamAcronym
-    }: Перемога ${Math.round(game.homeTeamWinChance)}%</span>`;
+    }: Победа ${Math.round(game.homeTeamWinChance)}%</span>`;
     let awayTeamWinChance: string = `<span style="color:${awayTeamColor}">${
       game.awayTeamAcronym
-    }: Перемога ${Math.round(game.awayTeamWinChance)}%</span>`;
+    }: Победа ${Math.round(game.awayTeamWinChance)}%</span>`;
 
     let playersMap: PlayerExpectedFantasyPointsInfo[] =
       this.teamPlayerExpectedOfoMap
@@ -435,7 +435,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     let playersToolTip: string = '';
 
     if (playersMap != null && playersMap.length > 0) {
-      playersToolTip += '<br>Найкращі гравці: <br>';
+      playersToolTip += '<br>Лучшие пики: <br>';
       playersMap.forEach((x) => {
         playersToolTip += `${x.playerName} (${x.price}), ${
           x.powerPlayNumber
@@ -452,12 +452,12 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     return `<b>${homeTeamWinChance}</b> | ${homeTeamStats.teamGoalsForm.toFixed(
       1
-    )} Забиті шайби | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} Пропущені шайби | ${
+    )} GF | ${homeTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${
       homeTeamStats.teamForm
     }<br>
     <b>${awayTeamWinChance}</b> | ${awayTeamStats.teamGoalsForm.toFixed(
       1
-    )} Забиті шайби | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} Пропущені шайби | ${
+    )} GF | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${
       awayTeamStats.teamForm
     }<br>
     ${playersToolTip}

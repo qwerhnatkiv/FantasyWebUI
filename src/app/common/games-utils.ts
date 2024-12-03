@@ -123,8 +123,8 @@ export module GamesUtils {
 
   export function GetPPText(ppNumber: number) {
     return ppNumber > 0
-              ? `PP${ppNumber}`
-              : '-';
+              ? `ПП${ppNumber}`
+              : 'нет';
   }
 
   /**
