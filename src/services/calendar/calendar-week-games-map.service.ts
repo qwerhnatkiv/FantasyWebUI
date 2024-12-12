@@ -33,11 +33,16 @@ export class CalendarWeekGamesMapService {
     startDate: Date | undefined
   ): number {
     const allGamesPriorToWeekCount: number = games.filter(
-      (game) =>
-        (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
-        !game.isOldGame &&
-        game.weekNumber <= week &&
-        (startDate == null || new Date(game.gameDate).getTime() >= startDate!.getTime())
+      (game) => {
+        const actualStartDate = new Date();
+        actualStartDate.setDate(startDate!.getDate() - 1);
+
+        return (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
+          !game.isOldGame &&
+          game.weekNumber <= week &&
+          (startDate == null || new Date(game.gameDate).getTime() > actualStartDate!.getTime());
+
+      }
     ).length;
 
     this._addOrUpdateWeekGamesMapValues(week, allGamesPriorToWeekCount);
