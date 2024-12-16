@@ -1,4 +1,9 @@
+import { DecimalPipe } from "@angular/common";
+import { ONE_DIGIT_NUMBER_FORMAT } from "src/constants";
+
 export module Utils {
+  const numberPipe: DecimalPipe = new DecimalPipe('en-US');
+
   export function groupBy(array: any[], f: Function) {
     let groups: any = {};
     array.forEach(function (o) {
@@ -66,5 +71,16 @@ export module Utils {
       : n,
       0
     )
+  }
+
+  export function formatNumber(value: number): string {
+    if (value == null) {
+      return value;
+    }
+
+    return numberPipe.transform(
+      value,
+      ONE_DIGIT_NUMBER_FORMAT
+    )!.replace(',', ' ');
   }
 }

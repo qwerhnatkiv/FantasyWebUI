@@ -796,7 +796,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
             const playerEfpSum: number = value.reduce((sum, x) => sum + x.playerExpectedFantasyPoints, 0);
             rowToReplace.team.displayValue =
-              value[0].playerName + `: ${this.numberPipe.transform(playerEfpSum, ONE_DIGIT_NUMBER_FORMAT)} ${EFP_LABEL}`;
+              value[0].playerName + `: ${Utils.formatNumber(playerEfpSum)} ${EFP_LABEL}`;
             rowToReplace.team.playerId = value[0].playerID;
             
             for (const game of value) {

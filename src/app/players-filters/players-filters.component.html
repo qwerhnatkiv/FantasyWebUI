@@ -222,7 +222,7 @@
                 {{ firstChoiceOfo.priceSum | number : "1.0-0" }}
               </td>
               <td style="text-align: center; vertical-align: middle">
-                {{ firstChoiceOfo.expectedFantasyPointsSum | number : "1.0-0" }}
+                {{ UTILS.formatNumber(firstChoiceOfo.expectedFantasyPointsSum) }}
               </td>
               <td style="text-align: center; vertical-align: middle">
                 {{
@@ -260,7 +260,7 @@
               </td>
               <td style="text-align: center; vertical-align: middle">
                 {{
-                  secondChoiceOfo.expectedFantasyPointsSum | number : "1.0-0"
+                  UTILS.formatNumber(secondChoiceOfo.expectedFantasyPointsSum)
                 }}
               </td>
               <td style="text-align: center; vertical-align: middle">

@@ -23,18 +23,18 @@ import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
 import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY, SQUAD_PLAYERS_COUNT } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
-import { DecimalPipe } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import { PlayerTooltipBuilder } from '../common/player-tooltip-builder';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
 import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
 import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
+import { Utils } from '../common/utils';
 
 @Component({
   selector: 'app-players-table',
@@ -77,6 +77,8 @@ export class PlayersTableComponent
   private deselectPlayersFromComparisonComponentSubscription?: Subscription;
   private _filterDatesRangeSubscription?: Subscription;
   private filterDictionary: Map<string, any> = new Map<string, any>();
+
+  protected UTILS = Utils;
 
   @ViewChild(MatSort) sort: MatSort | undefined;
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
@@ -126,8 +128,6 @@ export class PlayersTableComponent
   private players: PlayerChooseRecord[] = [];
   dataSource = new MatTableDataSource(this.players);
   private clickedOnCheckboxOrButton: boolean = false;
-
-  private numberPipe: DecimalPipe = new DecimalPipe('en-US');
 
   protected filterDates: DatesRangeModel = {
     minDate: new Date(),
@@ -268,10 +268,9 @@ export class PlayersTableComponent
           )!;
 
         player.expectedFantasyPoints = ofo;
-        //ofo > 0 ? this.numberPipe.transform(ofo, '1.0-1')! : '0';
         player.fantasyPointsPerGame =
           ofo > 0
-            ? this.numberPipe.transform(ofo / player.gamesCount, '1.0-1')!
+            ? Utils.formatNumber(ofo / player.gamesCount)
             : '0';
         player.priceByExpectedFantasyPoints =
           ofo > 0 && player.price > 0 ? player.price / ofo : 999;
@@ -555,10 +554,7 @@ export class PlayersTableComponent
       playerInfo?.map((x) => ({
         playerName: player.playerObject.playerName,
         playerID: player.playerObject.playerID,
-        playerExpectedFantasyPointsFormatted: this.numberPipe.transform(
-          x.playerExpectedFantasyPoints,
-          '1.0-1'
-        )!,
+        playerExpectedFantasyPointsFormatted: Utils.formatNumber(x.playerExpectedFantasyPoints),
         playerExpectedFantasyPoints: x.playerExpectedFantasyPoints,
         teamName: teamName,
         gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,

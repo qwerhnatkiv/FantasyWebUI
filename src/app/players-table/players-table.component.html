@@ -326,7 +326,7 @@
         ОФО
       </th>
       <td mat-cell *matCellDef="let element" class="bold">
-        {{ element.expectedFantasyPoints | number : "1.0-1" }}
+        {{ UTILS.formatNumber(element.expectedFantasyPoints) }}
       </td>
     </ng-container>
 

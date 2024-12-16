@@ -6,6 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { RED_GP_UPPER_BOUNDARY } from '../../constants'
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
+import { Utils } from '../common/utils';
 
 @Component({
   selector: 'app-players-filters',
@@ -14,6 +15,8 @@ import { FiltersObservableProxyService } from 'src/services/observable-proxy/fil
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayersFiltersComponent implements AfterViewInit {
+  protected UTILS = Utils;
+
   prices: number[] = DEFAULT_PRICES.sort((n1,n2) => n1 - n2);
   selectPositions: string[] = DEFAULT_POSITIONS;
   selectTeams: string[] = TEAMS;

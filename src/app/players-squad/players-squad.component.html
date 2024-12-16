@@ -108,10 +108,10 @@
       style="font-weight: 700"
       [class.removed-cell]="element.isRemoved"
     >
-      {{ element.expectedFantasyPoints | number : "1.0-1" }}
+      {{ UTILS.formatNumber(element.expectedFantasyPoints) }}
     </td>
     <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      {{ getTotalOFO() | number : "1.0-1" }}
+      {{ getTotalOFO() }}
     </td>
   </ng-container>
 

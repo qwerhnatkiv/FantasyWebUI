@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
-import { DEFAULT_POSITIONS, DEFAULT_SUBSTITUTION_VALUE, POSITIONS_SORT_MAP, SQUAD_PLAYERS_COUNT } from 'src/constants';
+import { DEFAULT_POSITIONS, DEFAULT_SUBSTITUTION_VALUE, ONE_DIGIT_NUMBER_FORMAT, POSITIONS_SORT_MAP, SQUAD_PLAYERS_COUNT } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { TeamGameInformation } from '../interfaces/team-game-information';
@@ -16,6 +16,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
 import { GamesUtils } from '../common/games-utils';
+import { Utils } from '../common/utils';
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
@@ -33,9 +34,10 @@ export class PlayersSquadComponent {
     'expectedFantasyPointsDifference',
   ];
 
+  protected UTILS = Utils;
+
   @ViewChild(MatTable)
   table!: MatTable<PlayerSquadRecord>;
-
   private _squadPlayers: PlayerSquadRecord[] = [];
   get squadPlayers(): PlayerSquadRecord[] {
     return this._squadPlayers;
@@ -89,15 +91,17 @@ export class PlayersSquadComponent {
     private _playersObservableProxyService: PlayersObservableProxyService
   ) {}
 
-  public getTotalOFO() {
+  public getTotalOFO(): string {
     if (this.squadPlayers == null) {
-      return 0;
+      return '0';
     }
 
-    return this.squadPlayers
+    const ofoValue: number = this.squadPlayers
       .filter((item) => !item.isRemoved)
       .map((t) => t.expectedFantasyPoints)
       .reduce((acc, value) => acc + (value == null ? 0 : value), 0);
+
+      return Utils.formatNumber(ofoValue);
   }
 
   public getTotalBalance(): number {
