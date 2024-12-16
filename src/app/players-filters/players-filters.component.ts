@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT } from 'src/constants';
+import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT, REMOVE_PLAYERS_WITH_NO_GAMES } from 'src/constants';
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { MatSelectChange } from '@angular/material/select';
 import { RED_GP_UPPER_BOUNDARY } from '../../constants'
@@ -31,7 +31,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
 
-  playersAreNotPlayedDisabled: boolean = false;
+  playersAreNotPlayedDisabled: boolean = REMOVE_PLAYERS_WITH_NO_GAMES;
   hideLowGPPlayersEnabled: boolean = false;
   public formLength: number = DEFAULT_FORM_LENGTH;
   public formLengthCount: Array<number> = new Array(DEFAULT_FORM_LENGTH_COUNT);
@@ -109,7 +109,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
         this.playersAreNotPlayedDisabledChanged();
       }
       else {
-        this.playersAreNotPlayedDisabled = false;
+        this.playersAreNotPlayedDisabled = REMOVE_PLAYERS_WITH_NO_GAMES;
         this.playersAreNotPlayedDisabledChanged();
       }
     }
@@ -196,7 +196,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
     this.clearAllPlayersSelection();
 
-    this.playersAreNotPlayedDisabled = false;
+    this.playersAreNotPlayedDisabled = REMOVE_PLAYERS_WITH_NO_GAMES;
     this.playersAreNotPlayedDisabledChanged();
 
     this.hideLowGPPlayersEnabled = false;

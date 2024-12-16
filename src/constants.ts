@@ -160,3 +160,6 @@ export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 // EXTERNAL SOURCES
 export const GAME_DAY_TWEETS_URL: string = 'https://www.gamedaytweets.com/';
 export const KNOWLEDGE_BASE_URL: string = 'https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit';
+
+
+export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;

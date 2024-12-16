@@ -22,6 +22,7 @@ import { PlayerSquadRecord } from './interfaces/player-squad-record';
 import {
   DEFAULT_FORM_LENGTH,
   DEFAULT_POSITIONS,
+  REMOVE_PLAYERS_WITH_NO_GAMES,
   SQUAD_PLAYERS_COUNT,
   USER_ID_NAME,
 } from 'src/constants';
@@ -80,7 +81,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
-  public playersAreNotPlayedDisabled: boolean = false;
+  public playersAreNotPlayedDisabled: boolean = REMOVE_PLAYERS_WITH_NO_GAMES;
   public hideLowGPPlayersEnabled: boolean = false;
 
   public teamPlayerExpectedOfoMap: Map<

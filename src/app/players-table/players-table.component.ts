@@ -21,7 +21,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PPToiPipe } from '../pipes/pptoi.pipe';
 import { GamesUtils } from '../common/games-utils';
 import { TeamGameInformation } from '../interfaces/team-game-information';
-import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY, SQUAD_PLAYERS_COUNT } from 'src/constants';
+import { DEFAULT_POSITIONS, RED_GP_UPPER_BOUNDARY, REMOVE_PLAYERS_WITH_NO_GAMES, SQUAD_PLAYERS_COUNT } from 'src/constants';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
@@ -97,7 +97,7 @@ export class PlayersTableComponent
 
   @Input() formLength: number = 0;
 
-  @Input() playersAreNotPlayedDisabled: boolean = false;
+  @Input() playersAreNotPlayedDisabled: boolean = REMOVE_PLAYERS_WITH_NO_GAMES;
   @Input() hideLowGPPlayersEnabled: boolean = false;
 
   @Input() playerGamesOfoMap:
