@@ -63,6 +63,7 @@ import { DateFiltersService } from 'src/services/filtering/date-filters.service'
 import { CancelButtonComponent } from './common-components/cancel-button/cancel-button.component';
 import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week-games-map.service';
 import { SquadPlayerPipe } from './pipes/squad-player.pipe';
+import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -128,7 +129,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CalendarObservableProxyService,
     FiltersObservableProxyService,
     DateFiltersService,
-    CalendarWeekGamesMapService
+    CalendarWeekGamesMapService,
+    PlayerCombinationsService
   ],
   bootstrap: [AppComponent],
 })

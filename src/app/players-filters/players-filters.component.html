@@ -108,7 +108,7 @@
 
     <button
       (click)="setDefaultPositions()"
-      [hidden]="positionsFormControl.value?.length === 0"
+      [hidden]="positionsFormControl.value?.length === 0 || areDefaultPositions()"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear positions filter"

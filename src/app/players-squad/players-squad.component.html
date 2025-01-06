@@ -1,3 +1,12 @@
+<i-button
+  class="get-optimal-players-combinations"
+  iconPath="/assets/images/clear-list-small.png"
+  [iconRelativeSize]="65"
+  (clickEmitter)="getOptimalPlayersCombinations()"
+  tooltipText="Выбрать оптимальных игроков"
+  [hidden]="true"
+></i-button>
+
 <table mat-table [dataSource]="dataSource" class="players-squad-table">
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef></th>

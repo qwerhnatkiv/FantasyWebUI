@@ -35,6 +35,7 @@ import { FiltersObservableProxyService } from 'src/services/observable-proxy/fil
 import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 import { Utils } from '../common/utils';
+import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 
 @Component({
   selector: 'app-players-table',
@@ -138,7 +139,8 @@ export class PlayersTableComponent
     private _playersObservableProxyService: PlayersObservableProxyService,
     private _filtersObservableProxyService: FiltersObservableProxyService,
     private _changeDetectorRef: ChangeDetectorRef,
-    private _dateFiltersService: DateFiltersService
+    private _dateFiltersService: DateFiltersService,
+    private _playerCombinationsService: PlayerCombinationsService
   ) {
     this.dataSource.filterPredicate = this.filter;
   }
@@ -236,6 +238,8 @@ export class PlayersTableComponent
           playerObject: player,
         });
       }
+
+      this._playerCombinationsService.availablePlayers = this.players;
     }
 
     if (changes['filteredTeamGames']?.currentValue) {
@@ -350,11 +354,11 @@ export class PlayersTableComponent
     return (
       this.positionsInSquadAvailable == null ||
       (this.positionsInSquadAvailable?.defendersAvailable == 0 &&
-        player.position == 'З') ||
+        player.position == DEFAULT_POSITIONS[1]) ||
       (this.positionsInSquadAvailable?.forwardsAvailable == 0 &&
-        player.position == 'Н') ||
+        player.position == DEFAULT_POSITIONS[2]) ||
       (this.positionsInSquadAvailable?.goaliesAvailable == 0 &&
-        player.position == 'В') ||
+        player.position == DEFAULT_POSITIONS[0]) ||
       (this.positionsInSquadAvailable?.selectedPlayerIds.length! > 0 &&
         this.positionsInSquadAvailable?.selectedPlayerIds.indexOf(
           player.playerObject.playerID

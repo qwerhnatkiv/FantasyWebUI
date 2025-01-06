@@ -115,6 +115,12 @@ export class PlayersFiltersComponent implements AfterViewInit {
     }
   }
 
+  areDefaultPositions(): boolean {
+    return this.positionsFormControl.value?.length === 2 && 
+           this.positionsFormControl.value[0] === DEFAULT_POSITIONS[1] &&
+           this.positionsFormControl.value[1] === DEFAULT_POSITIONS[2];
+  }
+
   formLengthChanged(event: MatSelectChange) {
     this.sendFormLength.emit(event.value);
   }
