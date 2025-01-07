@@ -1,5 +1,27 @@
+.user-squad-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-squad-table-container {
+  display: flex;
+}
+
+.player-combinations-container {
+  padding-top: 30px;
+  padding-left: 32%;
+}
+
 .players-squad-table {
   border-spacing: 0 4px !important;
+  z-index: 1;
+}
+
+.btn-get-optimal-players-combinations {
+  z-index: 2;
+  position: relative;
+  left: 10%;
+  height: fit-content;
 }
 
 .mat-mdc-cell,
@@ -31,6 +53,10 @@
 
 .silver-cell {
   background: #e1e1e1;
+}
+
+.yellow-cell {
+  background: #fef524;
 }
 
 .green-cell {
@@ -90,4 +116,9 @@
 .clear-squad-changes-button[hidden] {
   visibility: hidden;
   display: block !important;
+}
+
+.model-choice-label {
+  font-weight: 700;
+  text-align: center;
 }

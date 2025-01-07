@@ -23,7 +23,6 @@ import {
   DEFAULT_FORM_LENGTH,
   DEFAULT_POSITIONS,
   REMOVE_PLAYERS_WITH_NO_GAMES,
-  SQUAD_PLAYERS_COUNT,
   USER_ID_NAME,
 } from 'src/constants';
 import { OfoVariant } from './interfaces/ofo-variant';
@@ -361,6 +360,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
               expectedFantasyPoints: ofo ?? 0,
               isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
               isNew: addedIds.includes(matchingPlayerInfo.playerID),
+              isOptimal: false,
               playerObject: matchingPlayerInfo,
               teamObject: matchingTeam,
               powerPlayNumber: GamesUtils.GetPPText(
@@ -395,6 +395,7 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
               expectedFantasyPoints: ofo ?? 0,
               isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
               isNew: addedIds.includes(matchingPlayerInfo.playerID),
+              isOptimal: false,
               playerObject: matchingPlayerInfo,
               teamObject: matchingTeam,
               powerPlayNumber: GamesUtils.GetPPText(

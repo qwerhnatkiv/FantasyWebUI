@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -10,8 +12,7 @@ import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import {
   DEFAULT_POSITIONS,
   DEFAULT_SUBSTITUTION_VALUE,
-  ONE_DIGIT_NUMBER_FORMAT,
-  POSITIONS_SORT_MAP,
+  MODEL_CHOICE_LABEL,
   SQUAD_PLAYERS_COUNT,
 } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
@@ -24,13 +25,16 @@ import { PlayersObservableProxyService } from 'src/services/observable-proxy/pla
 import { GamesUtils } from '../common/games-utils';
 import { Utils } from '../common/utils';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
+import { Subscription } from 'rxjs';
+import { OptimalCombinationsResultDto } from '../interfaces/player-combinations/optimal-combinations-result-dto.model';
+import { PlayerChooseRecord } from '../interfaces/player-choose-record';
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
   styleUrls: ['./players-squad.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayersSquadComponent {
+export class PlayersSquadComponent implements OnInit {
   displayedColumns: string[] = [
     'action',
     'position',
@@ -41,7 +45,11 @@ export class PlayersSquadComponent {
     'expectedFantasyPointsDifference',
   ];
 
+  private playerCombinationsSubscription?: Subscription;
+
   protected UTILS = Utils;
+  protected MODEL_CHOICE_LABEL = MODEL_CHOICE_LABEL;
+  protected playerCombinations: string[] = [];
 
   @ViewChild(MatTable)
   table!: MatTable<PlayerSquadRecord>;
@@ -96,8 +104,18 @@ export class PlayersSquadComponent {
 
   constructor(
     private _playersObservableProxyService: PlayersObservableProxyService,
-    private _playerCombinationsService: PlayerCombinationsService
+    private _playerCombinationsService: PlayerCombinationsService,
+    private _changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.playerCombinationsSubscription =
+      this._playerCombinationsService.$optimalPlayerCombinationsObservable?.subscribe(
+        (combinations: OptimalCombinationsResultDto[]) => {
+          this._addOptimalPlayerCombinations(combinations)
+        }
+      );
+  }
 
   public getTotalOFO(): string {
     if (this.squadPlayers == null) {
@@ -156,14 +174,11 @@ export class PlayersSquadComponent {
       .reduce((acc, value) => acc + (value == null ? 0 : value), 0);
   }
 
-  protected getOptimalPlayersCombinations() {
-    const result =
-      this._playerCombinationsService.getOptimalPlayersCombinations(
-        this.getTotalBalance(false),
-        this.squadPlayers
-      );
-
-    console.log(result);
+  protected getOptimalPlayersCombinations(): void {
+    this._playerCombinationsService.getOptimalPlayersCombinations(
+      this.getTotalBalance(false),
+      this.squadPlayers
+    );
   }
 
   public sendSelectedPlayer(row: PlayerSquadRecord): void {
@@ -209,6 +224,8 @@ export class PlayersSquadComponent {
     this.squadPlayers
       .filter((x) => x.isRemoved)
       .forEach((x) => (x.isRemoved = false));
+
+    this.playerCombinations = [];
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
   }
@@ -392,5 +409,33 @@ export class PlayersSquadComponent {
         addedPlayers[i].expectedFantasyPoints -
         removedPlayers[i].expectedFantasyPoints;
     }
+  }
+
+  private _addOptimalPlayerCombinations(combinations: OptimalCombinationsResultDto[]) {
+    this.playerCombinations.length = 0;
+
+    if (combinations.length > 0 && combinations[0].players.length > 0) {
+      for (const combination of combinations) {
+        this.playerCombinations.push(combination.players.map(x => x.name).join(', '));
+      }
+    }
+
+    const bestCombination: OptimalCombinationsResultDto = combinations[0];
+
+    this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
+    for (const player of bestCombination.players) {
+      const playerChooseRecord: PlayerChooseRecord = 
+        this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
+
+      const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
+      this.squadPlayers.push(playerSquadRecord);
+    }
+    
+    this.squadPlayers = Object.assign([], this.squadPlayers);
+    this.setSquadPlayersSortOrder();
+
+    this.sendAvailableSlots.emit(this.getAvailableSlots());
+    this.squadPlayersChange.emit(this.squadPlayers);
+    this._changeDetectorRef.detectChanges();
   }
 }

@@ -1,161 +1,185 @@
-<i-button
-  class="get-optimal-players-combinations"
-  iconPath="/assets/images/clear-list-small.png"
-  [iconRelativeSize]="65"
-  (clickEmitter)="getOptimalPlayersCombinations()"
-  tooltipText="Выбрать оптимальных игроков"
-  [hidden]="true"
-></i-button>
+<div class="user-squad-container">
+  <div class="user-squad-table-container">
+    <i-button
+      class="btn-get-optimal-players-combinations"
+      iconPath="/assets/images/lightbulb.png"
+      [iconRelativeSize]="65"
+      (clickEmitter)="getOptimalPlayersCombinations()"
+      tooltipText="Выбрать оптимальных игроков"
+      [hidden]="squadPlayers.length === 0"
+    ></i-button>
 
-<table mat-table [dataSource]="dataSource" class="players-squad-table">
-  <ng-container matColumnDef="action">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td mat-cell *matCellDef="let element">
-      <button
-        class="player-action-button"
-        mat-icon-button
-        (click)="removeRestoreRow(element)"
-      >
-        <mat-icon class="player-action-icon">{{
-          !element.isRemoved ? "delete" : "undo"
-        }}</mat-icon>
-      </button>
-    </td>
-    <td mat-footer-cell *matFooterCellDef></td>
-  </ng-container>
+    <table mat-table [dataSource]="dataSource" class="players-squad-table">
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            class="player-action-button"
+            mat-icon-button
+            (click)="removeRestoreRow(element)"
+          >
+            <mat-icon class="player-action-icon">{{
+              !element.isRemoved ? "delete" : "undo"
+            }}</mat-icon>
+          </button>
+        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
 
-  <ng-container matColumnDef="position">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      class="left-column"
-      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
-    >
-      <span class="position-span">
-        {{ element.position | positionsMap }}
-      </span>
-    </td>
-    <td mat-footer-cell *matFooterCellDef></td>
-  </ng-container>
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="left-column"
+          [ngClass]="
+            element | squadPlayer : element.expectedFantasyPointsDifference
+          "
+        >
+          <span class="position-span">
+            {{ element.position | positionsMap }}
+          </span>
+        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
 
-  <ng-container matColumnDef="playerName">
-    <th mat-header-cell *matHeaderCellDef class="left-align">Игрок</th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      class="left-align"
-      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
-      [class.removed-cell]="element.isRemoved"
-      (click)="sendSelectedPlayer(element)"
-      [ngxTippy]="generateCellToolTip(element)"
-      tippyClassName="tooltip-general"
-      [tippyProps]="{
-        allowHTML: true,
-        placement: 'right',
-        arrow: false
-      }"
-    >
-      {{ element.playerName }}
-    </td>
-    <td
-      mat-footer-cell
-      *matFooterCellDef
-      class="left-align"
-      style="font-weight: 700"
-    >
-      <span>Баланс:</span>
-      <br />
-      <span>Замен:</span>
-    </td>
-  </ng-container>
+      <ng-container matColumnDef="playerName">
+        <th mat-header-cell *matHeaderCellDef class="left-align">Игрок</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="left-align"
+          [ngClass]="
+            element | squadPlayer : element.expectedFantasyPointsDifference
+          "
+          [class.removed-cell]="element.isRemoved"
+          (click)="sendSelectedPlayer(element)"
+          [ngxTippy]="generateCellToolTip(element)"
+          tippyClassName="tooltip-general"
+          [tippyProps]="{
+            allowHTML: true,
+            placement: 'right',
+            arrow: false
+          }"
+        >
+          {{ element.playerName }}
+        </td>
+        <td
+          mat-footer-cell
+          *matFooterCellDef
+          class="left-align"
+          style="font-weight: 700"
+        >
+          <span>Баланс:</span>
+          <br />
+          <span>Замен:</span>
+        </td>
+      </ng-container>
 
-  <ng-container matColumnDef="price">
-    <th mat-header-cell *matHeaderCellDef>Цена</th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      [class.removed-cell]="element.isRemoved"
-      (click)="sendSelectedPlayer(element)"
-      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
-    >
-      {{ element.price }}
-    </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      <span [class.red-text]="getTotalBalance() < 0">{{
-        getTotalBalance() | number : "1.0-1"
-      }}</span>
-      <br />
-      <span [class.red-text]="substitutionsLeft < 0">
-        {{ substitutionsLeft }}
-      </span>
-    </td>
-  </ng-container>
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Цена</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          [class.removed-cell]="element.isRemoved"
+          (click)="sendSelectedPlayer(element)"
+          [ngClass]="
+            element | squadPlayer : element.expectedFantasyPointsDifference
+          "
+        >
+          {{ element.price }}
+        </td>
+        <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+          <span [class.red-text]="getTotalBalance() < 0">{{
+            getTotalBalance() | number : "1.0-1"
+          }}</span>
+          <br />
+          <span [class.red-text]="substitutionsLeft < 0">
+            {{ substitutionsLeft }}
+          </span>
+        </td>
+      </ng-container>
 
-  <ng-container matColumnDef="gamesCount">
-    <th mat-header-cell *matHeaderCellDef>Игр</th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      class="right-column"
-      [ngClass]="element | squadPlayer : element.expectedFantasyPointsDifference"
-      (click)="sendSelectedPlayer(element)"
-      [class.removed-cell]="element.isRemoved"
-    >
-      {{ element.gamesCount }}
-    </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      {{ getTotalGames() | number : "1.0-0" }}
-    </td>
-  </ng-container>
+      <ng-container matColumnDef="gamesCount">
+        <th mat-header-cell *matHeaderCellDef>Игр</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="right-column"
+          [ngClass]="
+            element | squadPlayer : element.expectedFantasyPointsDifference
+          "
+          (click)="sendSelectedPlayer(element)"
+          [class.removed-cell]="element.isRemoved"
+        >
+          {{ element.gamesCount }}
+        </td>
+        <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+          {{ getTotalGames() | number : "1.0-0" }}
+        </td>
+      </ng-container>
 
-  <ng-container matColumnDef="expectedFantasyPoints">
-    <th mat-header-cell *matHeaderCellDef>ОФО</th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      style="font-weight: 700"
-      [class.removed-cell]="element.isRemoved"
-    >
-      {{ UTILS.formatNumber(element.expectedFantasyPoints) }}
-    </td>
-    <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
-      {{ getTotalOFO() }}
-    </td>
-  </ng-container>
+      <ng-container matColumnDef="expectedFantasyPoints">
+        <th mat-header-cell *matHeaderCellDef>ОФО</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          style="font-weight: 700"
+          [class.removed-cell]="element.isRemoved"
+        >
+          {{ UTILS.formatNumber(element.expectedFantasyPoints) }}
+        </td>
+        <td mat-footer-cell *matFooterCellDef style="font-weight: 700">
+          {{ getTotalOFO() }}
+        </td>
+      </ng-container>
 
-  <ng-container matColumnDef="expectedFantasyPointsDifference">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td
-      mat-cell
-      *matCellDef="let element"
-      style="font-weight: 700"
-      [class.green-text]="element.expectedFantasyPointsDifference >= 0"
-      [class.red-text]="element.expectedFantasyPointsDifference < 0"
-    >
-      {{ element.expectedFantasyPointsDifference | number : "1.0-1" }}
-    </td>
-    <td
-      mat-footer-cell
-      *matFooterCellDef
-      style="font-weight: 700"
-      [class.green-text]="getTotalExpectedFantasyPointsDifference() > 0"
-      [class.red-text]="getTotalExpectedFantasyPointsDifference() < 0"
-    >
-      {{ getTotalExpectedFantasyPointsDifference() | number : "1.0-1" }}
-    </td>
-  </ng-container>
+      <ng-container matColumnDef="expectedFantasyPointsDifference">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          style="font-weight: 700"
+          [class.green-text]="element.expectedFantasyPointsDifference >= 0"
+          [class.red-text]="element.expectedFantasyPointsDifference < 0"
+        >
+          {{ element.expectedFantasyPointsDifference | number : "1.0-1" }}
+        </td>
+        <td
+          mat-footer-cell
+          *matFooterCellDef
+          style="font-weight: 700"
+          [class.green-text]="getTotalExpectedFantasyPointsDifference() > 0"
+          [class.red-text]="getTotalExpectedFantasyPointsDifference() < 0"
+        >
+          {{ getTotalExpectedFantasyPointsDifference() | number : "1.0-1" }}
+        </td>
+      </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-</table>
-<button
-  (click)="clearAllSquadChanges()"
-  [hidden]="isClearAllSquadChangesButtonHidden()"
-  class="clear-squad-changes-button"
-  mat-icon-button
-  aria-label="Clear squad changes"
->
-  <mat-icon>cancel</mat-icon>
-</button>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+    </table>
+    <button
+      (click)="clearAllSquadChanges()"
+      [hidden]="isClearAllSquadChangesButtonHidden()"
+      class="clear-squad-changes-button"
+      mat-icon-button
+      aria-label="Clear squad changes"
+    >
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </div>
+  <div class="player-combinations-container"
+      [hidden]="playerCombinations.length === 0">
+    <p class="model-choice-label">
+      <b>
+        {{ MODEL_CHOICE_LABEL }}
+      </b>
+    </p>
+    <p *ngFor="let combination of playerCombinations; let i = index">
+      <b>{{ (i + 1).toString() + ': ' }} </b>
+      {{ combination }}
+    </p>
+  </div>
+</div>

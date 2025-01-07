@@ -6,6 +6,10 @@ import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 })
 export class SquadPlayerPipe implements PipeTransform {
   transform(squadPlayer: PlayerSquadRecord, expectedFantasyPointsDifference?: number): string {
+    if (squadPlayer.isOptimal) {
+      return 'yellow-cell';
+    }
+
     if (squadPlayer.isNew) {
         if (expectedFantasyPointsDifference != null && expectedFantasyPointsDifference >= 0) {
             return 'green-cell';

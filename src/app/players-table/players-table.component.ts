@@ -332,20 +332,7 @@ export class PlayersTableComponent
 
   public addPlayerToSquad(player: PlayerChooseRecord) {
     this.clickedOnCheckboxOrButton = true;
-
-    const playerSquadRecord: PlayerSquadRecord = {
-      playerName: player.playerObject.playerName,
-      position: player.playerObject.position,
-      price: player.playerObject.price,
-      gamesCount: player.gamesCount,
-      expectedFantasyPoints: player.expectedFantasyPoints,
-      isRemoved: false,
-      isNew: true,
-      playerObject: player.playerObject,
-      teamObject: player.teamObject,
-      powerPlayNumber: player.powerPlayNumber,
-      sortOrder: 0
-    };
+    const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(player, false);
 
     this.sendAddedToSquadPlayer.emit(playerSquadRecord);
   }
