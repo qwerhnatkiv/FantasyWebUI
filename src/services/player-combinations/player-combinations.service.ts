@@ -30,7 +30,7 @@ export class PlayerCombinationsService {
     const availablePlayers = this.availablePlayers.filter(
       (x) =>
         squadPlayers.findIndex(
-          (y) => y.playerObject.playerID == x.playerObject.playerID
+          (y) => y.playerObject.playerID == x.playerObject.playerID || y.isNew
         ) === -1
     );
 
