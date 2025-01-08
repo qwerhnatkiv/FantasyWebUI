@@ -27,11 +27,17 @@ export class PlayerCombinationsService {
     availableBudget: number,
     squadPlayers: PlayerSquadRecord[]
   ): void {
+
+    const availableSquadPlayers = squadPlayers.filter(x => x.isOptimal);
     const availablePlayers = this.availablePlayers.filter(
       (x) =>
         squadPlayers.findIndex(
-          (y) => y.playerObject.playerID == x.playerObject.playerID || y.isNew
+          (y) => y.playerObject.playerID == x.playerObject.playerID
         ) === -1
+        || 
+        availableSquadPlayers.findIndex(
+          (y) => y.playerObject.playerID == x.playerObject.playerID
+        ) > -1
     );
 
     const playerCombinationsDto: PlayerCombinationsDto = {
@@ -109,7 +115,8 @@ export class PlayerCombinationsService {
       missingPlayerCounts.set(
         position,
         squadPlayers.filter((x) => x.isRemoved && x.position === position)
-          .length
+          .length -
+          squadPlayers.filter((x) => !x.isOptimal && x.isNew && x.position === position).length
       );
     }
 

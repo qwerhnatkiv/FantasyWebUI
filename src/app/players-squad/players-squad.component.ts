@@ -130,17 +130,14 @@ export class PlayersSquadComponent implements OnInit {
     return Utils.formatNumber(ofoValue);
   }
 
-  public getTotalBalance(includeNewPlayers: boolean = true): number {
+  public getTotalBalance(includeOptimal: boolean = true): number {
     if (this.squadPlayers == null) {
       return 0;
     }
 
-    let bougthPlayersPrice: number = 0;
-    if (includeNewPlayers) {
-      bougthPlayersPrice = this.squadPlayers
-        .filter((item) => item.price && item.isNew)
-        .reduce((sum, current) => sum + current.price, 0);
-    }
+    const bougthPlayersPrice = this.squadPlayers
+    .filter((item) => item.price && item.isNew && (includeOptimal || !item.isOptimal))
+    .reduce((sum, current) => sum + current.price, 0);
 
     const removedPlayersPrice: number = this.squadPlayers
       .filter((item) => item.price && item.isRemoved)
@@ -415,20 +412,21 @@ export class PlayersSquadComponent implements OnInit {
     this.playerCombinations.length = 0;
 
     if (combinations.length > 0 && combinations[0].players.length > 0) {
-      for (const combination of combinations) {
+      const shownCombinations: OptimalCombinationsResultDto[] = combinations.slice(1);
+      for (const combination of shownCombinations) {
         this.playerCombinations.push(combination.players.map(x => x.name).join(', '));
       }
-    }
 
-    const bestCombination: OptimalCombinationsResultDto = combinations[0];
+      const bestCombination: OptimalCombinationsResultDto = combinations[0];
 
-    this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
-    for (const player of bestCombination.players) {
-      const playerChooseRecord: PlayerChooseRecord = 
-        this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
-
-      const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
-      this.squadPlayers.push(playerSquadRecord);
+      this.squadPlayers = this.squadPlayers.filter((x) => !x.isOptimal);
+      for (const player of bestCombination.players) {
+        const playerChooseRecord: PlayerChooseRecord = 
+          this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
+  
+        const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
+        this.squadPlayers.push(playerSquadRecord);
+      }
     }
     
     this.squadPlayers = Object.assign([], this.squadPlayers);
