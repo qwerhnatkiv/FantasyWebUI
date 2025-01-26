@@ -27,23 +27,10 @@ export class PlayerCombinationsService {
     availableBudget: number,
     squadPlayers: PlayerSquadRecord[]
   ): void {
-
-    const availableSquadPlayers = squadPlayers.filter(x => x.isOptimal);
-    const availablePlayers = this.availablePlayers.filter(
-      (x) =>
-        squadPlayers.findIndex(
-          (y) => y.playerObject.playerID == x.playerObject.playerID
-        ) === -1
-        || 
-        availableSquadPlayers.findIndex(
-          (y) => y.playerObject.playerID == x.playerObject.playerID
-        ) > -1
-    );
-
     const playerCombinationsDto: PlayerCombinationsDto = {
       availableBudget: availableBudget,
       solutionsCount: PLAYER_COMBINATIONS_COUNT,
-      availablePlayers: availablePlayers.map((x) => {
+      availablePlayers: this.availablePlayers.map((x) => {
         return {
           id: x.playerObject.playerID,
           name: x.playerName,
@@ -55,9 +42,8 @@ export class PlayerCombinationsService {
           hasProjections: x.projectedGamesCount > 0,
         };
       }),
-      missingPlayerCounts: Object.fromEntries(
-        this.buildMissingPlayerCounts(squadPlayers)
-      ),
+      squadPlayers: squadPlayers,
+      defaultPositions: DEFAULT_POSITIONS
     };
 
     this.http
@@ -103,25 +89,4 @@ export class PlayerCombinationsService {
   }
 
   //#endregion PUBLIC METHODS
-
-  //#region PRIVATE METHODS
-
-  private buildMissingPlayerCounts(
-    squadPlayers: PlayerSquadRecord[]
-  ): Map<string, number> {
-    const missingPlayerCounts: Map<string, number> = new Map<string, number>();
-
-    for (const position of DEFAULT_POSITIONS) {
-      missingPlayerCounts.set(
-        position,
-        squadPlayers.filter((x) => x.isRemoved && x.position === position)
-          .length -
-          squadPlayers.filter((x) => !x.isOptimal && x.isNew && x.position === position).length
-      );
-    }
-
-    return missingPlayerCounts;
-  }
-
-  //#endregion PRIVATE METHODS
 }

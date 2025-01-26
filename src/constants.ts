@@ -48,7 +48,7 @@ export const LOW_GAMES_WEEK_BOUNDARY = 1;
 export const DAY_CHANGE_HOUR: number = 3;
 
 export const SQUAD_PLAYERS_COUNT: number = 17;
-export const PLAYER_COMBINATIONS_COUNT: number = 10;
+export const PLAYER_COMBINATIONS_COUNT: number = 6;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["RaisingTheBar", 551339],
