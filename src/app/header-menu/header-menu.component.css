@@ -48,7 +48,7 @@
 .header-date-filters {
   height: fit-content;
   display: flex;
-  margin: 10px 0 5px 30px;
+  margin: 8px 30px 7px 30px;
   gap: 10px;
 }
 

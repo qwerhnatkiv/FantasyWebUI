@@ -57,20 +57,6 @@
         (clickEmitter)="showMostValuablePlayersInCalendar()"
         [tooltipText]="SHOW_BEST_PLAYERS_BY_EFP"
       ></i-button>
-      <i-button
-        [allowActiveState]="false"
-        iconPath="/assets/images/arrow-back.png"
-        [iconRelativeSize]="70"
-        (clickEmitter)="goToPreviousWeek()"
-        [tooltipText]="WEEK_BACK_BUTTON_LABEL"
-      ></i-button>
-      <i-button
-        [allowActiveState]="false"
-        iconPath="/assets/images/arrow-forward.png"
-        [iconRelativeSize]="70"
-        (clickEmitter)="goToNextWeek()"
-        [tooltipText]="WEEK_FORWARD_BUTTON_LABEL"
-      ></i-button>
     </div>
     <div class="header-date-filters">
       <mat-form-field>
@@ -104,6 +90,22 @@
         ></mat-datepicker-toggle>
         <mat-datepicker #pickerTo></mat-datepicker>
       </mat-form-field>
+    </div>
+    <div class="header-calendar-action-buttons">
+      <i-button
+        [allowActiveState]="false"
+        iconPath="/assets/images/arrow-back.png"
+        [iconRelativeSize]="70"
+        (clickEmitter)="goToPreviousWeek()"
+        [tooltipText]="WEEK_BACK_BUTTON_LABEL"
+      ></i-button>
+      <i-button
+        [allowActiveState]="false"
+        iconPath="/assets/images/arrow-forward.png"
+        [iconRelativeSize]="70"
+        (clickEmitter)="goToNextWeek()"
+        [tooltipText]="WEEK_FORWARD_BUTTON_LABEL"
+      ></i-button>
     </div>
     <div class="header-update-log-container">
       <p>
