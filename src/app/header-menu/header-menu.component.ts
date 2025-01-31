@@ -23,6 +23,8 @@ import {
   SHOW_BEST_PLAYERS_BY_EFP,
   START_DATE_CALENDAR_FILTER,
   TO_DATE_CALENDAR_FILTER,
+  WEEK_BACK_BUTTON_LABEL,
+  WEEK_FORWARD_BUTTON_LABEL,
   YELLOW_COLOR,
   YELLOW_COLOR_ACTIVE,
 } from 'src/constants';
@@ -36,6 +38,7 @@ import {
 import { Moment } from 'moment';
 import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { Subscription } from 'rxjs';
+import { Utils } from '../common/utils';
 
 @Component({
   selector: 'header-menu',
@@ -69,6 +72,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected FROM_DATE_CALENDAR_FILTER: string = FROM_DATE_CALENDAR_FILTER;
   protected TO_DATE_CALENDAR_FILTER: string = TO_DATE_CALENDAR_FILTER;
   protected START_DATE_CALENDAR_FILTER: string = START_DATE_CALENDAR_FILTER;
+  protected WEEK_BACK_BUTTON_LABEL: string = WEEK_BACK_BUTTON_LABEL;
+  protected WEEK_FORWARD_BUTTON_LABEL: string = WEEK_FORWARD_BUTTON_LABEL;
 
   // CONSTS
   protected DEFAULT_DATE_TIME_FORMAT: string = DEFAULT_DATE_TIME_FORMAT;
@@ -169,6 +174,43 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Sets date range to the previous week of the current selection
+   */
+  protected goToPreviousWeek(): void {
+    const today = new Date();
+    const minDateWeekMonday: Date = Utils.getMonday(this.filterDates.minDate!, 0);
+    const todayWeekMonday: Date = Utils.getMonday(today, 0);
+    if (minDateWeekMonday.getTime() === todayWeekMonday.getTime()) {
+      return;
+    }
+
+    const areDatesOnTheSameWeek: boolean = Utils.areOnTheSameWeek(this.filterDates.minDate!, this.filterDates.maxDate!);
+    const startDay: number = this.filterDates.minDate!.getDay();
+
+    if (areDatesOnTheSameWeek || startDay <= 4) {
+      this._setWeekDateRange(this.filterDates.minDate!, 1);
+      return;
+    }
+
+    this._setWeekDateRange(this.filterDates.minDate!, 0);
+  }
+
+  /**
+   * Sets date range to the mext week of the current selection
+   */
+  protected goToNextWeek(): void {
+    const areDatesOnTheSameWeek: boolean = Utils.areOnTheSameWeek(this.filterDates.minDate!, this.filterDates.maxDate!);
+    const endDay: number = this.filterDates.maxDate!.getDay();
+
+    if (areDatesOnTheSameWeek || endDay >= 4) {
+      this._setWeekDateRange(this.filterDates.maxDate!, -1);
+      return;
+    }
+
+    this._setWeekDateRange(this.filterDates.maxDate!, 0);
+  }
+
+  /**
    * Reacts to MatDatepickerInputEvent for lower bound filter and sends the update to dependent components
    * @param event DatePicker value change event
    */
@@ -176,12 +218,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     event: MatDatepickerInputEvent<Moment>
   ): void {
     const minFilterDate: Date | undefined = event.value?.toDate();
-    this._dateFiltersService.triggerDateFiltersSubjectUpdate(
-      minFilterDate,
-      this.filterDates.maxDate
-    );
-
-    this.updateSimplifiedModeStartDateFilterValue(minFilterDate);
+    this._setMinimumCalendarDate(minFilterDate);
   }
 
   /**
@@ -192,10 +229,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     event: MatDatepickerInputEvent<Moment>
   ): void {
     const maxFilterDate: Date | undefined = event.value?.toDate();
-    this._dateFiltersService.triggerDateFiltersSubjectUpdate(
-      this.filterDates.minDate,
-      maxFilterDate
-    );
+    this._setMaximumCalendarDate(maxFilterDate);
   }
 
   /**
@@ -209,5 +243,52 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   }
 
   //#endregion PROTECTED METHODS for HTML Template
+
+  //#region PRIVATE METHODS
+
+  /**
+   * Updates minimum filter date value for the calendar
+   * @param value Value for minFilterDate
+   */
+  private _setMinimumCalendarDate(value: Date | undefined): void {
+    this._dateFiltersService.triggerDateFiltersSubjectUpdate(
+      value,
+      this.filterDates.maxDate
+    );
+
+    this.updateSimplifiedModeStartDateFilterValue(value);
+  }
+
+  /**
+   * Updates maximum filter date value for the calendar
+   * @param value Value for maxFilterDate
+   */
+  private _setMaximumCalendarDate(value: Date | undefined): void {
+    this._dateFiltersService.triggerDateFiltersSubjectUpdate(
+      this.filterDates.minDate,
+      value
+    );
+  }
+
+  /**
+   * Sets week-long date range for a specific amount of weeks back/forward from the sourceDate
+   * @param sourceDate Date that is a relative source for week shift
+   * @param weeksBefore Amount of weeks before of the day to get shifted
+   */
+  private _setWeekDateRange(sourceDate: Date, weeksBefore: number) {
+    const today: Date = new Date();
+    const weekStartDate: Date = Utils.getMonday(sourceDate, weeksBefore);
+    const weekEndDate: Date = Utils.addDateDays(weekStartDate, 6);
+
+    if (today.getTime() > weekStartDate.getTime()) {
+      this._setMinimumCalendarDate(this._dateFiltersService.minDefaultDate);
+    }
+    else {
+      this._setMinimumCalendarDate(weekStartDate);
+    }
+    this._setMaximumCalendarDate(weekEndDate);
+  }
+
+  //#endregion PRIVATE METHODS
 
 }

@@ -10,6 +10,8 @@ export class DateFiltersService {
   private _dateFiltersSubject: Subject<DatesRangeModel> =
     new Subject<DatesRangeModel>();
 
+  public minDefaultDate: Date | undefined = undefined;
+
   /**
    * Observable for the event of changing the date filters (one of the min and max).
    */
@@ -88,6 +90,7 @@ export class DateFiltersService {
       }
     }
 
+    this.minDefaultDate = minFilterDate;
     this.triggerDateFiltersSubjectUpdate(minFilterDate, maxFilterDate);
   }
 

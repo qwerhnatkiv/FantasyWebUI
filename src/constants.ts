@@ -48,7 +48,7 @@ export const LOW_GAMES_WEEK_BOUNDARY = 1;
 export const DAY_CHANGE_HOUR: number = 3;
 
 export const SQUAD_PLAYERS_COUNT: number = 17;
-export const PLAYER_COMBINATIONS_COUNT: number = 6;
+export const PLAYER_COMBINATIONS_COUNT: number = 10;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   ["RaisingTheBar", 551339],
@@ -157,6 +157,8 @@ export const FROM_DATE_CALENDAR_FILTER: string = 'С: '
 export const TO_DATE_CALENDAR_FILTER: string = 'По: '
 export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 export const MODEL_CHOICE_LABEL: string = 'Выбор модели:';
+export const WEEK_BACK_BUTTON_LABEL: string = 'Перейти на прошлую неделю';
+export const WEEK_FORWARD_BUTTON_LABEL: string = 'Перейти на следующую неделю';
 
 
 // EXTERNAL SOURCES

@@ -58,6 +58,36 @@ export module Utils {
   }
 
   /**
+   * Determines whether two dates are in the same week or not
+   * @param startDate Start date of the date range
+   * @param endDate End date of the date range
+   * @returns True if two dates exist on the same week, otherwise false
+   */
+  export function areOnTheSameWeek(startDate: Date, endDate: Date) {
+    if (startDate > endDate) {
+      return false;
+    }
+
+    if (startDate.getTime() === endDate.getTime()) {
+      return true;
+    }
+
+    const millisecondsInOneWeek: number = 604800000;
+    if (endDate.getTime() - startDate.getTime() >= millisecondsInOneWeek) {
+      return false;
+    }
+
+    // As the week starts on sunday (but system needs monday), days get shifted
+    const startDay: number = (startDate.getUTCDay() - 1) % 7;
+    const endDay: number = (endDate.getUTCDay() - 1) % 7;
+    if (startDay >= endDay) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Returns count of array items with specific predicate filter
    * @param items Array of items 
    * @param predicateFn Predicate to filter the items
