@@ -12,7 +12,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { PlayerChooseRecord } from '../interfaces/player-choose-record';
 import { PlayersFilter } from '../interfaces/players-filter';
@@ -324,6 +324,8 @@ export class PlayersTableComponent
   ngAfterViewInit() {
     this.dataSource.sort = this.sort!;
     this.dataSource.paginator = this.paginator!;
+
+    this.dataSource.sortData = (data: PlayerChooseRecord[], sort: MatSort) => this._sortPlayersFunction(data, sort);
   }
 
   //#endregion NG overrides
@@ -653,6 +655,27 @@ export class PlayersTableComponent
       }
     }
     return isMatch;
+  }
+
+  private _sortPlayersFunction(data: PlayerChooseRecord[], sort: MatSort) {
+    const active: string = sort.active;
+      const direction: SortDirection = sort.direction;
+      return data.sort((a: PlayerChooseRecord, b: PlayerChooseRecord) => {
+        if (active === 'firstChoice') {
+          const comparatorResult = Utils.compare(a.firstChoice, b.firstChoice) || Utils.compare(a.secondChoice, b.secondChoice);
+          return comparatorResult * (direction == 'asc' ? 1 : -1);
+        }
+
+        if (active === 'secondChoice') {
+          const comparatorResult = Utils.compare(a.secondChoice, b.secondChoice) || Utils.compare(a.firstChoice, b.firstChoice);
+          return comparatorResult * (direction == 'asc' ? 1 : -1);
+        }
+
+        const valueA: string | number = this.dataSource.sortingDataAccessor(a, active);
+        const valueB: string | number = this.dataSource.sortingDataAccessor(b, active);
+
+        return Utils.compare(valueA, valueB) * (direction == 'asc' ? 1 : -1);
+      });
   }
 
   private applyPlayersFilter(filter: PlayersFilter) {

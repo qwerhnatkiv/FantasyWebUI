@@ -1,5 +1,5 @@
-import { DecimalPipe } from "@angular/common";
-import { ONE_DIGIT_NUMBER_FORMAT } from "src/constants";
+import { DecimalPipe } from '@angular/common';
+import { ONE_DIGIT_NUMBER_FORMAT } from 'src/constants';
 
 export module Utils {
   const numberPipe: DecimalPipe = new DecimalPipe('en-US');
@@ -22,6 +22,28 @@ export module Utils {
     }
 
     if (n1 < n2) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Comparator function that compares two any values and returns number for sort function
+   * @param a Object A
+   * @param b Object B
+   * @returns Sorting value
+   */
+  export function compare(a: any, b: any): number {
+    if (a != null && b != null) {
+      if (a > b) {
+        return 1;
+      } else if (a < b) {
+        return -1;
+      }
+    } else if (a != null) {
+      return 1;
+    } else if (b != null) {
       return -1;
     }
 
@@ -53,7 +75,8 @@ export module Utils {
   export function getMonday(date: Date, weeksBefore: number) {
     date = new Date(date);
     let day: number = date.getDay();
-    let diff: number = date.getDate() - day - (weeksBefore * 7) + (day == 0 ? -6 : 1); // adjust when day is sunday
+    let diff: number =
+      date.getDate() - day - weeksBefore * 7 + (day == 0 ? -6 : 1); // adjust when day is sunday
     return new Date(date.setDate(diff));
   }
 
@@ -89,18 +112,15 @@ export module Utils {
 
   /**
    * Returns count of array items with specific predicate filter
-   * @param items Array of items 
+   * @param items Array of items
    * @param predicateFn Predicate to filter the items
    * @returns Count of items in filtered array
    */
-  export function count<T>(items: Array<T>, predicateFn: (item: T) => boolean): number {
-    return items.reduce(
-      (n, item) => 
-        predicateFn(item)
-      ? n + 1
-      : n,
-      0
-    )
+  export function count<T>(
+    items: Array<T>,
+    predicateFn: (item: T) => boolean
+  ): number {
+    return items.reduce((n, item) => (predicateFn(item) ? n + 1 : n), 0);
   }
 
   export function formatNumber(value: number): string {
@@ -108,9 +128,8 @@ export module Utils {
       return value;
     }
 
-    return numberPipe.transform(
-      value,
-      ONE_DIGIT_NUMBER_FORMAT
-    )!.replace(',', ' ');
+    return numberPipe
+      .transform(value, ONE_DIGIT_NUMBER_FORMAT)!
+      .replace(',', ' ');
   }
 }
