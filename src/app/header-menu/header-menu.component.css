@@ -55,8 +55,15 @@
 .header-update-log-container {
   font-weight: 600;
   margin-right: auto;
-  margin-left: 5%;
+  margin-left: 1%;
   padding-top: 10px;
+}
+
+.header-schedule-information-container {
+  font-weight: 600;
+  padding-top: 10px;
+  margin-right: auto;
+  margin-left: 1%;
 }
 
 .header-external-links {

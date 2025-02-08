@@ -159,6 +159,7 @@ export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 export const MODEL_CHOICE_LABEL: string = 'Выбор модели:';
 export const WEEK_BACK_BUTTON_LABEL: string = 'Перейти на прошлую неделю';
 export const WEEK_FORWARD_BUTTON_LABEL: string = 'Перейти на следующую неделю';
+export const NEXT_DEADLINE_DATE_LABEL: string = 'След. дедлайн:';
 
 
 // EXTERNAL SOURCES

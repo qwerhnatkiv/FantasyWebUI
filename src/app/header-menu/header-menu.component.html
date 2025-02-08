@@ -123,6 +123,16 @@
         }}
       </p>
     </div>
+    <div class="header-schedule-information-container">
+      <p>
+        {{ NEXT_DEADLINE_DATE_LABEL }}
+        {{
+          updateLogInformation?.nextDeadlineTime
+            | date : DEFAULT_DATE_TIME_FORMAT
+        }}
+      </p>
+      <p></p>
+    </div>
     <div class="header-external-links">
       <a
         mat-raised-button
