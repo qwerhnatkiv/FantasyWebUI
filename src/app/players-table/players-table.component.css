@@ -89,6 +89,11 @@
   margin-left: auto;
 }
 
+.clear-table-calendar-button[hidden] {
+  visibility: hidden;
+  display: inline-block !important;
+}
+
 .date-filter-labels {
   align-self: center;
   display: flex;

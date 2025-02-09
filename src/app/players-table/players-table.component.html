@@ -15,6 +15,7 @@
       [iconRelativeSize]="65"
       (clickEmitter)="deselectAllPlayersInCalendar()"
       tooltipText="Отменить выбор игроков"
+      [hidden]="selectedPlayers.size === 0"
     ></i-button>
   </div>
   <table
