@@ -1,4 +1,8 @@
-import { RED_GP_UPPER_BOUNDARY, RED_PIM_LOWER_BOUNDARY } from 'src/constants';
+import {
+  DEFAULT_POSITIONS,
+  RED_GP_UPPER_BOUNDARY,
+  RED_PIM_LOWER_BOUNDARY,
+} from 'src/constants';
 import { DecimalPipe } from '@angular/common';
 import { TeamGameInformation } from '../interfaces/team-game-information';
 import { Utils } from './utils';
@@ -16,21 +20,116 @@ export module PlayerTooltipBuilder {
   ): string | null {
     const numberPipe: DecimalPipe = new DecimalPipe('en-US');
 
-    let header: string = `
+    const header: string = buildHeader(player);
+    const forecast: string =
+      player.position == DEFAULT_POSITIONS[0]
+        ? buildGoalkeeperForecast(player, numberPipe)
+        : buildPlayerForecast(player, numberPipe);
+    const form: string =
+      player.position == DEFAULT_POSITIONS[0]
+        ? buildGoalkeeperForm(player)
+        : buildPlayerForm(player);
+    const teamForm: string = buildTeamForm(player);
+    const opponentInfo: string = buildOpponentInformation(
+      player,
+      filteredTeamGames,
+      teamStats,
+      playerGamesOfoMap,
+      numberPipe
+    );
+
+    return `
+    <div style="font-family: Inter;
+                font-size: 12px;
+                font-weight: 500;
+                line-height: 15px;
+                letter-spacing: 0em;
+                text-align: left;"
+                >
+      ${header} <br>
+      ${forecast} <br>
+      ${form} <br>
+      ${teamForm} <br>
+      ${opponentInfo}
+    </div>`;
+  }
+
+  function buildHeader(player: PlayerCommonRecord): string {
+    return `
       <div style="font-size: 16px; line-height: 19px; text-align: center;">
         ${player.playerName} (${player.position}, ${player.teamObject.teamName})
       </div>`;
+  }
 
-    let forecastPimColor: string =
+  function buildGoalkeeperForecast(
+    player: PlayerCommonRecord,
+    numberPipe: DecimalPipe
+  ): string {
+    return `
+    <div>Прогноз на сезон:<div>
+    <table class="tooltip-table">
+      <thead>
+        <tr>
+          <th>GP</th>
+          <th>GA</th>
+          <th>SV</th>
+          <th>SO</th>
+          <th>W</th>
+          <th>L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">${
+      numberPipe.transform(player.playerObject.forecastGamesPlayed, '1.0-0') ??
+      '-'
+    }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastGoalsAgainst,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastSaves,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(
+              player.playerObject.forecastShutouts,
+              '1.0-0'
+            ) ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(player.playerObject.forecastWins, '1.0-0') ??
+            '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            numberPipe.transform(player.playerObject.forecastLosses, '1.0-0') ??
+            '-'
+          }</td>
+        </tr
+      </tbody>
+    </table>
+    `;
+  }
+
+  function buildPlayerForecast(
+    player: PlayerCommonRecord,
+    numberPipe: DecimalPipe
+  ): string {
+    const forecastPimColor: string =
       player.playerObject.forecastPIM! < RED_PIM_LOWER_BOUNDARY
         ? 'white'
         : '#ff7e7e';
-    let forecastGPColor: string =
+    const forecastGPColor: string =
       player.playerObject.forecastGamesPlayed! >= RED_GP_UPPER_BOUNDARY
         ? 'white'
         : '#ff7e7e';
 
-    let forecast: string = `
+    return `
     <div>Прогноз на сезон:<div>
     <table class="tooltip-table">
       <thead>
@@ -71,16 +170,12 @@ export module PlayerTooltipBuilder {
             ) ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            numberPipe.transform(
-              player.playerObject.forecastWins,
-              '1.0-0'
-            ) ?? '-'
+            numberPipe.transform(player.playerObject.forecastWins, '1.0-0') ??
+            '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            numberPipe.transform(
-              player.playerObject.forecastLosses,
-              '1.0-0'
-            ) ?? '-'
+            numberPipe.transform(player.playerObject.forecastLosses, '1.0-0') ??
+            '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
             numberPipe.transform(
@@ -92,8 +187,42 @@ export module PlayerTooltipBuilder {
       </tbody>
     </table>
     `;
+  }
 
-    let form: string = `
+  function buildGoalkeeperForm(player: PlayerCommonRecord): string {
+    return `
+    <div>Форма:<div>
+    <table class="tooltip-table">
+      <thead>
+        <tr>
+          <th>GP</th>
+          <th>GA</th>
+          <th>SV</th>
+          <th>SO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.formGamesPlayed ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.formGoalsAgainst ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.formSaves ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.formShutouts ?? '-'
+          }</td>
+        </tr
+      </tbody>
+    </table>
+    `;
+  }
+
+  function buildPlayerForm(player: PlayerCommonRecord): string {
+    return `
     <div>Форма:<div>
     <table class="tooltip-table">
       <thead>
@@ -130,8 +259,10 @@ export module PlayerTooltipBuilder {
       </tbody>
     </table>
     `;
+  }
 
-    let teamForm: string = `
+  function buildTeamForm(player: PlayerCommonRecord): string {
+    return `
     <div>Форма команды:<div>
     <table class="tooltip-table">
       <thead>
@@ -152,27 +283,37 @@ export module PlayerTooltipBuilder {
       </tbody>
     </table>
     `;
+  }
 
-    let teamGame: TeamGameInformation | undefined = filteredTeamGames
+  function buildOpponentInformation(
+    player: PlayerCommonRecord,
+    filteredTeamGames: Map<number, TeamGameInformation[]>,
+    teamStats: TeamStatsDTO[],
+    playerGamesOfoMap:
+      | Map<number, PlayerExpectedFantasyPointsDTO[]>
+      | undefined,
+    numberPipe: DecimalPipe
+  ): string {
+    const teamGame: TeamGameInformation | undefined = filteredTeamGames
       .get(player.teamObject.teamID)
       ?.sort((n1, n2) => Utils.sortTypes(n1.gameDate, n2.gameDate))[0];
 
-    let opponentTeam: TeamStatsDTO | undefined = teamStats.find(
+    const opponentTeam: TeamStatsDTO | undefined = teamStats.find(
       (x) => x.teamID == teamGame?.opponentTeamID
     );
-    let opponentAcronym: string = teamGame?.isHome
+    const opponentAcronym: string = teamGame?.isHome
       ? `${opponentTeam?.teamAcronym}`
       : `@${opponentTeam?.teamAcronym}`;
 
-    let teamWinColor: string = GamesUtils.getTooltipWinChanceSectionClass(
+    const teamWinColor: string = GamesUtils.getTooltipWinChanceSectionClass(
       teamGame?.winChance!
     );
 
-    let nearestGameOFO: number = playerGamesOfoMap
+    const nearestGameOFO: number = playerGamesOfoMap
       ?.get(player.playerObject.playerID)
       ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
 
-    let opponentInfo: string = `
+    return `
     <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(
       teamGame?.winChance!
     )}%</span><div>
@@ -200,20 +341,5 @@ export module PlayerTooltipBuilder {
       </tbody>
     </table>
     `;
-
-    return `
-    <div style="font-family: Inter;
-                font-size: 12px;
-                font-weight: 500;
-                line-height: 15px;
-                letter-spacing: 0em;
-                text-align: left;"
-                >
-      ${header} <br>
-      ${forecast} <br>
-      ${form} <br>
-      ${teamForm} <br>
-      ${opponentInfo}
-    </div>`;
   }
 }

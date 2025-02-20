@@ -28,6 +28,11 @@ export interface PlayerStatsDTO {
     forecastWins?: number
     forecastLosses?: number
     forecastShutouts?: number
+    formGoalsAgainst?: number
+    formSaves?: number
+    formShutouts?: number
+    forecastGoalsAgainst?: number
+    forecastSaves?: number
   }
   
   export interface ExpectedFpforGame {}
