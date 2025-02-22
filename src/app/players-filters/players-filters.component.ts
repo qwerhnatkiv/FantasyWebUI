@@ -1,12 +1,13 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT, REMOVE_PLAYERS_WITH_NO_GAMES } from 'src/constants';
+import { DEFAULT_PRICES, DEFAULT_POSITIONS, TEAMS, POWER_PLAY_UNITS, USER_ID_NAME, DEFAULT_FORM_LENGTH, DEFAULT_FORM_LENGTH_COUNT, REMOVE_PLAYERS_WITH_NO_GAMES, RESET_ALL_FILTERS_LABEL, GO_TO_FANTASY_TEAM_LABEL } from 'src/constants';
 import { OfoVariant } from '../interfaces/ofo-variant';
 import { MatSelectChange } from '@angular/material/select';
 import { RED_GP_UPPER_BOUNDARY } from '../../constants'
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
 import { Utils } from '../common/utils';
+import { NgxTippyService } from 'ngx-tippy-wrapper';
 
 @Component({
   selector: 'app-players-filters',
@@ -16,6 +17,8 @@ import { Utils } from '../common/utils';
 })
 export class PlayersFiltersComponent implements AfterViewInit {
   protected UTILS = Utils;
+  protected RESET_ALL_FILTERS_LABEL = RESET_ALL_FILTERS_LABEL;
+  protected GO_TO_FANTASY_TEAM_LABEL = GO_TO_FANTASY_TEAM_LABEL;
 
   prices: number[] = DEFAULT_PRICES.sort((n1,n2) => n1 - n2);
   selectPositions: string[] = DEFAULT_POSITIONS;
@@ -63,6 +66,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
   constructor(
     private _filtersObservableProxyService: FiltersObservableProxyService,
+    private _tippyService: NgxTippyService
   ) {
   }
 
@@ -207,6 +211,8 @@ export class PlayersFiltersComponent implements AfterViewInit {
 
     this.hideLowGPPlayersEnabled = false;
     this.hideLowGPPlayersEnabledChanged();
+
+    this._tippyService.hideAll();
   }
 
   protected clearAllPlayersSelection() {

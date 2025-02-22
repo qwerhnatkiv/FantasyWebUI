@@ -183,7 +183,7 @@
       iconPath="/assets/images/reset-filter-small.png"
       [iconRelativeSize]="82"
       (clickEmitter)="resetAllFilters()"
-      tooltipText="Сбросить все фильтры"
+      [tooltipText]="RESET_ALL_FILTERS_LABEL"
     ></i-button>
 
     <i-button
@@ -192,7 +192,7 @@
       iconPath="/assets/images/sports-icon-small.png"
       [iconRelativeSize]="82"
       (clickEmitter)="openSportsRuProfile()"
-      tooltipText="Перейти в фентези-команду"
+      [tooltipText]="GO_TO_FANTASY_TEAM_LABEL"
     ></i-button>
   </div>
   <div style="display: flex">

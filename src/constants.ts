@@ -160,6 +160,8 @@ export const MODEL_CHOICE_LABEL: string = 'Выбор модели:';
 export const WEEK_BACK_BUTTON_LABEL: string = 'Перейти на прошлую неделю';
 export const WEEK_FORWARD_BUTTON_LABEL: string = 'Перейти на следующую неделю';
 export const NEXT_DEADLINE_DATE_LABEL: string = 'След. дедлайн:';
+export const RESET_ALL_FILTERS_LABEL: string = 'Сбросить все фильтры';
+export const GO_TO_FANTASY_TEAM_LABEL: string = 'Перейти в фентези-команду';
 
 
 // EXTERNAL SOURCES
