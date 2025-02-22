@@ -33,6 +33,7 @@ export interface PlayerStatsDTO {
     formShutouts?: number
     forecastGoalsAgainst?: number
     forecastSaves?: number
+    isGoaliePlayedMostGames?: boolean
   }
   
   export interface ExpectedFpforGame {}

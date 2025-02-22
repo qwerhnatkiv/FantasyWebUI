@@ -476,7 +476,11 @@ export class PlayersTableComponent
 
   getPlayerSelectedClassByRow(row: PlayerChooseRecord): string {
     let cellClass: string = '';
-    if (row.playerObject.formGamesPlayed < this.formLength) {
+    if (row.playerObject.position !== DEFAULT_POSITIONS[0] && row.playerObject.formGamesPlayed < this.formLength) {
+      cellClass = 'inactive-player-cell ';
+    }
+
+    if (row.playerObject.position === DEFAULT_POSITIONS[0] && !row.playerObject.isGoaliePlayedMostGames) {
       cellClass = 'inactive-player-cell ';
     }
 
