@@ -139,7 +139,8 @@ export const YELLOW_COLOR = '#fef524';
 export const YELLOW_COLOR_ACTIVE = '#e2d90b';
 export const GREEN_COLOR = '#64ff8f'
 export const GREEN_COLOR_ACTIVE = '#2fff68'
-
+export const ORANGE_COLOR = '#EFA42A'
+export const ORANGE_COLOR_ACTIVE = '#EFA42A'
 
 // TEXT
 export const EXPAND_CALENDAR: string = 'Развернуть';
@@ -162,6 +163,8 @@ export const WEEK_FORWARD_BUTTON_LABEL: string = 'Перейти на следу
 export const NEXT_DEADLINE_DATE_LABEL: string = 'След. дедлайн:';
 export const RESET_ALL_FILTERS_LABEL: string = 'Сбросить все фильтры';
 export const GO_TO_FANTASY_TEAM_LABEL: string = 'Перейти в фентези-команду';
+export const SHOW_TEAMS_EASY_SERIES: string = 'Отобразить легкие серии для команд';
+export const HIDE_TEAMS_EASY_SERIES: string = 'Скрыть легкие серии для команд';
 
 
 // EXTERNAL SOURCES

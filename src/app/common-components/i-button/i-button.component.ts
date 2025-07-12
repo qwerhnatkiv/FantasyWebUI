@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { GREEN_COLOR, GREEN_COLOR_ACTIVE, WHITE_COLOR, YELLOW_COLOR, YELLOW_COLOR_ACTIVE } from 'src/constants';
+import { GREEN_COLOR, GREEN_COLOR_ACTIVE, ORANGE_COLOR, ORANGE_COLOR_ACTIVE, WHITE_COLOR, YELLOW_COLOR, YELLOW_COLOR_ACTIVE } from 'src/constants';
 
 const DEFAULT_ICON_RELATIVE_SIZE: number = 91;
 
@@ -29,6 +29,9 @@ export class IButtonComponent implements OnInit {
    */
   @Input() tooltipText: string | null = null;
 
+  /**
+   * Determines whether background color should be removed
+   */
   @Input() removeBackgroundColor: boolean = false;
 
   /**
@@ -61,8 +64,8 @@ export class IButtonComponent implements OnInit {
 
   private _setBackgroundColor(): void {
     if (this._isActive) {
-      this.backgroundColor = GREEN_COLOR;
-      this.backgroundColorActive = GREEN_COLOR_ACTIVE;
+      this.backgroundColor = ORANGE_COLOR;
+      this.backgroundColorActive = ORANGE_COLOR_ACTIVE;
     }
     else {
       this.backgroundColor = YELLOW_COLOR;

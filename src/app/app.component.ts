@@ -32,6 +32,7 @@ import { DateFiltersService } from 'src/services/filtering/date-filters.service'
 import { DatesRangeModel } from './interfaces/dates-range.model';
 import { PlayersObservableProxyService } from 'src/services/observable-proxy/players-observable-proxy.service';
 import { Subscription } from 'rxjs';
+import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 
 @Component({
   selector: 'app-root',
@@ -124,8 +125,10 @@ export class AppComponent implements OnInit, OnChanges, OnDestroy {
     private http: HttpClient,
     private ngxLoader: NgxUiLoaderService,
     private _dateFiltersService: DateFiltersService,
-    private _playersObservableProxyService: PlayersObservableProxyService
+    private _playersObservableProxyService: PlayersObservableProxyService,
+    private _teamsEasySeriesService: TeamsEasySeriesService
   ) {
+    this._teamsEasySeriesService.getTeamsEasySeries();
     this.getCalendarData(true);
   }
 

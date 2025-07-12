@@ -145,11 +145,6 @@ export module GamesUtils {
    * @returns True/False result
    */
   export function isOldDate(sourceDate: Date | undefined, targetDate: Date): boolean {
-    const result: boolean = sourceDate?.getTime()! < targetDate.getTime();
-    if (result) {
-      console.log(sourceDate, targetDate);
-    }
-
     return sourceDate?.getTime()! < targetDate.getTime();
   }
 
@@ -191,6 +186,23 @@ export module GamesUtils {
     }
 
     return a.price - b.price;
+  }
+
+  /**
+   * Converts date string in DD.MM format to Date object
+   * @param dateStr Original date string in DD.MM format
+   * @returns Date object
+   */
+  export function toDateFromShortFormat(dateStr: string) {
+    const currentYear: number = new Date().getFullYear();
+
+    const dateParts: string[] = dateStr.split('.');
+    const day: number = +dateParts[0];
+    const month: number = +dateParts[1] - 1;
+
+    const year = month > 7 ? currentYear : currentYear + 1;
+
+    return new Date(year, month, day, 0, 0, 0);
   }
 
   // Helper function to generate all possible pairings

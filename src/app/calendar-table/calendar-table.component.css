@@ -23,6 +23,7 @@ table {
   display:flex;
   gap: 13px;
   line-height: 25px;
+  z-index: 7;
 }
 
 .team-cell.replaced-by-player {
@@ -56,6 +57,7 @@ td:nth-child(1) {
 
 .cdk-column-team {
   background: white;
+  z-index: 7;
 }
 
 .cdk-header-cell:first-child,.cdk-footer-cell:first-child {
@@ -69,15 +71,28 @@ td:nth-child(1) {
   border-bottom: 1px dashed rgba(128, 128, 128);
 
   padding: 0;
+  z-index: 1;
 }
 
+.yellow-line {
+  position: absolute;
+  top: 50%;               /* center vertically */
+  left: 0;
+  width: 100%;            /* full width */
+  height: 14px;            /* thin horizontal line */
+  background-color: #FEF524;
+  transform: translateY(-50%);  /* truly center line */
+  z-index: 3;
+}
 
 .calendar-cell-not-selected {
   background: white;
+  z-index: 2;
 }
 
 .calendar-cell-selected {
   background: #dfdfdf;
+  z-index: 2;
 }
 
 .calendar-cell-old {
@@ -111,6 +126,9 @@ td:nth-child(1) {
   display:flex;
   align-items: center;
   justify-content: space-around;
+
+  position: relative;
+  z-index: 4;
 }
 
 .calendar-cell-old-content {
@@ -120,10 +138,12 @@ td:nth-child(1) {
 
 .calendar-cell-not-selected > .calendar-cell-empty {
   background: white;
+  z-index: 2;
 }
 
 .calendar-cell-selected > .calendar-cell-empty {
   background: #dfdfdf;
+  z-index: 2;
 }
 
 .calendar-cell-normal {
@@ -235,6 +255,7 @@ td {
 
 td.strike {
   position: relative;
+  z-index: 5;
 }
 td.strike:before {
   content: " ";
@@ -243,6 +264,7 @@ td.strike:before {
   left: 0;
   border-bottom: 3px solid #ff7e7e;
   width: 100%;
+  z-index: 5;
 }
 
 mat-form-field {

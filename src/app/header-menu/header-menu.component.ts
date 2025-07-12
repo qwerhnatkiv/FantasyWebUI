@@ -19,9 +19,11 @@ import {
   EXPAND_CALENDAR,
   FROM_DATE_CALENDAR_FILTER,
   GAME_DAY_TWEETS_URL,
+  HIDE_TEAMS_EASY_SERIES,
   KNOWLEDGE_BASE_URL,
   NEXT_DEADLINE_DATE_LABEL,
   SHOW_BEST_PLAYERS_BY_EFP,
+  SHOW_TEAMS_EASY_SERIES,
   START_DATE_CALENDAR_FILTER,
   TO_DATE_CALENDAR_FILTER,
   WEEK_BACK_BUTTON_LABEL,
@@ -76,6 +78,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected WEEK_BACK_BUTTON_LABEL: string = WEEK_BACK_BUTTON_LABEL;
   protected WEEK_FORWARD_BUTTON_LABEL: string = WEEK_FORWARD_BUTTON_LABEL;
   protected NEXT_DEADLINE_DATE_LABEL: string = NEXT_DEADLINE_DATE_LABEL;
+  protected SHOW_TEAMS_EASY_SERIES: string = SHOW_TEAMS_EASY_SERIES;
+  protected HIDE_TEAMS_EASY_SERIES: string = HIDE_TEAMS_EASY_SERIES;
 
   // CONSTS
   protected DEFAULT_DATE_TIME_FORMAT: string = DEFAULT_DATE_TIME_FORMAT;
@@ -94,6 +98,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     minDate: new Date(),
     maxDate: new Date(),
   };
+  protected areTeamsEasySeriesEnabled: boolean = false;
 
   //#region CTOR
 
@@ -210,6 +215,16 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     }
 
     this._setWeekDateRange(this.filterDates.maxDate!, 0);
+  }
+
+  /**
+   * Enables/Disables teams easy series
+   */
+  protected setTeamsEasySeriesState(): void {
+    this.areTeamsEasySeriesEnabled = !this.areTeamsEasySeriesEnabled;
+    this._calendarObservableProxyService.triggerTeamsEasySeriesSubject(
+      this.areTeamsEasySeriesEnabled
+    );
   }
 
   /**

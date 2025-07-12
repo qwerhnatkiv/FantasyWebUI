@@ -57,6 +57,21 @@
         (clickEmitter)="showMostValuablePlayersInCalendar()"
         [tooltipText]="SHOW_BEST_PLAYERS_BY_EFP"
       ></i-button>
+
+      <i-button
+        [allowActiveState]="true"
+        [iconPath]="
+          areTeamsEasySeriesEnabled
+            ? '/assets/images/easy-series-off.png'
+            : '/assets/images/easy-series-on.png'
+        "
+        (clickEmitter)="setTeamsEasySeriesState()"
+        [tooltipText]="
+          areTeamsEasySeriesEnabled
+            ? HIDE_TEAMS_EASY_SERIES
+            : SHOW_TEAMS_EASY_SERIES
+        "
+      ></i-button>
     </div>
     <div class="header-date-filters">
       <mat-form-field>

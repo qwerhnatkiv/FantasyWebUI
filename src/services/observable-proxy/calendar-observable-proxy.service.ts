@@ -9,6 +9,7 @@ export class CalendarObservableProxyService {
   private _simplifiedCalendarDrawingModeSubject: Subject<boolean> =
     new Subject<boolean>();
   private _simplifiedCalendarModeStartDateSubject: Subject<Date | undefined> = new Subject<Date | undefined>();
+  private _teamsEasySeriesSubject: Subject<boolean> = new Subject<boolean>();
 
   /**
    * Observable for the event of clicking on "minesweeper" button.
@@ -37,6 +38,12 @@ export class CalendarObservableProxyService {
    */
   public $simplifiedCalendarModeStartDateObservable: Observable<Date | undefined> =
     this._simplifiedCalendarModeStartDateSubject.asObservable();
+
+  /**
+   * Observable for the event of clicking on "show / hide teams easy series" button.
+   * This will result in highlighting teams easy series on calendar
+   */
+  public $teamsEasySeriesObservable: Observable<boolean> = this._teamsEasySeriesSubject.asObservable();
 
   /**
    * Triggers the subject for "minesweeper" calendar mode
@@ -68,5 +75,13 @@ export class CalendarObservableProxyService {
    */
   public triggerSimplifiedCalendarModeStartDateSubject(value: Date | undefined): void {
     this._simplifiedCalendarModeStartDateSubject.next(value);
+  }
+
+  /**
+   * Triggers the subject for for the event of clicking on "show / hide teams easy series"
+   * @param value Determines whether teams easy series highlighting is enabled or disabled
+   */
+  public triggerTeamsEasySeriesSubject(value: boolean): void {
+    this._teamsEasySeriesSubject.next(value);
   }
 }
