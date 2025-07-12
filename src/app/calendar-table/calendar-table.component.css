@@ -55,11 +55,6 @@ td:nth-child(1) {
   text-align: center;
 }
 
-.cdk-column-team {
-  background: white;
-  z-index: 7;
-}
-
 .cdk-header-cell:first-child,.cdk-footer-cell:first-child {
   background: white;
 }
@@ -71,7 +66,11 @@ td:nth-child(1) {
   border-bottom: 1px dashed rgba(128, 128, 128);
 
   padding: 0;
-  z-index: 1;
+}
+
+.cdk-column-team {
+  background: white;
+  z-index: 7 !important;
 }
 
 .yellow-line {
