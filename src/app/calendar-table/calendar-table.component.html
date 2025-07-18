@@ -71,7 +71,7 @@
         "
         class="virtual-horizontal-cell"
       >
-        <div class="yellow-line" *ngIf="element[column.header].belongsToEasySeries"></div>
+        <div class="yellow-line" *ngIf="isTeamsEasySeriesModeEnabled && element[column.header].belongsToEasySeries"></div>
         <div
           class="calendar-cell"
           [ngClass]="
