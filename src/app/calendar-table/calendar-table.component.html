@@ -71,7 +71,9 @@
         "
         class="virtual-horizontal-cell"
       >
-        <div class="yellow-line" *ngIf="isTeamsEasySeriesModeEnabled && element[column.header].belongsToEasySeries"></div>
+        <div class="yellow-line" *ngIf="isTeamsEasySeriesModeEnabled && element[column.header].belongsToEasySeries && !element[column.header].isEasySeriesStart && !element[column.header].isEasySeriesEnd"></div>
+        <div class="yellow-line-right" *ngIf="isTeamsEasySeriesModeEnabled && element[column.header].belongsToEasySeries && element[column.header].isEasySeriesStart"></div>
+        <div class="yellow-line-left" *ngIf="isTeamsEasySeriesModeEnabled && element[column.header].belongsToEasySeries && element[column.header].isEasySeriesEnd"></div>
         <div
           class="calendar-cell"
           [ngClass]="

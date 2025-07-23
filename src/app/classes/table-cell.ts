@@ -10,6 +10,8 @@ export class TableCell {
   public opponentTeamName: string | undefined;
   public playerId: number | undefined;
   public belongsToEasySeries: boolean | undefined;
+  public isEasySeriesStart: boolean | undefined;
+  public isEasySeriesEnd: boolean | undefined;
 
   constructor(
     pDisplayValue: string,
@@ -20,7 +22,9 @@ export class TableCell {
     priorToWeekGamesCount: number | undefined = undefined,
     opponentTeamName: string | undefined = undefined,
     playerId: number | undefined = undefined,
-    belongsToEasySeries: boolean | undefined = undefined
+    belongsToEasySeries: boolean | undefined = undefined,
+    isEasySeriesStart: boolean | undefined = undefined,
+    isEasySeriesEnd: boolean | undefined = undefined,
   ) {
     this.displayValue = pDisplayValue;
     this.cellValue = pCellValue;
@@ -31,5 +35,7 @@ export class TableCell {
     this.opponentTeamName = opponentTeamName;
     this.playerId = playerId;
     this.belongsToEasySeries = belongsToEasySeries;
+    this.isEasySeriesStart = isEasySeriesStart;
+    this.isEasySeriesEnd = isEasySeriesEnd;
   }
 }

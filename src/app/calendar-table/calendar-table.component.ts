@@ -40,7 +40,14 @@ import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import { cloneDeep } from 'lodash';
 import { PlayerExpectedFantasyPointsInfo } from '../interfaces/player-efp-info';
-import { combineLatestWith, concatWith, distinctUntilChanged, Observable, Subject, Subscription } from 'rxjs';
+import {
+  combineLatestWith,
+  concatWith,
+  distinctUntilChanged,
+  Observable,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import { CdkHeaderCell } from '@angular/cdk/table';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CalendarObservableProxyService } from 'src/services/observable-proxy/calendar-observable-proxy.service';
@@ -51,6 +58,7 @@ import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week-games-map.service';
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 import { TeamsEasySeriesDto } from '../interfaces/teams-easy-series/teams-easy-series.model';
+import { EasySeriesDateType } from '../interfaces/teams-easy-series/easy-series-date-type.enum';
 
 @Component({
   selector: 'app-calendar-table',
@@ -68,8 +76,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   private _teamsEasySeries: TeamsEasySeriesDto[] = [];
   private _isCalendarDataUpdated: boolean = false;
 
-  private _startCalendarDataExecutionSubject: Subject<void> = new Subject<void>();
-  private _startCalendarDataExecutionObservable: Observable<void> = this._startCalendarDataExecutionSubject.asObservable();
+  private _startCalendarDataExecutionSubject: Subject<void> =
+    new Subject<void>();
+  private _startCalendarDataExecutionObservable: Observable<void> =
+    this._startCalendarDataExecutionSubject.asObservable();
 
   private _calendarGamesRangeSubscription?: Subscription;
   private _calendarSimplifiedModeSubscription?: Subscription;
@@ -141,7 +151,6 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     maxDate: new Date(),
   };
 
-
   @Input()
   set teamStats(value: TeamStatsDTO[]) {
     this._teamStats = value;
@@ -184,12 +193,12 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this._subscribeToCalendarModeObservables();
     this._subscribeToPlayerObservables();
 
-    this._startCalendarDataExecutionSubscription = this._startCalendarDataExecutionObservable
-      .subscribe(() => {
+    this._startCalendarDataExecutionSubscription =
+      this._startCalendarDataExecutionObservable.subscribe(() => {
         if (this._isCalendarReadyForDisplaying()) {
           this.setUpDataSourceAndColumns(this.games);
         }
-      })
+      });
 
     this.yesterdayDate.setTime(new Date().getTime() - 24 * 60 * 60 * 1000);
     this.yesterdayDate.setHours(0, 0, 0, 0);
@@ -315,7 +324,11 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           }
 
           teamSpecificRow.push(
-            this.getEmptyCalendarCell(lowGamesTeamWeek?.gamesCount, column.header, teamName)
+            this.getEmptyCalendarCell(
+              lowGamesTeamWeek?.gamesCount,
+              column.header,
+              teamName
+            )
           );
         }
       }
@@ -523,7 +536,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       return;
     }
 
-    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(teamNameCell.playerId!)
+    this._playersObservableProxyService.triggerShowPlayerInCalendarSubject(
+      teamNameCell.playerId!
+    );
   }
 
   /**
@@ -561,7 +576,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         columnDef: thisWeekMaxDate,
         header: `${DEFAULT_WEEK_HEADER_PREFIX}${week}`,
         isWeekColumn: true,
-        isOldDate: GamesUtils.isCalendarDateOld(thisWeekMaxDate, this.yesterdayDate),
+        isOldDate: GamesUtils.isCalendarDateOld(
+          thisWeekMaxDate,
+          this.yesterdayDate
+        ),
         week,
       },
     ];
@@ -656,9 +674,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     if (homeGame != null) {
       let displayValue: string = homeGame.awayTeamAcronym;
       if (homeGame.isOldGame) {
-
-        displayValue = `${homeGame.homeTeamGoals ?? '-'}:${homeGame.awayTeamGoals ?? '-'}`;
+        displayValue = `${homeGame.homeTeamGoals ?? '-'}:${
+          homeGame.awayTeamGoals ?? '-'
+        }`;
       }
+
+      const easySeriesGameType: EasySeriesDateType | undefined =
+        this._getEasySeriesDateType(new Date(homeGame.gameDate), teamName);
 
       return new TableCell(
         displayValue,
@@ -669,7 +691,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         undefined,
         homeGame.awayTeamAcronym,
         undefined,
-        this._belongsToEasySeries(new Date(homeGame.gameDate), teamName)
+        this._belongsToEasySeries(new Date(homeGame.gameDate), teamName),
+        easySeriesGameType === EasySeriesDateType.Start,
+        easySeriesGameType === EasySeriesDateType.End
       );
     }
 
@@ -683,10 +707,16 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
     // if it's away game for team -> return new cell object
     if (awayGame != null) {
-      let displayValue: string = DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym;
+      let displayValue: string =
+        DEFAULT_AWAY_GAME_TEAM_PREFIX + awayGame.homeTeamAcronym;
       if (awayGame.isOldGame) {
-        displayValue = `${awayGame.homeTeamGoals ?? '-'}:${awayGame.awayTeamGoals ?? '-'}`;
+        displayValue = `${awayGame.homeTeamGoals ?? '-'}:${
+          awayGame.awayTeamGoals ?? '-'
+        }`;
       }
+
+      const easySeriesGameType: EasySeriesDateType | undefined =
+        this._getEasySeriesDateType(new Date(awayGame.gameDate), teamName);
 
       return new TableCell(
         displayValue,
@@ -697,7 +727,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         undefined,
         awayGame.homeTeamAcronym,
         undefined,
-        this._belongsToEasySeries(new Date(awayGame.gameDate), teamName)
+        this._belongsToEasySeries(new Date(awayGame.gameDate), teamName),
+        easySeriesGameType === EasySeriesDateType.Start,
+        easySeriesGameType === EasySeriesDateType.End
       );
     }
 
@@ -753,13 +785,33 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
    * @param weekGamesCount Amount of games in a week for a team that cell coresponds to
    * @returns TableCell object with empty data
    */
-  private getEmptyCalendarCell(weekGamesCount: number | undefined, columnHeaderText: string, teamName: string): TableCell {
+  private getEmptyCalendarCell(
+    weekGamesCount: number | undefined,
+    columnHeaderText: string,
+    teamName: string
+  ): TableCell {
     const gameDate: Date = GamesUtils.toDateFromShortFormat(columnHeaderText);
-    return new TableCell('', -1, weekGamesCount, undefined, undefined, undefined, undefined, undefined, this._belongsToEasySeries(gameDate, teamName));
+    const easySeriesGameType: EasySeriesDateType | undefined =
+      this._getEasySeriesDateType(new Date(gameDate), teamName);
+
+    return new TableCell(
+      '',
+      -1,
+      weekGamesCount,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      this._belongsToEasySeries(gameDate, teamName),
+      easySeriesGameType === EasySeriesDateType.Start,
+      easySeriesGameType === EasySeriesDateType.End
+    );
   }
 
   private _belongsToEasySeries(gameDate: Date, teamName: string): boolean {
-    const easySeriesByTeam: TeamsEasySeriesDto[] = this._easySeriesByTeamMap.get(teamName)!;
+    const easySeriesByTeam: TeamsEasySeriesDto[] =
+      this._easySeriesByTeamMap.get(teamName)!;
     if (easySeriesByTeam == null) {
       return false;
     }
@@ -772,6 +824,28 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return false;
   }
 
+  private _getEasySeriesDateType(
+    gameDate: Date,
+    teamName: string
+  ): EasySeriesDateType | undefined {
+    const easySeriesByTeam: TeamsEasySeriesDto[] =
+      this._easySeriesByTeamMap.get(teamName)!;
+    if (easySeriesByTeam == null) {
+      return undefined;
+    }
+
+    for (const easySeries of easySeriesByTeam) {
+      if (gameDate.getTime() === easySeries.startDt.getTime()) {
+        return EasySeriesDateType.Start;
+      }
+
+      if (gameDate.getTime() === easySeries.endDt.getTime()) {
+        return EasySeriesDateType.End;
+      }
+    }
+
+    return EasySeriesDateType.None;
+  }
 
   private _subscribeToCalendarModeObservables(): void {
     this._calendarGamesRangeSubscription =
@@ -822,13 +896,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         }
       );
 
-    this._teamsEasySeriesToggleSubscription = 
+    this._teamsEasySeriesToggleSubscription =
       this._calendarObservableProxyService.$teamsEasySeriesObservable?.subscribe(
         (value: boolean) => {
           this.isTeamsEasySeriesModeEnabled = value;
           this._changeDetectorRef.detectChanges();
         }
-      )
+      );
   }
 
   private _subscribeToPlayerObservables() {
@@ -859,12 +933,15 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
               this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
             }
 
-
-            const playerEfpSum: number = value.reduce((sum, x) => sum + x.playerExpectedFantasyPoints, 0);
+            const playerEfpSum: number = value.reduce(
+              (sum, x) => sum + x.playerExpectedFantasyPoints,
+              0
+            );
             rowToReplace.team.displayValue =
-              value[0].playerName + `: ${Utils.formatNumber(playerEfpSum)} ${EFP_LABEL}`;
+              value[0].playerName +
+              `: ${Utils.formatNumber(playerEfpSum)} ${EFP_LABEL}`;
             rowToReplace.team.playerId = value[0].playerID;
-            
+
             for (const game of value) {
               const gameDateStr: string = this.datepipe.transform(
                 game.gameDate,
@@ -880,19 +957,20 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private _subscribeToDataObservables(): void {
-    this._teamsEasySeriesDataSubscription = 
+    this._teamsEasySeriesDataSubscription =
       this._teamsEasySeriesService.$teamsEasySeriesObservable?.subscribe(
         (teamsEasySeries: TeamsEasySeriesDto[]) => {
           this._teamsEasySeries = teamsEasySeries;
           this._setEasySeriesForTeams();
         }
-      )
+      );
   }
 
   private _setEasySeriesForTeams() {
-    this._easySeriesByTeamMap = new Map<string, TeamsEasySeriesDto[]>;
+    this._easySeriesByTeamMap = new Map<string, TeamsEasySeriesDto[]>();
     for (const team of this.teamStats) {
-      const easySeriesForTeam: TeamsEasySeriesDto[] = this._teamsEasySeries.filter(x => x.teamId === team.teamID);
+      const easySeriesForTeam: TeamsEasySeriesDto[] =
+        this._teamsEasySeries.filter((x) => x.teamId === team.teamID);
       this._easySeriesByTeamMap.set(team.teamName, easySeriesForTeam);
       this._changeDetectorRef.detectChanges();
     }
@@ -903,6 +981,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private _isCalendarReadyForDisplaying() {
-    return this._easySeriesByTeamMap.size > 0 && this._isCalendarDataUpdated && this._teamStats.length > 0;
+    return (
+      this._easySeriesByTeamMap.size > 0 &&
+      this._isCalendarDataUpdated &&
+      this._teamStats.length > 0
+    );
   }
 }

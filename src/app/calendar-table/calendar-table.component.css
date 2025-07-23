@@ -84,6 +84,28 @@ td:nth-child(1) {
   z-index: 3;
 }
 
+.yellow-line-left {
+  position: absolute;
+  top: 50%;               /* center vertically */
+  left: 0;
+  width: 50%;            /* full width */
+  height: 14px;            /* thin horizontal line */
+  background-color: #FEF524;
+  transform: translateY(-50%);  /* truly center line */
+  z-index: 3;
+}
+
+.yellow-line-right {
+  position: absolute;
+  top: 50%;               /* center vertically */
+  right: 0;
+  width: 50%;            /* full width */
+  height: 14px;            /* thin horizontal line */
+  background-color: #FEF524;
+  transform: translateY(-50%);  /* truly center line */
+  z-index: 3;
+}
+
 .calendar-cell-not-selected {
   background: white;
   z-index: 2;
