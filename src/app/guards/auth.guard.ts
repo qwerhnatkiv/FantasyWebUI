@@ -19,6 +19,7 @@ export const canActivate: CanActivateFn = (
   if (authService.isAuthenticated()) {
     return true;
   } else {
+    authService.logout(); // logout here if token expired
     router.navigate(['/login']);
     return false;
   }
