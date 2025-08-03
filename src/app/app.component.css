@@ -2,34 +2,3 @@
   font-family: "Inter";
   font-size: 16px;
 }
-
-body {
-  display: flex;
-  flex-direction: column;
-}
-
-footer {
-  height: 100px;
-}
-
-.calendar-container {
-  max-width: 100%;
-  width: 100%;
-  overflow: auto;
-  flex-grow: 10;
-}
-
-.players-configuration-section {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-app-players-table {
-  flex-basis: 70%;
-}
-
-.user-team-block {
-  flex-basis: 20%;
-  margin-right: 50px;
-}

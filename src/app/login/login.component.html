@@ -1,0 +1,33 @@
+<div class="login-container">
+  <h1>Login</h1>
+
+  <form class="login-form" (ngSubmit)="login()">
+    <mat-form-field class="auth-input">
+      <mat-label>Username</mat-label>
+      <input
+        type="username"
+        matInput
+        [formControl]="usernameFormControl"
+        [errorStateMatcher]="matcher"
+      />
+      @if (usernameFormControl.hasError('required')) {
+      <mat-error>Username is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="auth-input">
+      <mat-label>Password</mat-label>
+      <input
+        type="password"
+        matInput
+        [formControl]="passwordFormControl"
+        [errorStateMatcher]="matcher"
+      />
+      @if (passwordFormControl.hasError('required')) {
+      <mat-error>Password is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+
+    <button class="login-button" mat-raised-button color="primary" type="submit">Login</button>
+  </form>
+</div>

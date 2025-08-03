@@ -1,0 +1,32 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    position: relative;
+    top: 30%;
+}
+
+h1 {
+    position: relative;
+    display: block;
+    margin-bottom: 100px;
+}
+
+.login-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 30%;
+}
+
+.auth-input {
+    width: 100%;
+}
+
+.login-button {
+    width: 30%;
+    height: 50px;
+}

@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -65,6 +65,11 @@ import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week
 import { SquadPlayerPipe } from './pipes/squad-player.pipe';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
+import { LoginComponent } from './login/login.component';
+import { AppRoutingModule } from './app-routing.module';
+import { MainViewComponent } from './main-view/main-view.component';
+import { ApiService } from 'src/services/api/api.service';
+import { AuthInterceptor } from 'src/services/auth/auth.interceptor';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -90,7 +95,9 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     SquadPlayerPipe,
     IButtonComponent,
     SimpleSelectComponent,
-    CancelButtonComponent
+    CancelButtonComponent,
+    LoginComponent,
+    MainViewComponent
   ],
   imports: [
     BrowserModule,
@@ -117,6 +124,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatRadioModule,
     MatCheckboxModule,
     ScrollingModule,
+    AppRoutingModule
 ],
   providers: [
     {
@@ -126,13 +134,19 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
     PlayersObservableProxyService,
     CalendarObservableProxyService,
     FiltersObservableProxyService,
     DateFiltersService,
     CalendarWeekGamesMapService,
     PlayerCombinationsService,
-    TeamsEasySeriesService
+    TeamsEasySeriesService,
+    ApiService
   ],
   bootstrap: [AppComponent],
 })
