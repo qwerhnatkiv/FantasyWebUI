@@ -51,8 +51,8 @@ export const SQUAD_PLAYERS_COUNT: number = 17;
 export const PLAYER_COMBINATIONS_COUNT: number = 10;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
-  ["RaisingTheBar", 551339],
-  ["A-N-O N-I-M", 552044],
+  ["RaisingTheBar", 572033],
+  ["A-N-O N-I-M", 571879],
   // ["o_kai", 536668],
   // ["AntonovAC", 535080],
   // ["Александр_Ронни", 551324],
