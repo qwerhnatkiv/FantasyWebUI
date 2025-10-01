@@ -98,7 +98,7 @@ export const TEAMS = [
 
 export const TEAM_NAME_LOGO_PATH_MAP = {
   'Anaheim Ducks': 'anaheim-ducks-logo.svg',
-  'Utah HC': 'utah-hockey-club-logo.svg',
+  'Utah Mammoth': 'utah-mammoth-logo.svg',
   'Boston Bruins': 'boston-bruins-logo.svg',
   'Buffalo Sabres': 'buffalo-sabres-logo.svg',
   'Calgary Flames': 'calgary-flames-logo.svg',
