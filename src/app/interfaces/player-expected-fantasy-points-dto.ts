@@ -4,4 +4,5 @@ export interface PlayerExpectedFantasyPointsDTO {
     teamName: string;
     gameID: number;
     playerExpectedFantasyPoints: number;
+    playerExpectedFantasyPointsByModel: number;
   }

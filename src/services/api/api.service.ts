@@ -6,6 +6,7 @@ import { GamesDTO } from 'src/app/interfaces/games-dto';
 import { PlayerExpectedFantasyPointsDTO } from 'src/app/interfaces/player-expected-fantasy-points-dto';
 import { USER_ID_NAME } from 'src/constants';
 import { SportsSquadDTO } from 'src/app/interfaces/sports-squad-dto';
+import { PlayersGamesObject } from 'src/app/interfaces/players-games-object.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -32,10 +33,12 @@ export class ApiService {
   public getPlayersEFP(
     minDate: string,
     maxDate: string,
-    formLength: number
+    formLength: number,
+    playersGamesObject: PlayersGamesObject
   ): Observable<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }> {
-    return this.http.get<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }>(
-      `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${formLength}`
+    return this.http.post<{ [index: number]: PlayerExpectedFantasyPointsDTO[] }>(
+      `https://qwerhnatkiv-backend.azurewebsites.net/predictions/ofo_predictions/get?lowerBoundDate=${minDate}&upperBoundDate=${maxDate}&formLength=${formLength}`,
+      playersGamesObject
     );
   }
 

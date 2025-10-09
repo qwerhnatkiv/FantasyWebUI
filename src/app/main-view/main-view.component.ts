@@ -264,8 +264,22 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
       .replace(':', '%3A')
       .split('.')[0]!;
 
+    const gamesIdsForDates: number[] = this.games
+      .map((x) => {
+        return {
+          gameDate: new Date(x.gameDate).toISOString(),
+          id: x.gameId,
+        };
+      })
+      .filter((x) => x.gameDate >= minDate && x.gameDate <= maxDate)
+      .map((x) => x.id);
+    const playersIds: number[] = this.playerStats.map((x) => x.playerID);
+
     this._apiService
-      .getPlayersEFP(minDate, maxDate, this.formLength)
+      .getPlayersEFP(minDate, maxDate, this.formLength, {
+        gameIds: gamesIdsForDates,
+        playerIds: playersIds,
+      })
       .subscribe({
         next: (result) => {
           let localOfoMap: Map<number, PlayerExpectedFantasyPointsDTO[]> =

@@ -331,6 +331,20 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="expectedFantasyPointsByModel">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by expectedFantasyPointsByModel"
+      >
+        ОФО 2
+      </th>
+      <td mat-cell *matCellDef="let element" class="bold">
+        {{ UTILS.formatNumber(element.expectedFantasyPointsByModel) }}
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="fantasyPointsPerGame">
       <th
         mat-header-cell

@@ -17,6 +17,7 @@ export interface PlayerChooseRecord extends PlayerCommonRecord{
     iCF: number;
     iHDCF: number;
     expectedFantasyPoints: number;
+    expectedFantasyPointsByModel: number;
     fantasyPointsPerGame: string;
     priceByExpectedFantasyPoints: number;
     priceByExpectedFantasyPointsPerGame: number;
