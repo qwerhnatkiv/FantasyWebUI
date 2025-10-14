@@ -8,7 +8,7 @@ import { MainViewComponent } from './main-view/main-view.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'main', component: MainViewComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'main' }
 ];
 
 @NgModule({
