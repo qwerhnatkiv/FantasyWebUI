@@ -287,6 +287,17 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     );
   }
 
+    /**
+   * Updates both filter date values for the calendar
+   * @param value Value for maxFilterDate
+   */
+  private _setBothCalendasrDates(minValue: Date | undefined, maxValue: Date | undefined): void {
+    this._dateFiltersService.triggerDateFiltersSubjectUpdate(
+      minValue,
+      maxValue
+    );
+  }
+
   /**
    * Sets week-long date range for a specific amount of weeks back/forward from the sourceDate
    * @param sourceDate Date that is a relative source for week shift
@@ -298,12 +309,11 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     const weekEndDate: Date = Utils.addDateDays(weekStartDate, 6);
 
     if (today.getTime() > weekStartDate.getTime()) {
-      this._setMinimumCalendarDate(this._dateFiltersService.minDefaultDate);
+      this._setBothCalendasrDates(this._dateFiltersService.minDefaultDate, weekEndDate);
     }
     else {
-      this._setMinimumCalendarDate(weekStartDate);
+      this._setBothCalendasrDates(weekStartDate, weekEndDate);
     }
-    this._setMaximumCalendarDate(weekEndDate);
   }
 
   //#endregion PRIVATE METHODS
