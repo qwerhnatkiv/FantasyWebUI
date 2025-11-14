@@ -1,6 +1,7 @@
 // src/app/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -37,7 +38,10 @@ export class AuthService {
    * @returns True if token exists, otherwise false
    */
   public isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.TOKEN_KEY);
+    const token: string | null = localStorage.getItem(this.TOKEN_KEY);
+    const jwtHelperService: JwtHelperService = new JwtHelperService();
+
+    return !!token && !jwtHelperService.isTokenExpired(token);
   }
 
   /**
