@@ -291,11 +291,13 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
    * Updates both filter date values for the calendar
    * @param value Value for maxFilterDate
    */
-  private _setBothCalendasrDates(minValue: Date | undefined, maxValue: Date | undefined): void {
+  private _setBothCalendarDates(minValue: Date | undefined, maxValue: Date | undefined): void {
     this._dateFiltersService.triggerDateFiltersSubjectUpdate(
       minValue,
       maxValue
     );
+
+    this.updateSimplifiedModeStartDateFilterValue(minValue);
   }
 
   /**
@@ -309,10 +311,10 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     const weekEndDate: Date = Utils.addDateDays(weekStartDate, 6);
 
     if (today.getTime() > weekStartDate.getTime()) {
-      this._setBothCalendasrDates(this._dateFiltersService.minDefaultDate, weekEndDate);
+      this._setBothCalendarDates(this._dateFiltersService.minDefaultDate, weekEndDate);
     }
     else {
-      this._setBothCalendasrDates(weekStartDate, weekEndDate);
+      this._setBothCalendarDates(weekStartDate, weekEndDate);
     }
   }
 
