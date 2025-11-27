@@ -34,8 +34,17 @@ export class CalendarWeekGamesMapService {
   ): number {
     const allGamesPriorToWeekCount: number = games.filter(
       (game) => {
-        const actualStartDate = new Date();
-        actualStartDate.setDate(startDate!.getDate() - 1);
+        const now = new Date();
+
+        const actualStartDate = new Date(
+          startDate!.getFullYear(),
+          startDate!.getMonth(),
+          startDate!.getDate() - 1,             
+          now.getHours(),
+          now.getMinutes(),
+          now.getSeconds(),
+          now.getMilliseconds()
+        );
 
         return (game.homeTeamName == teamName || game.awayTeamName == teamName) &&
           !game.isOldGame &&
