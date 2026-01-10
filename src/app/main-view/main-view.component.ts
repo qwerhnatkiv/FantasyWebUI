@@ -122,7 +122,6 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
   >();
 
   constructor(
-    private http: HttpClient,
     private ngxLoader: NgxUiLoaderService,
     private _dateFiltersService: DateFiltersService,
     private _playersObservableProxyService: PlayersObservableProxyService,

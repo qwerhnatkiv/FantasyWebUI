@@ -36,6 +36,8 @@ import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 import { Utils } from '../common/utils';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
+import { PlayerLineFormatted } from '../interfaces/sports-squad-dto copy';
+import { ApiService } from 'src/services/api/api.service';
 
 @Component({
   selector: 'app-players-table',
@@ -70,6 +72,7 @@ export class PlayersTableComponent
     'iHDCF',
     'fantasyPointsPerGame',
     'priceByExpectedFantasyPointsPerGame',
+    'linemates',
     'sources',
     'addPlayerToSquad',
   ];
@@ -78,7 +81,9 @@ export class PlayersTableComponent
   private showBestPlayersInCalendarEventSubscription?: Subscription;
   private deselectPlayersFromComparisonComponentSubscription?: Subscription;
   private _filterDatesRangeSubscription?: Subscription;
+  private _playerLinesSubscription?: Subscription;
   private filterDictionary: Map<string, any> = new Map<string, any>();
+  private _playerLines: Map<number, PlayerLineFormatted[]> = new Map<number, PlayerLineFormatted[]>();
 
   protected UTILS = Utils;
 
@@ -141,7 +146,8 @@ export class PlayersTableComponent
     private _filtersObservableProxyService: FiltersObservableProxyService,
     private _changeDetectorRef: ChangeDetectorRef,
     private _dateFiltersService: DateFiltersService,
-    private _playerCombinationsService: PlayerCombinationsService
+    private _playerCombinationsService: PlayerCombinationsService,
+    private _apiService: ApiService
   ) {
     this.dataSource.filterPredicate = this.filter;
   }
@@ -180,6 +186,12 @@ export class PlayersTableComponent
           this.filterDates = value;
         }
       );
+    
+    this._playerLinesSubscription = this._playersObservableProxyService.$playerLinesObservable.subscribe(
+      (value: Map<number, PlayerLineFormatted[]>) => {
+        this._handlePlayerLines(value);
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -187,6 +199,7 @@ export class PlayersTableComponent
     this.showBestPlayersInCalendarEventSubscription?.unsubscribe();
     this.deselectPlayersFromComparisonComponentSubscription?.unsubscribe();
     this._filterDatesRangeSubscription?.unsubscribe();
+    this._playerLinesSubscription?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -237,11 +250,18 @@ export class PlayersTableComponent
           forecastSources:
             player.forecastSources.length > 0 ? player.forecastSources : 'NONE',
           teamObject: matchingTeam,
+          linemates: '',
           playerObject: player,
         });
       }
 
       this._playerCombinationsService.availablePlayers = this.players;
+
+      this._apiService.getPlayerLines().subscribe({
+        next: (result) => {
+          this._playersObservableProxyService.triggerPlayerLinesTransfer(result);
+        }
+      });
     }
 
     if (changes['filteredTeamGames']?.currentValue) {
@@ -698,6 +718,18 @@ export class PlayersTableComponent
       Array.from(this.filterDictionary.entries())
     );
     this.dataSource.filter = jsonString;
+  }
+
+  private _handlePlayerLines(playerLines: Map<number, PlayerLineFormatted[]>) {
+    for (const player of this.players) {
+      const lines = playerLines.get(player.playerObject.playerID);
+
+      if (!lines || lines.length === 0) {
+        continue;
+      }
+
+      player.linemates = lines[0].playerLinematesSimplified;
+    }
   }
 
   //#endregion

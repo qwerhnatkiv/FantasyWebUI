@@ -21,6 +21,7 @@ export interface PlayerChooseRecord extends PlayerCommonRecord{
     fantasyPointsPerGame: string;
     priceByExpectedFantasyPoints: number;
     priceByExpectedFantasyPointsPerGame: number;
+    linemates: string;
     forecastSources: string;
   }
   

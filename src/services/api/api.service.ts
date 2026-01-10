@@ -1,12 +1,13 @@
 // src/app/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { GamesDTO } from 'src/app/interfaces/games-dto';
 import { PlayerExpectedFantasyPointsDTO } from 'src/app/interfaces/player-expected-fantasy-points-dto';
 import { USER_ID_NAME } from 'src/constants';
 import { SportsSquadDTO } from 'src/app/interfaces/sports-squad-dto';
 import { PlayersGamesObject } from 'src/app/interfaces/players-games-object.model';
+import { PlayerLineFormatted } from 'src/app/interfaces/sports-squad-dto copy';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -42,7 +43,7 @@ export class ApiService {
     );
   }
 
-    /**
+  /**
    * Returns squad on sports.ru for a specific user
    * @param selectedUsername User's username
    * @returns Observable with squad data to subscribe for
@@ -54,4 +55,22 @@ export class ApiService {
       )}`
     );
   }
+
+  /**
+   * Returns list linemates for each player
+   * @returns Observable with player lines
+   */
+  public getPlayerLines(): Observable<Map<number, PlayerLineFormatted[]>> {
+    return this.http
+      .get<Record<number, PlayerLineFormatted[]>>(
+        'https://qwerhnatkiv-backend.azurewebsites.net/lines'
+      )
+      .pipe(
+        map(obj =>
+          new Map<number, PlayerLineFormatted[]>(
+            Object.entries(obj).map(([key, value]) => [Number(key), value])
+          )
+        )
+      );
+    }
 }

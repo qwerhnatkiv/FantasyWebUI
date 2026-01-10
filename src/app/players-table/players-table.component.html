@@ -389,6 +389,21 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="linemates">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by linemates"
+        start="asc"
+      >
+        Партнеры
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.linemates }}
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="sources">
       <th
         mat-header-cell
