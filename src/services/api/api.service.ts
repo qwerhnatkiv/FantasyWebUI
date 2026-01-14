@@ -60,10 +60,10 @@ export class ApiService {
    * Returns list linemates for each player
    * @returns Observable with player lines
    */
-  public getPlayerLines(): Observable<Map<number, PlayerLineFormatted[]>> {
+  public getPlayerLines(formLength: number): Observable<Map<number, PlayerLineFormatted[]>> {
     return this.http
       .get<Record<number, PlayerLineFormatted[]>>(
-        'https://qwerhnatkiv-backend.azurewebsites.net/lines'
+        `https://qwerhnatkiv-backend.azurewebsites.net/lines?formLength=${formLength}`
       )
       .pipe(
         map(obj =>

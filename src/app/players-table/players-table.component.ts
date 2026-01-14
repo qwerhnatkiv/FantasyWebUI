@@ -81,9 +81,7 @@ export class PlayersTableComponent
   private showBestPlayersInCalendarEventSubscription?: Subscription;
   private deselectPlayersFromComparisonComponentSubscription?: Subscription;
   private _filterDatesRangeSubscription?: Subscription;
-  private _playerLinesSubscription?: Subscription;
   private filterDictionary: Map<string, any> = new Map<string, any>();
-  private _playerLines: Map<number, PlayerLineFormatted[]> = new Map<number, PlayerLineFormatted[]>();
 
   protected UTILS = Utils;
 
@@ -186,12 +184,6 @@ export class PlayersTableComponent
           this.filterDates = value;
         }
       );
-    
-    this._playerLinesSubscription = this._playersObservableProxyService.$playerLinesObservable.subscribe(
-      (value: Map<number, PlayerLineFormatted[]>) => {
-        this._handlePlayerLines(value);
-      }
-    );
   }
 
   ngOnDestroy(): void {
@@ -199,7 +191,6 @@ export class PlayersTableComponent
     this.showBestPlayersInCalendarEventSubscription?.unsubscribe();
     this.deselectPlayersFromComparisonComponentSubscription?.unsubscribe();
     this._filterDatesRangeSubscription?.unsubscribe();
-    this._playerLinesSubscription?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -257,9 +248,9 @@ export class PlayersTableComponent
 
       this._playerCombinationsService.availablePlayers = this.players;
 
-      this._apiService.getPlayerLines().subscribe({
+      this._apiService.getPlayerLines(this.formLength).subscribe({
         next: (result) => {
-          this._playersObservableProxyService.triggerPlayerLinesTransfer(result);
+          this._handlePlayerLines(result);
         }
       });
     }

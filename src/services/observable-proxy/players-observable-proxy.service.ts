@@ -12,9 +12,6 @@ export class PlayersObservableProxyService {
     new Subject<Map<string, SelectedPlayerModel[]>>();
   private _updatePlayersEfpDataByDateRangeSubject: Subject<void> =
     new Subject<void>();
-  private _playerLinesSubject: Subject<Map<number, PlayerLineFormatted[]>> =
-    new Subject<Map<number, PlayerLineFormatted[]>>();
-
 
   /**
    * Observable for the event of selecting player id and showing him in calendar
@@ -40,13 +37,6 @@ export class PlayersObservableProxyService {
    */
   public $updatePlayersEfpDataByDateRangeObservable: Observable<void> =
     this._updatePlayersEfpDataByDateRangeSubject.asObservable();
-
-    /**
-   * Observable for the subject containing list of player lines
-   */
-  public $playerLinesObservable: Observable<
-    Map<number, PlayerLineFormatted[]>
-  > = this._playerLinesSubject.asObservable();
 
   /**
    * Triggers the subject of selecting player id and showing him in calendar
@@ -76,14 +66,5 @@ export class PlayersObservableProxyService {
    */
   public triggerUpdatePlayersEfpDataByDateRangeEvent(): void {
     this._updatePlayersEfpDataByDateRangeSubject.next();
-  }
-
-  /**
-   * Triggers the subject containing best players for each team
-   */
-  public triggerPlayerLinesTransfer(
-    players: Map<number, PlayerLineFormatted[]>
-  ): void {
-    this._playerLinesSubject.next(players);
   }
 }
