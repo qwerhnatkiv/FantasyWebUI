@@ -5,6 +5,7 @@ export interface PlayerStatsDTO {
     teamID: number
     position: string
     price: number
+    startPrice: number
     expectedFPForGame: ExpectedFpforGame
     formGamesPlayed: number
     formGoals: number

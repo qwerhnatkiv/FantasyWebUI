@@ -74,6 +74,7 @@ export class PlayerCombinationsService {
       playerName: player.playerObject.playerName,
       position: player.playerObject.position,
       price: player.playerObject.price,
+      startPrice: player.playerObject.startPrice,
       gamesCount: player.gamesCount,
       expectedFantasyPoints: player.expectedFantasyPoints,
       isRemoved: false,

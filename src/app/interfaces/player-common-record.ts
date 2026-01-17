@@ -5,6 +5,7 @@ export interface PlayerCommonRecord {
     playerName: string;
     position: string;
     price: number;
+    startPrice: number;
     gamesCount: number;
     expectedFantasyPoints: number;
     playerObject: PlayerStatsDTO;

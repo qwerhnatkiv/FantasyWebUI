@@ -360,6 +360,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
             playerName: matchingPlayerInfo.playerName,
             position: matchingPlayerInfo.position,
             price: matchingPlayerInfo.price,
+            startPrice: matchingPlayerInfo.startPrice,
             gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
               ?.length!,
             expectedFantasyPoints: ofo ?? 0,
@@ -395,6 +396,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
             playerName: matchingPlayerInfo.playerName,
             position: matchingPlayerInfo.position,
             price: matchingPlayerInfo.price,
+            startPrice: matchingPlayerInfo.startPrice,
             gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
               ?.length!,
             expectedFantasyPoints: ofo ?? 0,
