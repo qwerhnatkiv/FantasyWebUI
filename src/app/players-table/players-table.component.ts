@@ -36,7 +36,7 @@ import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { DateFiltersService } from 'src/services/filtering/date-filters.service';
 import { Utils } from '../common/utils';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
-import { PlayerLineFormatted } from '../interfaces/sports-squad-dto copy';
+import { PlayerLineFormatted } from '../interfaces/player-line-formatted';
 import { ApiService } from 'src/services/api/api.service';
 
 @Component({
@@ -82,6 +82,7 @@ export class PlayersTableComponent
   private showBestPlayersInCalendarEventSubscription?: Subscription;
   private deselectPlayersFromComparisonComponentSubscription?: Subscription;
   private _filterDatesRangeSubscription?: Subscription;
+  private _showOnlyUpsideLinesPlayers?: Subscription;
   private filterDictionary: Map<string, any> = new Map<string, any>();
 
   protected UTILS = Utils;
@@ -185,12 +186,23 @@ export class PlayersTableComponent
           this.filterDates = value;
         }
       );
+
+    this._showOnlyUpsideLinesPlayers =
+      this._filtersObservableProxyService.$selectOnlyFromUpsideLinesObservable?.subscribe(
+        (x: boolean) => {
+          this.applyPlayersFilter({
+            name: 'showOnlyUpsideLinesPlayers',
+            value: x,
+          });
+        }
+      );
   }
 
   ngOnDestroy(): void {
     this.selectPlayerByIdSubscription?.unsubscribe();
     this.showBestPlayersInCalendarEventSubscription?.unsubscribe();
     this.deselectPlayersFromComparisonComponentSubscription?.unsubscribe();
+    this._showOnlyUpsideLinesPlayers?.unsubscribe();
     this._filterDatesRangeSubscription?.unsubscribe();
   }
 
@@ -244,6 +256,8 @@ export class PlayersTableComponent
             player.forecastSources.length > 0 ? player.forecastSources : 'NONE',
           teamObject: matchingTeam,
           linemates: '',
+          isPlayingInUpsideLine: false,
+          tooltipLines: [],
           playerObject: player,
         });
       }
@@ -677,6 +691,10 @@ export class PlayersTableComponent
           record.playerObject?.forecastGamesPlayed! > RED_GP_UPPER_BOUNDARY;
       }
 
+      if (key == 'showOnlyUpsideLinesPlayers') {
+        isMatch = !value || record?.isPlayingInUpsideLine === true;
+      }
+
       if (!isMatch) {
         return false;
       }
@@ -722,6 +740,8 @@ export class PlayersTableComponent
       }
 
       player.linemates = lines[0].playerLinematesSimplified;
+      player.isPlayingInUpsideLine = lines[0].isPlayingInUpsideLine;
+      player.tooltipLines = lines.map(x => x.playerLinematesTooltip);
     }
   }
 

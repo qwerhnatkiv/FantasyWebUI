@@ -22,6 +22,7 @@ export interface PlayerChooseRecord extends PlayerCommonRecord{
     priceByExpectedFantasyPoints: number;
     priceByExpectedFantasyPointsPerGame: number;
     linemates: string;
+    isPlayingInUpsideLine: boolean;
     forecastSources: string;
   }
   

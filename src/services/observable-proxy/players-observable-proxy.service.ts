@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { SelectedPlayerModel } from 'src/app/interfaces/selected-player-model';
-import { PlayerLineFormatted } from 'src/app/interfaces/sports-squad-dto copy';
+import { PlayerLineFormatted } from 'src/app/interfaces/player-line-formatted';
 
 @Injectable()
 export class PlayersObservableProxyService {

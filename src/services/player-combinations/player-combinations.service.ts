@@ -84,6 +84,7 @@ export class PlayerCombinationsService {
       teamObject: player.teamObject,
       powerPlayNumber: player.powerPlayNumber,
       sortOrder: 0,
+      tooltipLines: []
     };
 
     return playerSquadRecord;

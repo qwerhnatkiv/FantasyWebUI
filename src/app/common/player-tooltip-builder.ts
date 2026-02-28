@@ -38,6 +38,8 @@ export module PlayerTooltipBuilder {
       numberPipe
     );
 
+    const linesInformation: string = buildLinesInformation(player);
+
     return `
     <div style="font-family: Inter;
                 font-size: 12px;
@@ -50,7 +52,8 @@ export module PlayerTooltipBuilder {
       ${forecast} <br>
       ${form} <br>
       ${teamForm} <br>
-      ${opponentInfo}
+      ${opponentInfo} <br>
+      ${linesInformation}
     </div>`;
   }
 
@@ -341,5 +344,12 @@ export module PlayerTooltipBuilder {
       </tbody>
     </table>
     `;
+  }
+
+  function buildLinesInformation(player: PlayerCommonRecord): string {
+    const sectionStart: string = "<div>Звенья:<div>\n";
+    const sectionBody: string = player.tooltipLines.map(x => `<div>${x}</div>`).join('\n');
+
+    return sectionStart + sectionBody;
   }
 }

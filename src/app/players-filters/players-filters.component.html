@@ -298,6 +298,12 @@
         (change)="hideLowGPPlayersEnabledChanged()"
         >Скрыть игроков с менее {{ RED_GP_UPPER_BOUNDARY }} прогнозных GP
       </mat-checkbox>
+      <br />
+      <mat-checkbox
+        [(ngModel)]="showOnlyPlayersInUpsideLines"
+        (change)="showOnlyUpsideLinePlayersChanged()"
+        >{{ SHOW_UPSIDE_LINES_LABEL }}
+      </mat-checkbox>
     </div>
   </div>
 </div>

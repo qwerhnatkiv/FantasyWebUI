@@ -165,7 +165,7 @@ export const RESET_ALL_FILTERS_LABEL: string = 'Сбросить все филь
 export const GO_TO_FANTASY_TEAM_LABEL: string = 'Перейти в фентези-команду';
 export const SHOW_TEAMS_EASY_SERIES: string = 'Отобразить легкие серии для команд';
 export const HIDE_TEAMS_EASY_SERIES: string = 'Скрыть легкие серии для команд';
-
+export const SHOW_UPSIDE_LINES_LABEL: string = 'Показать игроков в крутых звеньях';
 
 // EXTERNAL SOURCES
 export const GAME_DAY_TWEETS_URL: string = 'https://www.gamedaytweets.com/';
@@ -173,3 +173,4 @@ export const KNOWLEDGE_BASE_URL: string = 'https://docs.google.com/document/d/1L
 
 
 export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;
+export const SHOW_ONLY_PLAYERS_IN_UPSIDE_LINES: boolean = false;

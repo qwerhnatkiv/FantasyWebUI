@@ -373,6 +373,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
               matchingPlayerInfo.formPowerPlayNumber
             ),
             sortOrder: matchingPlayerInfo.price,
+            tooltipLines: []
           });
         }
 
@@ -409,6 +410,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
               matchingPlayerInfo.formPowerPlayNumber
             ),
             sortOrder: matchingPlayerInfo.price,
+            tooltipLines: []
           });
         }
 

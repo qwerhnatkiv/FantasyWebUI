@@ -11,4 +11,5 @@ export interface PlayerCommonRecord {
     playerObject: PlayerStatsDTO;
     powerPlayNumber: string;
     teamObject: TeamStatsDTO;
+    tooltipLines: string[];
 }

@@ -7,7 +7,7 @@ import { PlayerExpectedFantasyPointsDTO } from 'src/app/interfaces/player-expect
 import { USER_ID_NAME } from 'src/constants';
 import { SportsSquadDTO } from 'src/app/interfaces/sports-squad-dto';
 import { PlayersGamesObject } from 'src/app/interfaces/players-games-object.model';
-import { PlayerLineFormatted } from 'src/app/interfaces/sports-squad-dto copy';
+import { PlayerLineFormatted } from 'src/app/interfaces/player-line-formatted';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
