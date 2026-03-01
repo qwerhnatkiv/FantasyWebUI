@@ -57,7 +57,6 @@ export class PlayersTableComponent
     'team',
     'position',
     'price',
-    'startPrice',
     'expectedFantasyPoints',
     'expectedFantasyPointsByModel',
     'priceByExpectedFantasyPoints',
