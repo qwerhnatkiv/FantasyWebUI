@@ -94,6 +94,7 @@ export class PlayersTableComponent
   @Input() teams: string[] | undefined = [];
   @Input() teamIdAcronymMap: Map<number, string> | undefined = undefined;
   @Input() powerPlayUnits: string[] | undefined = [];
+  @Input() search: string | undefined = '';
   @Input() playerStats: PlayerStatsDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
   @Input() filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
@@ -354,6 +355,11 @@ export class PlayersTableComponent
     this.applyPlayersFilter({
       name: 'powerPlayUnits',
       value: this.powerPlayUnits,
+    });
+
+    this.applyPlayersFilter({
+      name: 'search',
+      value: this.search,
     });
   }
 
@@ -692,6 +698,18 @@ export class PlayersTableComponent
 
       if (key == 'showOnlyUpsideLinesPlayers') {
         isMatch = !value || record?.isPlayingInUpsideLine === true;
+      }
+
+      if (key == 'search') {
+        if (!value || value.trim() === '') {
+          isMatch = true;
+        } else {
+          const searchTerm = value.toLowerCase().trim();
+          isMatch =
+            record.playerName.toLowerCase().includes(searchTerm) ||
+            record.team.toLowerCase().includes(searchTerm) ||
+            record.position.toLowerCase().includes(searchTerm);
+        }
       }
 
       if (!isMatch) {

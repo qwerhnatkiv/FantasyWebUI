@@ -81,6 +81,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
   public positions: string[] | undefined = [];
   public teams: string[] | undefined = [];
   public powerPlayUnits: string[] | undefined = [];
+  public search: string | undefined = '';
   public playersAreNotPlayedDisabled: boolean = REMOVE_PLAYERS_WITH_NO_GAMES;
   public hideLowGPPlayersEnabled: boolean = false;
 

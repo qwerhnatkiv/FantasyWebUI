@@ -51,6 +51,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
   powerPlayFormControl = new FormControl<string[]>([]);
+  searchFormControl = new FormControl<string>('');
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
 
@@ -82,6 +83,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
     new EventEmitter<boolean>();
 
   @Output() sendFormLength: EventEmitter<number> = new EventEmitter<number>();
+  @Output() sendSearch: EventEmitter<string> = new EventEmitter<string>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum: 0,
@@ -183,6 +185,10 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value!);
   }
 
+  searchChanged() {
+    this.sendSearch.emit(this.searchFormControl.value!);
+  }
+
   public selectAllTeams() {
     this.teamsFormControl.setValue(this.selectTeams);
     this.teamsChanged();
@@ -223,6 +229,11 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.selectedUserChanged();
   }
 
+  public resetSearchFilter() {
+    this.searchFormControl.setValue('');
+    this.searchChanged();
+  }
+
   public resetAllFilters() {
     this.resetLowerBoundPriceFilter();
     this.resetUpperBoundPriceFilter();
@@ -230,6 +241,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.deselectAllTeams();
     this.resetPowerPlayFilter();
     this.resetSelectedUserFilter();
+    this.resetSearchFilter();
 
     if (this.formLength != DEFAULT_FORM_LENGTH) {
       this.formLength = DEFAULT_FORM_LENGTH;

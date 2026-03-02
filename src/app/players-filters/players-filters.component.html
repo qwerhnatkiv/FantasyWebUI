@@ -1,5 +1,27 @@
 <div class="player-filters-block">
   <div class="filters-row">
+    <label class="filter-label">Поиск:</label>
+    <mat-form-field class="search-filter-form">
+      <mat-label>Search</mat-label>
+      <input
+        matInput
+        [formControl]="searchFormControl"
+        (input)="searchChanged()"
+        placeholder="Фамилия, команда..."
+      />
+    </mat-form-field>
+    <button
+      (click)="resetSearchFilter()"
+      [hidden]="!searchFormControl.value || searchFormControl.value === ''"
+      class="clear-filter-button"
+      mat-icon-button
+      aria-label="Clear search filter"
+    >
+      <mat-icon>cancel</mat-icon>
+    </button>
+
+    <div class="vl"></div>
+
     <label class="filter-label">Цена от:</label>
     <mat-form-field class="filter-form">
       <mat-label>Price</mat-label>
