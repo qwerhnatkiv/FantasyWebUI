@@ -4,7 +4,12 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnInit,
+  OnChanges,
   Output,
+  SimpleChange,
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
@@ -28,6 +33,10 @@ import { MatOptionSelectionChange } from '@angular/material/core';
 import { FiltersObservableProxyService } from 'src/services/observable-proxy/filters-observable-proxy.service';
 import { Utils } from '../common/utils';
 import { NgxTippyService } from 'ngx-tippy-wrapper';
+import { PlayerStatsDTO } from '../interfaces/player-stats-dto';
+import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { map, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-players-filters',
@@ -35,7 +44,7 @@ import { NgxTippyService } from 'ngx-tippy-wrapper';
   styleUrls: ['./players-filters.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayersFiltersComponent implements AfterViewInit {
+export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges {
   protected UTILS = Utils;
   protected RESET_ALL_FILTERS_LABEL = RESET_ALL_FILTERS_LABEL;
   protected GO_TO_FANTASY_TEAM_LABEL = GO_TO_FANTASY_TEAM_LABEL;
@@ -51,9 +60,14 @@ export class PlayersFiltersComponent implements AfterViewInit {
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
   powerPlayFormControl = new FormControl<string[]>([]);
-  searchFormControl = new FormControl<string>('');
+  playerSearchInputControl = new FormControl<string>('');
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
+
+  // Player search related
+  selectedPlayers: Map<number, string> = new Map(); // playerID -> playerName
+  filteredPlayers$: Observable<{ id: number; name: string; efp: number }[]> | undefined;
+  allPlayers: { id: number; name: string; efp: number }[] = [];
 
   playersAreNotPlayedDisabled: boolean = REMOVE_PLAYERS_WITH_NO_GAMES;
   hideLowGPPlayersEnabled: boolean = false;
@@ -63,6 +77,11 @@ export class PlayersFiltersComponent implements AfterViewInit {
   protected SHOW_UPSIDE_LINES_LABEL: string = SHOW_UPSIDE_LINES_LABEL;
   protected showOnlyPlayersInUpsideLines: boolean =
     SHOW_ONLY_PLAYERS_IN_UPSIDE_LINES;
+
+  @ViewChild('playerSearchTrigger') playerSearchTrigger!: MatAutocompleteTrigger;
+
+  @Input() playerStats: PlayerStatsDTO[] = [];
+  @Input() playerGamesOfoMap: Map<number, any[]> | undefined = undefined;
 
   @Output() sendLowerBoundPrice: EventEmitter<number | undefined> =
     new EventEmitter<number | undefined>();
@@ -83,7 +102,7 @@ export class PlayersFiltersComponent implements AfterViewInit {
     new EventEmitter<boolean>();
 
   @Output() sendFormLength: EventEmitter<number> = new EventEmitter<number>();
-  @Output() sendSearch: EventEmitter<string> = new EventEmitter<string>();
+  @Output() sendSelectedPlayerIds: EventEmitter<number[]> = new EventEmitter<number[]>();
 
   @Input() firstChoiceOfo: OfoVariant = {
     priceByExpectedFantasyPointsSum: 0,
@@ -104,8 +123,98 @@ export class PlayersFiltersComponent implements AfterViewInit {
     private _tippyService: NgxTippyService,
   ) {}
 
+  ngOnInit() {
+    this.initializePlayerList();
+    this.filteredPlayers$ = this.playerSearchInputControl.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => {
+        const strValue = value ? String(value).trim() : '';
+        return this._filterPlayers(strValue);
+      })
+    );
+  }
+
   ngAfterViewInit() {
     this.setDefaultPositions();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ((changes['playerStats'] || changes['playerGamesOfoMap']) && 
+        (!changes['playerStats']?.firstChange || !changes['playerGamesOfoMap']?.firstChange)) {
+      this.initializePlayerList();
+    }
+  }
+
+  private initializePlayerList() {
+    this.allPlayers = this.playerStats.map((player) => {
+      let efp = 0;
+      if (this.playerGamesOfoMap) {
+        const playerOfo = this.playerGamesOfoMap.get(player.playerID);
+        if (playerOfo && Array.isArray(playerOfo)) {
+          efp = playerOfo.reduce((sum, o) => sum + (o.playerExpectedFantasyPoints || 0), 0);
+        }
+      }
+      return {
+        id: player.playerID,
+        name: player.playerName,
+        efp: efp,
+      };
+    });
+    
+    // Sort by EFP descending (highest first)
+    this.allPlayers.sort((a, b) => b.efp - a.efp);
+  }
+
+  private _filterPlayers(
+    searchValue: string
+  ): { id: number; name: string; efp: number }[] {
+    const filterValue = searchValue.toLowerCase().trim();
+
+    const filtered = this.allPlayers.filter((player) => {
+      if (this.selectedPlayers.has(player.id)) {
+        return false; // Exclude already selected players
+      }
+      if (!filterValue) {
+        return true; // Return all if no filter
+      }
+      return player.name.toLowerCase().includes(filterValue);
+    });
+
+    // Results are already sorted by EFP from allPlayers
+    return filtered;
+  }
+
+  onPlayerSelected(event: MatAutocompleteSelectedEvent) {
+    const playerData = event.option.value;
+    const playerId = playerData.id;
+    const playerName = playerData.name;
+
+    if (!this.selectedPlayers.has(playerId)) {
+      this.selectedPlayers.set(playerId, playerName);
+      this.onSelectedPlayersChanged();
+    }
+    
+    // Clear the input and close autocomplete
+    setTimeout(() => {
+      this.playerSearchInputControl.setValue('');
+      this.playerSearchTrigger.closePanel();
+    }, 100);
+  }
+
+  removeSelectedPlayer(playerId: number) {
+    this.selectedPlayers.delete(playerId);
+    this.onSelectedPlayersChanged();
+  }
+
+  displayPlayerName(player: { id: number; name: string } | null | string): string {
+    if (!player) return '';
+    if (typeof player === 'string') return '';
+    return (player as any).name || '';
+  }
+
+  onSelectedPlayersChanged() {
+    const playerIds = Array.from(this.selectedPlayers.keys());
+    this.sendSelectedPlayerIds.emit(playerIds);
   }
 
   lowerBoundPriceChanged() {
@@ -185,9 +294,6 @@ export class PlayersFiltersComponent implements AfterViewInit {
     this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value!);
   }
 
-  searchChanged() {
-    this.sendSearch.emit(this.searchFormControl.value!);
-  }
 
   public selectAllTeams() {
     this.teamsFormControl.setValue(this.selectTeams);
@@ -230,8 +336,9 @@ export class PlayersFiltersComponent implements AfterViewInit {
   }
 
   public resetSearchFilter() {
-    this.searchFormControl.setValue('');
-    this.searchChanged();
+    this.selectedPlayers.clear();
+    this.playerSearchInputControl.setValue('');
+    this.onSelectedPlayersChanged();
   }
 
   public resetAllFilters() {

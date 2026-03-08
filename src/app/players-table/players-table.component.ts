@@ -94,7 +94,7 @@ export class PlayersTableComponent
   @Input() teams: string[] | undefined = [];
   @Input() teamIdAcronymMap: Map<number, string> | undefined = undefined;
   @Input() powerPlayUnits: string[] | undefined = [];
-  @Input() search: string | undefined = '';
+  @Input() selectedPlayerIds: number[] = [];
   @Input() playerStats: PlayerStatsDTO[] = [];
   @Input() teamStats: TeamStatsDTO[] = [];
   @Input() filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
@@ -149,7 +149,8 @@ export class PlayersTableComponent
     private _playerCombinationsService: PlayerCombinationsService,
     private _apiService: ApiService
   ) {
-    this.dataSource.filterPredicate = this.filter;
+    this.dataSource.filterPredicate = (record: PlayerChooseRecord, filter: string) => 
+      this._filterPlayers(record, filter);
   }
 
   //#region LIFECYCLE HOOKS
@@ -358,9 +359,11 @@ export class PlayersTableComponent
     });
 
     this.applyPlayersFilter({
-      name: 'search',
-      value: this.search,
+      name: 'selectedPlayerIds',
+      value: this.selectedPlayerIds,
     });
+
+    this._changeDetectorRef.detectChanges();
   }
 
   ngAfterViewInit() {
@@ -656,60 +659,48 @@ export class PlayersTableComponent
     }
   }
 
-  private filter(record: PlayerChooseRecord, filter: string) {
+  private _filterPlayers(record: PlayerChooseRecord, filter: string) {
     var map = new Map<string, any>(JSON.parse(filter));
     let isMatch = false;
 
     for (let [key, value] of map) {
-      if (value == null || value.length === 0) {
+      // Skip null values, but allow empty arrays/falsy values for specific filters
+      if (value == null) {
+        isMatch = true;
+        continue;
+      }
+
+      // For array-based filters, skip if empty
+      if (Array.isArray(value) && value.length === 0) {
         isMatch = true;
         continue;
       }
 
       if (key == 'lowerBoundPrice') {
         isMatch = record.price >= value;
-      }
-
-      if (key == 'upperBoundPrice') {
+      } else if (key == 'upperBoundPrice') {
         isMatch = record.price <= value;
-      }
-
-      if (key == 'positions') {
+      } else if (key == 'positions') {
         isMatch = value.includes(record.position);
-      }
-
-      if (key == 'teams') {
+      } else if (key == 'teams') {
         isMatch = value.includes(record.team);
-      }
-
-      if (key == 'powerPlayUnits') {
+      } else if (key == 'powerPlayUnits') {
         isMatch = value.includes(record.powerPlayNumber);
-      }
-
-      if (key == 'playersAreNotPlayedDisabled') {
+      } else if (key == 'playersAreNotPlayedDisabled') {
         isMatch = !value || record.toi > 0;
-      }
-
-      if (key == 'hideLowGPPlayersEnabled') {
+      } else if (key == 'hideLowGPPlayersEnabled') {
         isMatch =
           !value ||
           record.playerObject?.forecastGamesPlayed! > RED_GP_UPPER_BOUNDARY;
-      }
-
-      if (key == 'showOnlyUpsideLinesPlayers') {
+      } else if (key == 'showOnlyUpsideLinesPlayers') {
         isMatch = !value || record?.isPlayingInUpsideLine === true;
-      }
-
-      if (key == 'search') {
-        if (!value || value.trim() === '') {
-          isMatch = true;
-        } else {
-          const searchTerm = value.toLowerCase().trim();
-          isMatch =
-            record.playerName.toLowerCase().includes(searchTerm) ||
-            record.team.toLowerCase().includes(searchTerm) ||
-            record.position.toLowerCase().includes(searchTerm);
-        }
+      } else if (key == 'selectedPlayerIds') {
+        // This filter should only match if the player ID is in the selected list
+        isMatch = Array.isArray(value) && value.length > 0 
+          ? value.includes(record.playerObject?.playerID)
+          : true; // If no players selected, show all
+      } else {
+        isMatch = true;
       }
 
       if (!isMatch) {

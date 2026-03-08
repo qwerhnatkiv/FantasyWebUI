@@ -19,12 +19,14 @@
   (sendTeams)="teams = $event"
   (sendPowerPlayUnits)="powerPlayUnits = $event"
   (sendSelectedUser)="selectedUser = $event"
-  (sendSearch)="search = $event"
+  (sendSelectedPlayerIds)="selectedPlayerIds = $event"
   [firstChoiceOfo]="firstChoiceOfo"
   [secondChoiceOfo]="secondChoiceOfo"
   (sendPlayersAreNotPlayedDisabled)="playersAreNotPlayedDisabled = $event"
   (sendHideLowGPPlayersEnabled)="hideLowGPPlayersEnabled = $event"
   (sendFormLength)="formLengthChanged($event)"
+  [playerStats]="playerStats"
+  [playerGamesOfoMap]="playerGamesOfoMap"
 ></app-players-filters>
 
 <section class="players-configuration-section">
@@ -34,7 +36,7 @@
     [positions]="positions"
     [teams]="teams"
     [powerPlayUnits]="powerPlayUnits"
-    [search]="search"
+    [selectedPlayerIds]="selectedPlayerIds"
     [playerStats]="playerStats"
     [teamStats]="teamStats"
     [filteredTeamGames]="filteredTeamGames"

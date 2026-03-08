@@ -1,18 +1,30 @@
 <div class="player-filters-block">
   <div class="filters-row">
-    <label class="filter-label">Поиск:</label>
+    <label class="filter-label">Поиск игроков:</label>
     <mat-form-field class="search-filter-form">
-      <mat-label>Search</mat-label>
+      <mat-label>Выберите игроков</mat-label>
       <input
         matInput
-        [formControl]="searchFormControl"
-        (input)="searchChanged()"
-        placeholder="Фамилия, команда..."
+        #playerSearchTrigger="matAutocompleteTrigger"
+        [formControl]="playerSearchInputControl"
+        [matAutocomplete]="auto"
+        placeholder="Введите имя игрока..."
+        autocomplete="off"
       />
+      <mat-autocomplete 
+        #auto="matAutocomplete" 
+        [displayWith]="displayPlayerName"
+        (optionSelected)="onPlayerSelected($event)"
+      >
+        <mat-option *ngFor="let player of filteredPlayers$ | async" [value]="player">
+          <span>{{ player.name }}</span>
+        </mat-option>
+      </mat-autocomplete>
     </mat-form-field>
+
     <button
       (click)="resetSearchFilter()"
-      [hidden]="!searchFormControl.value || searchFormControl.value === ''"
+      [hidden]="selectedPlayers.size === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear search filter"
@@ -217,6 +229,23 @@
       [tooltipText]="GO_TO_FANTASY_TEAM_LABEL"
     ></i-button>
   </div>
+
+  <!-- Selected players display -->
+  <div class="selected-players-row" *ngIf="selectedPlayers.size > 0">
+    <label class="filter-label">Выбранные игроки:</label>
+    <div class="selected-players-chips-container">
+      <mat-chip-set aria-label="Selected players">
+        <mat-chip *ngFor="let playerId of selectedPlayers | keyvalue"
+          removable
+          (removed)="removeSelectedPlayer(playerId.key)"
+        >
+          {{ playerId.value }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+  
   <div style="display: flex">
     <div>
       <div class="choice-row">

@@ -6,6 +6,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 import { MapKeysPipe } from './pipes/mapkeys.pipe';
 import { PlayersLabelByCountPipe } from './pipes/players-label-by-count.pipe';
 import { NgxUiLoaderModule } from 'ngx-ui-loader';
@@ -104,6 +106,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     HttpClientModule,
     BrowserAnimationsModule,
     MatTableModule,
+    MatAutocompleteModule,
+    MatChipsModule,
     NgxUiLoaderModule,
     MatTooltipModule,
     MatFormFieldModule,
