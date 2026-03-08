@@ -101,8 +101,9 @@ export module Utils {
     }
 
     // As the week starts on sunday (but system needs monday), days get shifted
-    const startDay: number = (startDate.getUTCDay() - 1) % 7;
-    const endDay: number = (endDate.getUTCDay() - 1) % 7;
+    // Add 7 before modulo to handle Sunday (day 0) correctly
+    const startDay: number = (startDate.getDay() - 1 + 7) % 7;
+    const endDay: number = (endDate.getDay() - 1 + 7) % 7;
     if (startDay >= endDay) {
       return false;
     }

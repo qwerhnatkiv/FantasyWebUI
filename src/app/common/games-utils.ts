@@ -193,8 +193,13 @@ export module GamesUtils {
    * @param dateStr Original date string in DD.MM format
    * @returns Date object
    */
+  /**
+   * Converts a date string in "DD.MM" format (like "15.03" or "28.12") to a Date object in UTC
+   * @param dateStr Date string in DD.MM format
+   * @returns Date object at UTC midnight
+   */
   export function toDateFromShortFormat(dateStr: string) {
-    const currentYear: number = new Date().getFullYear();
+    const currentYear: number = new Date().getUTCFullYear();
 
     const dateParts: string[] = dateStr.split('.');
     const day: number = +dateParts[0];
@@ -202,7 +207,7 @@ export module GamesUtils {
 
     const year = month > 7 ? currentYear : currentYear + 1;
 
-    return new Date(year, month, day, 0, 0, 0);
+    return new Date(Date.UTC(year, month, day, 0, 0, 0));
   }
 
   // Helper function to generate all possible pairings

@@ -310,12 +310,20 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     const weekStartDate: Date = Utils.getMonday(sourceDate, weeksBefore);
     const weekEndDate: Date = Utils.addDateDays(weekStartDate, 6);
 
-    if (today.getTime() > weekStartDate.getTime()) {
-      this._setBothCalendarDates(this._dateFiltersService.minDefaultDate, weekEndDate);
+    // If today falls within this week, start from today (including Sunday)
+    // weekEndDatePlus extends to include the full day (through 23:59:59)
+    const weekEndDatePlus: Date = Utils.addDateDays(weekEndDate, 1);
+    let finalStartDate = weekStartDate;
+    if (today.getTime() >= weekStartDate.getTime() && 
+        today.getTime() < weekEndDatePlus.getTime()) {
+      finalStartDate = today;
     }
-    else {
-      this._setBothCalendarDates(weekStartDate, weekEndDate);
-    }
+
+    // Normalize dates to midnight to ensure consistent API calls
+    const normalizedStartDate = new Date(finalStartDate.getFullYear(), finalStartDate.getMonth(), finalStartDate.getDate());
+    const normalizedEndDate = new Date(weekEndDate.getFullYear(), weekEndDate.getMonth(), weekEndDate.getDate());
+
+    this._setBothCalendarDates(normalizedStartDate, normalizedEndDate);
   }
 
   //#endregion PRIVATE METHODS
