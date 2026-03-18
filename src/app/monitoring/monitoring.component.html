@@ -1,0 +1,112 @@
+<div class="monitoring-container">
+  <div class="monitoring-header">
+    <h1>System Monitoring & Status Dashboard</h1>
+    <button (click)="refreshData()" class="refresh-button" [disabled]="isLoading">
+      {{ isLoading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Last updated timestamp -->
+  <div *ngIf="healthCheck" class="last-updated">
+    Last updated: <strong>{{ formatDate(healthCheck.timestamp) }}</strong>
+  </div>
+
+  <!-- Health Summary Card -->
+  <div *ngIf="healthCheck" class="health-summary">
+    <div class="status-badge" [ngStyle]="{ backgroundColor: getStatusColor(healthCheck.status) }">
+      <mat-icon>{{ healthCheck.status === 'healthy' ? 'check_circle' : 'warning' }}</mat-icon>
+      <span>{{ healthCheck.status | uppercase }}</span>
+    </div>
+    <div class="health-info">
+      <p><strong>Status:</strong> {{ healthCheck.message }}</p>
+      <p><strong>Avg Time Since Update:</strong> {{ formatDuration(healthCheck.averageTimeSinceLastUpdateMinutes) }}</p>
+      <p *ngIf="healthCheck.tablesInError > 0" class="warning-text">
+        <mat-icon>warning</mat-icon>
+        {{ healthCheck.tablesInError }} table(s) in error state
+      </p>
+    </div>
+  </div>
+
+  <!-- Tables Status Grid -->
+  <div *ngIf="healthCheck" class="tables-status-section">
+    <h2>Table Status</h2>
+    <div class="tables-grid">
+      <div
+        *ngFor="let tableStatus of healthCheck.tableStatuses"
+        class="table-card"
+        [ngClass]="getStatusClass(tableStatus.status)"
+      >
+        <div class="card-header">
+          <h3>{{ tableStatus.tableName }}</h3>
+          <span
+            class="status-dot"
+            [ngStyle]="{ backgroundColor: getStatusColor(tableStatus.status) }"
+          ></span>
+        </div>
+        <div class="card-body">
+          <p><span class="label">Status:</span> {{ tableStatus.status | titlecase }}</p>
+          <p><span class="label">Records:</span> {{ tableStatus.recordCount | number }}</p>
+          <p><span class="label">Last Updated:</span> {{ getTimeSinceUpdate(tableStatus.lastUpdateTime) }}m ago</p>
+          <p><span class="label">Rows Affected:</span> {{ tableStatus.rowsAffected }}</p>
+          <p *ngIf="tableStatus.message" class="message">{{ tableStatus.message }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Logs Section -->
+  <div *ngIf="updateLogs.length > 0" class="update-logs-section">
+    <h2>Recent Update Logs</h2>
+    <div class="logs-table-wrapper">
+      <table class="logs-table">
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Tables</th>
+            <th>Status</th>
+            <th>Inserted</th>
+            <th>Updated</th>
+            <th>Deleted</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of updateLogs" [ngClass]="'status-' + log.status">
+            <td class="operation-name">{{ log.operationName }}</td>
+            <td class="table-names">
+              <span *ngFor="let table of log.tableNames; let last = last" class="table-badge">
+                {{ table }}<span *ngIf="!last">, </span>
+              </span>
+            </td>
+            <td>
+              <span class="status-badge-small" [ngClass]="'status-' + log.status">
+                {{ log.status | titlecase }}
+              </span>
+            </td>
+            <td class="number">{{ log.recordsInserted | number }}</td>
+            <td class="number">{{ log.recordsUpdated | number }}</td>
+            <td class="number">{{ log.recordsDeleted | number }}</td>
+            <td>{{ formatDate(log.startTime) }}</td>
+            <td>{{ formatDate(log.endTime) }}</td>
+            <td class="number">
+              {{ getOperationDuration(log.startTime, log.endTime) }}s
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- No logs message -->
+  <div *ngIf="!isLoading && updateLogs.length === 0" class="no-logs">
+    <p>No update logs available</p>
+  </div>
+</div>

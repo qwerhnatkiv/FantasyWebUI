@@ -70,6 +70,7 @@ import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-eas
 import { LoginComponent } from './login/login.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainViewComponent } from './main-view/main-view.component';
+import { MonitoringComponent } from './monitoring/monitoring.component';
 import { ApiService } from 'src/services/api/api.service';
 import { AuthInterceptor } from 'src/services/auth/auth.interceptor';
 
@@ -99,7 +100,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     SimpleSelectComponent,
     CancelButtonComponent,
     LoginComponent,
-    MainViewComponent
+    MainViewComponent,
+    MonitoringComponent
   ],
   imports: [
     BrowserModule,
