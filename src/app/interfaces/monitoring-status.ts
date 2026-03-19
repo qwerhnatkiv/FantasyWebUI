@@ -6,7 +6,10 @@ export interface TableStatusDTO {
   tableName: string;
 
   /** Timestamp of the last successful data update */
-  lastUpdateTime: Date;
+  lastUpdateTime: Date | null;
+
+  /** Time since the last update in hours (null when not available) */
+  hoursSinceLastUpdate: number | null;
 
   /** Number of records in the table */
   recordCount: number;
@@ -37,11 +40,26 @@ export interface HealthCheckDTO {
   /** List of all monitored tables and their statuses */
   tableStatuses: TableStatusDTO[];
 
-  /** Average time since last update across all tables (in minutes) */
-  averageTimeSinceLastUpdateMinutes: number;
+  /** Average time since last update across all tables (in hours) */
+  averageTimeSinceLastUpdateHours: number;
 
   /** Number of tables with errors */
   tablesInError: number;
+
+  /** Duplicate row counts for important tables */
+  importantTablesDuplicateCounts: ImportantTableDuplicateCountDTO[];
+
+  /** Total duplicate rows across monitored duplicate checks */
+  totalDuplicateRows: number;
+}
+
+/**
+ * Duplicate count summary for one important table
+ */
+export interface ImportantTableDuplicateCountDTO {
+  tableName: string;
+  duplicateRows: number;
+  duplicateBy: string;
 }
 
 /**
@@ -91,4 +109,13 @@ export interface MonitoringDataDTO {
 
   /** Recent update log entries */
   updateLog: UpdateLogEntryDTO[];
+}
+
+/**
+ * Response from manual DM update execution endpoint
+ */
+export interface ExecuteDmUpdateResponseDTO {
+  executedAtUtc: Date;
+  dmSeasonPredsPlayersRowCount: number;
+  dmPlayerLinesRowCount: number;
 }

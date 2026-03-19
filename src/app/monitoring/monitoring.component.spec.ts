@@ -20,13 +20,16 @@ describe('MonitoringComponent', () => {
         {
           tableName: 'f_players_nst',
           lastUpdateTime: new Date(),
+          hoursSinceLastUpdate: 0.5,
           recordCount: 1000,
           rowsAffected: 50,
           status: 'healthy',
         },
       ],
-      averageTimeSinceLastUpdateMinutes: 5,
+      averageTimeSinceLastUpdateHours: 0.5,
       tablesInError: 0,
+      importantTablesDuplicateCounts: [],
+      totalDuplicateRows: 0,
     },
     updateLog: [],
   };
@@ -37,6 +40,7 @@ describe('MonitoringComponent', () => {
       'getHealthCheck',
       'getUpdateLogs',
       'getTableStatus',
+      'executeDmUpdate',
     ]);
     const uiLoaderSpy = jasmine.createSpyObj('NgxUiLoaderService', [
       'start',

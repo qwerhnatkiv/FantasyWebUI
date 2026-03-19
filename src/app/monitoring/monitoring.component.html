@@ -1,9 +1,26 @@
 <div class="monitoring-container">
   <div class="monitoring-header">
     <h1>System Monitoring & Status Dashboard</h1>
-    <button (click)="refreshData()" class="refresh-button" [disabled]="isLoading">
-      {{ isLoading ? 'Loading...' : 'Refresh' }}
-    </button>
+    <div class="header-actions">
+      <a mat-stroked-button color="primary" routerLink="/main">Main</a>
+      <button
+        (click)="executeDmUpdate()"
+        class="dm-update-button"
+        [disabled]="isExecutingDmUpdate || isLoading"
+      >
+        {{ isExecutingDmUpdate ? 'Executing DM Update...' : 'Run DM Update' }}
+      </button>
+      <button (click)="refreshData()" class="refresh-button" [disabled]="isLoading">
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="dmUpdateResult" class="dm-update-result">
+    <h3>Last Manual DM Update</h3>
+    <p><strong>Executed:</strong> {{ formatDate(dmUpdateResult.executedAtUtc) }}</p>
+    <p><strong>dm_season_preds_players rows:</strong> {{ dmUpdateResult.dmSeasonPredsPlayersRowCount | number }}</p>
+    <p><strong>dm_player_lines rows:</strong> {{ dmUpdateResult.dmPlayerLinesRowCount | number }}</p>
   </div>
 
   <!-- Error message -->
@@ -25,11 +42,30 @@
     </div>
     <div class="health-info">
       <p><strong>Status:</strong> {{ healthCheck.message }}</p>
-      <p><strong>Avg Time Since Update:</strong> {{ formatDuration(healthCheck.averageTimeSinceLastUpdateMinutes) }}</p>
+      <p><strong>Avg Time Since Update:</strong> {{ formatHoursDuration(healthCheck.averageTimeSinceLastUpdateHours) }}</p>
       <p *ngIf="healthCheck.tablesInError > 0" class="warning-text">
         <mat-icon>warning</mat-icon>
         {{ healthCheck.tablesInError }} table(s) in error state
       </p>
+      <p *ngIf="isBootstrapWarning()" class="bootstrap-text">
+        <mat-icon>schedule</mat-icon>
+        Initial bootstrap state: waiting for first scheduled update window.
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="healthCheck" class="duplicates-section">
+    <h2>Duplicate Records</h2>
+    <div class="duplicate-summary" [ngClass]="{ 'has-duplicates': hasDuplicateRows() }">
+      <span class="label">Total duplicates:</span>
+      <span class="value">{{ healthCheck.totalDuplicateRows | number }}</span>
+    </div>
+    <div class="duplicate-list" *ngIf="healthCheck.importantTablesDuplicateCounts.length > 0">
+      <div class="duplicate-row" *ngFor="let duplicate of healthCheck.importantTablesDuplicateCounts">
+        <span class="table-name">{{ duplicate.tableName }}</span>
+        <span class="duplicate-count">{{ duplicate.duplicateRows | number }}</span>
+        <span class="duplicate-by">{{ duplicate.duplicateBy }}</span>
+      </div>
     </div>
   </div>
 
@@ -52,7 +88,8 @@
         <div class="card-body">
           <p><span class="label">Status:</span> {{ tableStatus.status | titlecase }}</p>
           <p><span class="label">Records:</span> {{ tableStatus.recordCount | number }}</p>
-          <p><span class="label">Last Updated:</span> {{ getTimeSinceUpdate(tableStatus.lastUpdateTime) }}m ago</p>
+          <p><span class="label">Last Updated:</span> {{ formatHoursDuration(getHoursSinceUpdate(tableStatus)) }} ago</p>
+          <p><span class="label">Update Time:</span> {{ tableStatus.lastUpdateTime ? formatDate(tableStatus.lastUpdateTime) : 'N/A' }}</p>
           <p><span class="label">Rows Affected:</span> {{ tableStatus.rowsAffected }}</p>
           <p *ngIf="tableStatus.message" class="message">{{ tableStatus.message }}</p>
         </div>
@@ -97,7 +134,7 @@
             <td>{{ formatDate(log.startTime) }}</td>
             <td>{{ formatDate(log.endTime) }}</td>
             <td class="number">
-              {{ getOperationDuration(log.startTime, log.endTime) }}s
+              {{ getOperationDuration(log.startTime, log.endTime) !== null ? getOperationDuration(log.startTime, log.endTime) + 's' : 'N/A' }}
             </td>
           </tr>
         </tbody>

@@ -72,6 +72,25 @@
   margin-right: 10%;
 }
 
+.monitoring-link-button {
+  min-width: 34px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monitoring-link-button mat-icon {
+  margin: 0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+}
+
 .header-simplified-calendar-mode-sub-actions {
   display: flex;
   gap: 30px;

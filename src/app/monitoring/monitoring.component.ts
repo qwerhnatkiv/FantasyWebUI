@@ -7,10 +7,16 @@ import {
 } from '@angular/core';
 import { MonitoringService } from 'src/services/api/monitoring.service';
 import { Subject, interval, Subscription } from 'rxjs';
-import { takeUntil, switchMap, catchError } from 'rxjs/operators';
-import { MonitoringDataDTO, HealthCheckDTO, UpdateLogEntryDTO, TableStatusDTO } from '../interfaces/monitoring-status';
+import { takeUntil, switchMap, catchError, map } from 'rxjs/operators';
+import {
+  MonitoringDataDTO,
+  HealthCheckDTO,
+  UpdateLogEntryDTO,
+  TableStatusDTO,
+  ExecuteDmUpdateResponseDTO,
+} from '../interfaces/monitoring-status';
 import { of } from 'rxjs';
-import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-monitoring',
@@ -23,7 +29,9 @@ export class MonitoringComponent implements OnInit, OnDestroy {
   protected healthCheck?: HealthCheckDTO;
   protected updateLogs: UpdateLogEntryDTO[] = [];
   protected isLoading = false;
+  protected isExecutingDmUpdate = false;
   protected errorMessage?: string;
+  protected dmUpdateResult?: ExecuteDmUpdateResponseDTO;
 
   private destroy$ = new Subject<void>();
   private refreshSubscription?: Subscription;
@@ -54,7 +62,6 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 
   constructor(
     private monitoringService: MonitoringService,
-    private ngxUiLoaderService: NgxUiLoaderService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
@@ -79,13 +86,19 @@ export class MonitoringComponent implements OnInit, OnDestroy {
     this.errorMessage = undefined;
 
     this.monitoringService
-      .getMonitoringData(this.LOG_LIMIT)
+      .getMonitoringData()
       .pipe(
-        catchError((error) => {
+        catchError((error: HttpErrorResponse) => {
           console.error('Failed to load monitoring data:', error);
-          this.errorMessage =
-            'Failed to load monitoring data. Please try again later.';
-          return of(undefined);
+          return this.monitoringService.getHealthCheck().pipe(
+            map((healthCheck) => ({ healthCheck, updateLog: [] } as MonitoringDataDTO)),
+            catchError((healthError) => {
+              console.error('Failed to load health check fallback:', healthError);
+              this.errorMessage =
+                'Failed to load monitoring data. Please try again later.';
+              return of(undefined);
+            })
+          );
         }),
         takeUntil(this.destroy$)
       )
@@ -106,7 +119,7 @@ export class MonitoringComponent implements OnInit, OnDestroy {
   private startAutoRefresh(): void {
     this.refreshSubscription = interval(this.REFRESH_INTERVAL_MS)
       .pipe(
-        switchMap(() => this.monitoringService.getMonitoringData(this.LOG_LIMIT)),
+        switchMap(() => this.monitoringService.getMonitoringData()),
         catchError((error) => {
           console.error('Auto-refresh failed:', error);
           return of(undefined);
@@ -130,6 +143,35 @@ export class MonitoringComponent implements OnInit, OnDestroy {
     this.loadMonitoringData();
   }
 
+  protected executeDmUpdate(): void {
+    if (this.isExecutingDmUpdate) {
+      return;
+    }
+
+    this.isExecutingDmUpdate = true;
+    this.errorMessage = undefined;
+
+    this.monitoringService
+      .executeDmUpdate()
+      .pipe(
+        catchError((error) => {
+          console.error('DM update execution failed:', error);
+          this.errorMessage = 'Manual DM update failed. Please try again.';
+          return of(undefined);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.dmUpdateResult = result;
+          this.loadMonitoringData();
+        }
+
+        this.isExecutingDmUpdate = false;
+        this.changeDetectorRef.markForCheck();
+      });
+  }
+
   /**
    * Get status color for display
    */
@@ -147,14 +189,20 @@ export class MonitoringComponent implements OnInit, OnDestroy {
   /**
    * Format duration in minutes to readable string
    */
-  protected formatDuration(minutes: number): string {
-    if (minutes < 60) {
-      return `${Math.round(minutes)}m`;
-    } else if (minutes < 1440) {
-      return `${Math.round(minutes / 60)}h`;
-    } else {
-      return `${Math.round(minutes / 1440)}d`;
+  protected formatHoursDuration(hours: number | null): string {
+    if (hours === null || hours === undefined) {
+      return 'N/A';
     }
+
+    if (hours < 1) {
+      return `${Math.round(hours * 60)}m`;
+    }
+
+    if (hours < 24) {
+      return `${Math.round(hours)}h`;
+    }
+
+    return `${Math.round(hours / 24)}d`;
   }
 
   /**
@@ -168,20 +216,47 @@ export class MonitoringComponent implements OnInit, OnDestroy {
   /**
    * Get time since update in minutes
    */
-  protected getTimeSinceUpdate(date: Date | string | null): number {
-    if (!date) {
-      return 0;
+  protected getHoursSinceUpdate(tableStatus: TableStatusDTO): number | null {
+    if (tableStatus.hoursSinceLastUpdate !== null && tableStatus.hoursSinceLastUpdate !== undefined) {
+      return tableStatus.hoursSinceLastUpdate;
     }
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return Math.floor((Date.now() - d.getTime()) / 60000);
+
+    if (!tableStatus.lastUpdateTime) {
+      return null;
+    }
+
+    const d = typeof tableStatus.lastUpdateTime === 'string'
+      ? new Date(tableStatus.lastUpdateTime)
+      : tableStatus.lastUpdateTime;
+
+    return (Date.now() - d.getTime()) / 3600000;
   }
 
   /**
    * Calculate operation duration in seconds
    */
-  protected getOperationDuration(startTime: Date | string, endTime: Date | string): number {
+  protected getOperationDuration(startTime: Date | string, endTime: Date | string | null): number | null {
+    if (!startTime || !endTime) {
+      return null;
+    }
+
     const start = typeof startTime === 'string' ? new Date(startTime).getTime() : new Date(startTime).getTime();
     const end = typeof endTime === 'string' ? new Date(endTime).getTime() : new Date(endTime).getTime();
     return Math.round((end - start) / 1000);
+  }
+
+  protected isBootstrapWarning(): boolean {
+    if (!this.healthCheck) {
+      return false;
+    }
+
+    return (
+      this.healthCheck.status === 'degraded' &&
+      this.healthCheck.message.includes('Waiting for first scheduled update window')
+    );
+  }
+
+  protected hasDuplicateRows(): boolean {
+    return (this.healthCheck?.totalDuplicateRows || 0) > 0;
   }
 }
