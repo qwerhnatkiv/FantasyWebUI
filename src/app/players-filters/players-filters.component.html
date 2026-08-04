@@ -36,7 +36,7 @@
     <mat-form-field class="filter-form">
       <mat-select
         [(value)]="lowerBoundPrice"
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="lowerBoundPriceChanged()"
       >
         <mat-option>None</mat-option>
@@ -58,7 +58,7 @@
     <mat-form-field class="filter-form">
       <mat-select
         [(value)]="upperBoundPrice"
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="upperBoundPriceChanged()"
       >
         <mat-option>None</mat-option>
@@ -127,7 +127,7 @@
       <mat-select
         [formControl]="positionsFormControl"
         multiple
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="positionsChanged()"
       >
         <mat-option
@@ -155,7 +155,7 @@
       <mat-select
         [formControl]="powerPlayFormControl"
         multiple
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="powerPlayUnitsChanged()"
       >
         <mat-option *ngFor="let powerPlay of selectPP" [value]="powerPlay">{{
@@ -178,7 +178,7 @@
     <mat-form-field class="filter-form">
       <mat-select
         [(value)]="formLength"
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="formLengthChanged($event)"
       >
         <mat-option
@@ -193,7 +193,7 @@
     <mat-form-field class="the-widest-filter-form">
       <mat-select
         [(value)]="selectedUser"
-        panelWidth="auto"
+        panelWidth=""
         (selectionChange)="selectedUserChanged()"
       >
         <mat-option *ngFor="let user of selectUsers" [value]="user">{{

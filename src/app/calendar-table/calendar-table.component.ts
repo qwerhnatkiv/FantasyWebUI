@@ -105,6 +105,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   protected isTeamsEasySeriesModeEnabled: boolean = false;
 
   private _openTeamTooltipNames: Set<string> = new Set<string>();
+  private _teamTooltipPropsCache: Map<string, NgxTippyProps> = new Map<
+    string,
+    NgxTippyProps
+  >();
 
   protected EFP_LABEL: string = EFP_LABEL;
 
@@ -406,11 +410,20 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
   /**
    * Builds tippy props for a team cell, wiring the highlight state and the tooltip's close button
-   * to the show/hide lifecycle so any close method (button or re-click) clears the highlight
+   * to the show/hide lifecycle so any close method (button or re-click) clears the highlight.
+   * Cached per team: ngx-tippy calls tippy.setProps() (which resets the instance) whenever this
+   * binding's value changes by reference, so a fresh object literal here would reset - and break -
+   * the tippy instance on every change-detection cycle, including reentrantly from inside onShow.
    */
   public getTeamTooltipProps(teamCell: TableCell): NgxTippyProps {
-    return {
+    const cachedProps = this._teamTooltipPropsCache.get(teamCell.cellValue);
+    if (cachedProps) {
+      return cachedProps;
+    }
+
+    const props: NgxTippyProps = {
       allowHTML: true,
+      interactive: true,
       placement: 'auto-end',
       trigger: 'click manual',
       hideOnClick: 'toggle',
@@ -429,6 +442,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
         this._changeDetectorRef.detectChanges();
       },
     };
+
+    this._teamTooltipPropsCache.set(teamCell.cellValue, props);
+    return props;
   }
 
   public generateTeamCellToolTip(teamCell: TableCell): string | null {
