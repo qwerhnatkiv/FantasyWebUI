@@ -20,7 +20,6 @@ import {
   FROM_DATE_CALENDAR_FILTER,
   GAME_DAY_TWEETS_URL,
   HIDE_TEAMS_EASY_SERIES,
-  KNOWLEDGE_BASE_URL,
   NEXT_DEADLINE_DATE_LABEL,
   SHOW_BEST_PLAYERS_BY_EFP,
   SHOW_TEAMS_EASY_SERIES,
@@ -86,7 +85,6 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected YELLOW_COLOR: string = YELLOW_COLOR;
   protected YELLOW_COLOR_ACTIVE: string = YELLOW_COLOR_ACTIVE;
   protected GAME_DAY_TWEETS_URL: string = GAME_DAY_TWEETS_URL;
-  protected KNOWLEDGE_BASE_URL: string = KNOWLEDGE_BASE_URL;
 
   // FIELDS FOR HTML
   protected isSecondLevelSubMenuHidden: boolean = true;
