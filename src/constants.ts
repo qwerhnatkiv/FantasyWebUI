@@ -168,7 +168,6 @@ export const HIDE_TEAMS_EASY_SERIES: string = 'Скрыть легкие сер�
 export const SHOW_UPSIDE_LINES_LABEL: string = 'Показать игроков в крутых звеньях';
 
 // EXTERNAL SOURCES
-export const GAME_DAY_TWEETS_URL: string = 'https://www.gamedaytweets.com/';
 
 
 export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;

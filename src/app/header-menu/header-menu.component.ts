@@ -6,6 +6,9 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { Router } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { AuthService } from 'src/services/auth/auth.service';
 import {
   COEFS_UPDATED_LOG_INFO,
   COLLAPSE_CALENDAR,
@@ -18,7 +21,6 @@ import {
   ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL,
   EXPAND_CALENDAR,
   FROM_DATE_CALENDAR_FILTER,
-  GAME_DAY_TWEETS_URL,
   HIDE_TEAMS_EASY_SERIES,
   NEXT_DEADLINE_DATE_LABEL,
   SHOW_BEST_PLAYERS_BY_EFP,
@@ -84,7 +86,6 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   protected DEFAULT_DATE_TIME_FORMAT: string = DEFAULT_DATE_TIME_FORMAT;
   protected YELLOW_COLOR: string = YELLOW_COLOR;
   protected YELLOW_COLOR_ACTIVE: string = YELLOW_COLOR_ACTIVE;
-  protected GAME_DAY_TWEETS_URL: string = GAME_DAY_TWEETS_URL;
 
   // FIELDS FOR HTML
   protected isSecondLevelSubMenuHidden: boolean = true;
@@ -97,13 +98,16 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     maxDate: new Date(),
   };
   protected areTeamsEasySeriesEnabled: boolean = false;
+  protected username: string = '';
 
   //#region CTOR
 
   constructor(
     private _calendarObservableProxyService: CalendarObservableProxyService,
     private _playersObservableProxyService: PlayersObservableProxyService,
-    private _dateFiltersService: DateFiltersService
+    private _dateFiltersService: DateFiltersService,
+    private _authService: AuthService,
+    private _router: Router
   ) {}
 
   //#endregion CTOR
@@ -118,6 +122,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
           this._playersObservableProxyService.triggerUpdatePlayersEfpDataByDateRangeEvent();
         }
       );
+
+    this._setUsernameFromToken();
   }
 
   ngOnDestroy(): void {
@@ -257,9 +263,36 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     this._calendarObservableProxyService.triggerSimplifiedCalendarModeStartDateSubject(startDate);
   }
 
+  /**
+   * Logs the user out and redirects to the login page
+   */
+  protected logout(): void {
+    this._authService.logout();
+    this._router.navigate(['/login']);
+  }
+
+  /**
+   * Placeholder for the settings action - not implemented yet
+   */
+  protected openSettings(): void {}
+
   //#endregion PROTECTED METHODS for HTML Template
 
   //#region PRIVATE METHODS
+
+  /**
+   * Decodes the stored JWT to populate the displayed username
+   */
+  private _setUsernameFromToken(): void {
+    const token: string | null = this._authService.getToken();
+    if (!token) {
+      return;
+    }
+
+    const jwtHelperService: JwtHelperService = new JwtHelperService();
+    const decodedToken: any = jwtHelperService.decodeToken(token);
+    this.username = decodedToken?.preferred_username ?? '';
+  }
 
   /**
    * Updates minimum filter date value for the calendar
