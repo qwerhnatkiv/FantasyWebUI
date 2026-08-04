@@ -59,6 +59,7 @@ import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 import { TeamsEasySeriesDto } from '../interfaces/teams-easy-series/teams-easy-series.model';
 import { EasySeriesDateType } from '../interfaces/teams-easy-series/easy-series-date-type.enum';
+import { NgxTippyProps } from 'ngx-tippy-wrapper';
 
 @Component({
   selector: 'app-calendar-table',
@@ -102,6 +103,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   protected isSimplifiedCalendarModeEnabled: boolean = false;
   protected isSimplifiedCalendarAdvancedDrawingModeEnabled: boolean = false;
   protected isTeamsEasySeriesModeEnabled: boolean = false;
+
+  private _openTeamTooltipNames: Set<string> = new Set<string>();
 
   protected EFP_LABEL: string = EFP_LABEL;
 
@@ -394,9 +397,44 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Whether the team's tooltip is currently open, used to highlight its row label cell
+   */
+  public isTeamTooltipOpen(teamCell: TableCell): boolean {
+    return this._openTeamTooltipNames.has(teamCell.cellValue);
+  }
+
+  /**
+   * Builds tippy props for a team cell, wiring the highlight state and the tooltip's close button
+   * to the show/hide lifecycle so any close method (button or re-click) clears the highlight
+   */
+  public getTeamTooltipProps(teamCell: TableCell): NgxTippyProps {
+    return {
+      allowHTML: true,
+      placement: 'auto-end',
+      trigger: 'click manual',
+      hideOnClick: 'toggle',
+      maxWidth: 'none',
+      arrow: false,
+      onShow: (instance) => {
+        this._openTeamTooltipNames.add(teamCell.cellValue);
+        this._changeDetectorRef.detectChanges();
+
+        instance.popper
+          .querySelector('.team-tooltip-close-btn')
+          ?.addEventListener('click', () => instance.hide(), { once: true });
+      },
+      onHidden: () => {
+        this._openTeamTooltipNames.delete(teamCell.cellValue);
+        this._changeDetectorRef.detectChanges();
+      },
+    };
+  }
+
   public generateTeamCellToolTip(teamCell: TableCell): string | null {
     let header: string = `
-      <div style="font-size: 20px; line-height: 19px; text-align: center;">
+      <div style="position: relative; font-size: 20px; line-height: 19px; text-align: center;">
+        <span class="team-tooltip-close-btn" style="position: absolute; top: -4px; right: 0; cursor: pointer; font-size: 16px; line-height: 16px;">&#10005;</span>
         ${teamCell.displayValue}
       </div>`;
 

@@ -26,7 +26,8 @@ table {
   z-index: 7;
 }
 
-.team-cell.replaced-by-player {
+.team-cell.replaced-by-player,
+.team-cell.team-cell-tooltip-open {
   background: #fef524;
 }
 

@@ -12,16 +12,10 @@
           [class.replaced-by-player]="
             element['team'].displayValue.includes(EFP_LABEL)
           "
+          [class.team-cell-tooltip-open]="isTeamTooltipOpen(element['team'])"
           [ngxTippy]="generateTeamCellToolTip(element['team'])"
           tippyClassName="tooltip-general"
-          [tippyProps]="{
-            allowHTML: true,
-            placement: 'auto-end',
-            trigger: 'click manual',
-            hideOnClick: 'toggle',
-            maxWidth: 'none',
-            arrow: false
-          }"
+          [tippyProps]="getTeamTooltipProps(element['team'])"
           (click)="deselectPlayerRow(element['team'])"
         >
           <img
