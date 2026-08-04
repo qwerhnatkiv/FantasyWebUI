@@ -48,8 +48,53 @@
 .header-date-filters {
   height: fit-content;
   display: flex;
-  margin: 8px 30px 7px 30px;
-  gap: 10px;
+  align-items: center;
+  margin: 0 30px;
+  gap: 12px;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-form-field {
+  width: 150px;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-text-field-wrapper {
+  background: white;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  padding: 0 10px;
+  transition: border-color 0.15s ease;
+}
+
+.header-date-filters ::ng-deep .mdc-text-field--focused .mat-mdc-text-field-wrapper,
+.header-date-filters ::ng-deep .mat-mdc-text-field-wrapper:hover {
+  border-color: var(--background-color-active, #e2d90b);
+}
+
+.header-date-filters ::ng-deep .mdc-line-ripple {
+  display: none;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-form-field-flex {
+  align-items: center;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-form-field-infix {
+  min-height: unset;
+  padding: 8px 0;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.header-date-filters ::ng-deep .mat-mdc-floating-label {
+  font-weight: 600;
+}
+
+.header-date-filters ::ng-deep .mat-datepicker-toggle .mat-mdc-icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
 }
 
 .header-update-log-container {

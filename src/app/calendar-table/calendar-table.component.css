@@ -157,6 +157,18 @@ td:nth-child(1) {
   color: white;
 }
 
+.old-game-score-win {
+  color: #64ff8f;
+}
+
+.old-game-score-loss {
+  color: #ff7e7e;
+}
+
+.old-game-score-opponent {
+  color: white;
+}
+
 .calendar-cell-not-selected > .calendar-cell-empty {
   background: white;
   z-index: 2;

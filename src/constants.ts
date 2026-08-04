@@ -145,8 +145,8 @@ export const ORANGE_COLOR_ACTIVE = '#EFA42A'
 // TEXT
 export const EXPAND_CALENDAR: string = 'Развернуть';
 export const COLLAPSE_CALENDAR: string = 'Свернуть';
-export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показать завершенные недели';
-export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Скрыть завершенные недели';
+export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показать завершенные матчи';
+export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Скрыть завершенные матчи';
 export const ENABLE_FULL_CALENDAR_MODE_LABEL: string = 'Показать полный календарь';
 export const ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL: string = 'Показать только число игр (режим сапера)';
 export const ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL: string = 'Включить доп. режим сапера';

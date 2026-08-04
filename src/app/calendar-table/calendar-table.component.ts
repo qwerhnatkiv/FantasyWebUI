@@ -358,6 +358,29 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return cell.game != null && cell.game.isFromBookmakers;
   }
 
+  /**
+   * Splits a completed game's score into the row team's goals and the opponent's goals,
+   * so only the row team's number can be color-highlighted
+   */
+  public getOldGameScore(
+    cell: TableCell
+  ): { rowGoals: number; opponentGoals: number; isWin: boolean } | null {
+    if (!cell.game?.isOldGame) {
+      return null;
+    }
+
+    const isRowTeamAway: boolean =
+      cell.game.homeTeamAcronym === cell.opponentTeamName;
+    const rowGoals: number = (
+      isRowTeamAway ? cell.game.awayTeamGoals : cell.game.homeTeamGoals
+    ) ?? 0;
+    const opponentGoals: number = (
+      isRowTeamAway ? cell.game.homeTeamGoals : cell.game.awayTeamGoals
+    ) ?? 0;
+
+    return { rowGoals, opponentGoals, isWin: rowGoals > opponentGoals };
+  }
+
   public getSelectedPlayerCellOpponentName(
     element: any,
     cell: TableCell
