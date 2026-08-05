@@ -9,7 +9,7 @@
       [hidden]="squadPlayers.length === 0"
     ></i-button>
 
-    <table mat-table [dataSource]="dataSource" class="players-squad-table">
+    <table mat-table [dataSource]="dataSource" [trackBy]="trackByPlayerId" class="players-squad-table">
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">

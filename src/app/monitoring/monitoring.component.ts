@@ -5,6 +5,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { MonitoringService } from 'src/services/api/monitoring.service';
 import { Subject, interval, Subscription } from 'rxjs';
 import { takeUntil, switchMap, catchError, map } from 'rxjs/operators';
@@ -18,11 +22,19 @@ import {
 import { of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
+// Standalone (rather than declared in AppModule) so the router can lazy-load
+// it via loadComponent - the monitoring dashboard is rarely visited, so it
+// no longer needs to ship in the initial bundle everyone downloads on first
+// load (see docs/perf-notes.md). No separate lazy-loading module file was
+// needed since Angular 17 supports lazy-loading a single standalone
+// component directly.
 @Component({
   selector: 'app-monitoring',
   templateUrl: './monitoring.component.html',
   styleUrl: './monitoring.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule],
 })
 export class MonitoringComponent implements OnInit, OnDestroy {
   protected monitoringData?: MonitoringDataDTO;
