@@ -518,13 +518,52 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     const gameHistory: string = this._buildTeamGameHistoryTable(
       teamStat.teamGameStats
     );
+    const bestPicks: string = this._buildTeamBestPicksSection(
+      teamStat.teamID
+    );
 
     return `
       <div>
         ${header} <br>
         ${averageTeamStat} <br>
         ${gameHistory}
+        ${bestPicks}
       </div>`;
+  }
+
+  /**
+   * Builds the "Лучшие пики" section for the team's next upcoming game, reusing the same
+   * teamPlayerExpectedOfoMap lookup as the per-game calendar cell tooltip
+   */
+  private _buildTeamBestPicksSection(teamID: number): string {
+    const nearestGame: GamePredictionDTO | undefined = this.games
+      .filter(
+        (g) =>
+          !g.isOldGame && (g.homeTeamId === teamID || g.awayTeamId === teamID)
+      )
+      .sort((a, b) => Utils.sortTypes(a.gameDate, b.gameDate))[0];
+
+    if (!nearestGame) {
+      return '';
+    }
+
+    const playersMap: PlayerExpectedFantasyPointsInfo[] | undefined =
+      this.teamPlayerExpectedOfoMap
+        .get(teamID)
+        ?.get(nearestGame.gameDate);
+
+    if (!playersMap || playersMap.length === 0) {
+      return '';
+    }
+
+    const playersList: string = playersMap
+      .map(
+        (x) =>
+          `${x.playerName} (${x.price}), ${x.powerPlayNumber}, ${x.playerExpectedFantasyPoints.toFixed(0)} ${this.EFP_LABEL} <br>`
+      )
+      .join('');
+
+    return `<div style="margin-top: 6px;">Лучшие пики: <br>${playersList}</div>`;
   }
 
   /**
@@ -537,6 +576,10 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       return '';
     }
 
+    const cellStyle: string =
+      'padding: 4px 12px; border: 1px solid white; text-align: center;';
+    const headerCellStyle: string = `${cellStyle} font-weight: 700;`;
+
     const rows: string = teamGameStats
       .map((game) => {
         const opponent: string = game.isAway
@@ -547,28 +590,30 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
 
         return `
           <tr>
-            <td>${this.datepipe.transform(game.gameDateTime, 'dd.MM.yy')}</td>
-            <td>${opponent}</td>
-            <td>${result}</td>
-            <td>${shotsAndHdcf}</td>
+            <td style="${cellStyle}">${this.datepipe.transform(game.gameDateTime, 'dd.MM.yy')}</td>
+            <td style="${cellStyle}">${opponent}</td>
+            <td style="${cellStyle}">${result}</td>
+            <td style="${cellStyle}">${shotsAndHdcf}</td>
           </tr>`;
       })
       .join('');
 
     return `
-      <table class="tooltip-table" style="white-space: nowrap;">
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Соп</th>
-            <th>Исход</th>
-            <th>Броски, HDCF</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
+      <div style="background: transparent; color: white; border-radius: 6px; padding: 8px; margin-top: 4px;">
+        <table style="border-collapse: collapse; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="${headerCellStyle}">Дата</th>
+              <th style="${headerCellStyle}">Соп</th>
+              <th style="${headerCellStyle}">Исход</th>
+              <th style="${headerCellStyle}">Броски, HDCF</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
       `;
   }
 
