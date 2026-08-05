@@ -556,7 +556,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       .join('');
 
     return `
-      <table class="tooltip-table">
+      <table class="tooltip-table" style="white-space: nowrap;">
         <thead>
           <tr>
             <th>Дата</th>
