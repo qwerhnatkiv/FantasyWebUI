@@ -36,6 +36,7 @@ import {
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
+import { TeamGameStatDTO } from '../interfaces/team-game-stat-dto';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import { cloneDeep } from 'lodash';
@@ -514,11 +515,61 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           </div>
       `;
 
+    const gameHistory: string = this._buildTeamGameHistoryTable(
+      teamStat.teamGameStats
+    );
+
     return `
       <div>
         ${header} <br>
-        ${averageTeamStat}
+        ${averageTeamStat} <br>
+        ${gameHistory}
       </div>`;
+  }
+
+  /**
+   * Builds the per-game history table (last N games, N being the form length filter) shown in the team tooltip
+   */
+  private _buildTeamGameHistoryTable(
+    teamGameStats: TeamGameStatDTO[] | undefined
+  ): string {
+    if (!teamGameStats || teamGameStats.length === 0) {
+      return '';
+    }
+
+    const rows: string = teamGameStats
+      .map((game) => {
+        const opponent: string = game.isAway
+          ? `@${game.opponentAcronym}`
+          : game.opponentAcronym;
+        const result: string = `${game.resultType} ${game.teamGoals}-${game.teamGoalsAway}`;
+        const shotsAndHdcf: string = `${game.teamShots}-${game.teamShotsAway}, ${game.teamHdcf}-${game.teamHdcfAway}`;
+
+        return `
+          <tr>
+            <td>${this.datepipe.transform(game.gameDateTime, 'dd.MM.yy')}</td>
+            <td>${opponent}</td>
+            <td>${result}</td>
+            <td>${shotsAndHdcf}</td>
+          </tr>`;
+      })
+      .join('');
+
+    return `
+      <table class="tooltip-table">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Соп</th>
+            <th>Исход</th>
+            <th>Броски, HDCF</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+      `;
   }
 
   public generateCellToolTip(
