@@ -236,6 +236,12 @@ export class PlayersSquadComponent implements OnInit {
     );
   }
 
+  // Lets Angular Material diff rows by player identity instead of rebuilding
+  // every row's DOM whenever `dataSource` is reassigned (see docs/perf-notes.md).
+  public trackByPlayerId(index: number, item: PlayerSquadRecord): number {
+    return item.playerObject.playerID;
+  }
+
   public isClearAllSquadChangesButtonHidden() {
     return this.squadPlayers.filter((x) => x.isNew || x.isRemoved)?.length == 0;
   }

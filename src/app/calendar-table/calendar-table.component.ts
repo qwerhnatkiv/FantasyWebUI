@@ -36,6 +36,7 @@ import {
 import { TableCell } from '../classes/table-cell';
 import { Utils } from '../common/utils';
 import { TeamStatsDTO } from '../interfaces/team-stats-dto';
+import { TeamGameStatDTO } from '../interfaces/team-game-stat-dto';
 import { SelectedPlayerModel } from '../interfaces/selected-player-model';
 
 import { cloneDeep } from 'lodash';
@@ -59,6 +60,7 @@ import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 import { TeamsEasySeriesDto } from '../interfaces/teams-easy-series/teams-easy-series.model';
 import { EasySeriesDateType } from '../interfaces/teams-easy-series/easy-series-date-type.enum';
+import { NgxTippyProps } from 'ngx-tippy-wrapper';
 
 @Component({
   selector: 'app-calendar-table',
@@ -102,6 +104,12 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   protected isSimplifiedCalendarModeEnabled: boolean = false;
   protected isSimplifiedCalendarAdvancedDrawingModeEnabled: boolean = false;
   protected isTeamsEasySeriesModeEnabled: boolean = false;
+
+  private _openTeamTooltipNames: Set<string> = new Set<string>();
+  private _teamTooltipPropsCache: Map<string, NgxTippyProps> = new Map<
+    string,
+    NgxTippyProps
+  >();
 
   protected EFP_LABEL: string = EFP_LABEL;
 
@@ -358,6 +366,29 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     return cell.game != null && cell.game.isFromBookmakers;
   }
 
+  /**
+   * Splits a completed game's score into the row team's goals and the opponent's goals,
+   * so only the row team's number can be color-highlighted
+   */
+  public getOldGameScore(
+    cell: TableCell
+  ): { rowGoals: number; opponentGoals: number; isWin: boolean } | null {
+    if (!cell.game?.isOldGame) {
+      return null;
+    }
+
+    const isRowTeamAway: boolean =
+      cell.game.homeTeamAcronym === cell.opponentTeamName;
+    const rowGoals: number = (
+      isRowTeamAway ? cell.game.awayTeamGoals : cell.game.homeTeamGoals
+    ) ?? 0;
+    const opponentGoals: number = (
+      isRowTeamAway ? cell.game.homeTeamGoals : cell.game.awayTeamGoals
+    ) ?? 0;
+
+    return { rowGoals, opponentGoals, isWin: rowGoals > opponentGoals };
+  }
+
   public getSelectedPlayerCellOpponentName(
     element: any,
     cell: TableCell
@@ -371,9 +402,56 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Whether the team's tooltip is currently open, used to highlight its row label cell
+   */
+  public isTeamTooltipOpen(teamCell: TableCell): boolean {
+    return this._openTeamTooltipNames.has(teamCell.cellValue);
+  }
+
+  /**
+   * Builds tippy props for a team cell, wiring the highlight state and the tooltip's close button
+   * to the show/hide lifecycle so any close method (button or re-click) clears the highlight.
+   * Cached per team: ngx-tippy calls tippy.setProps() (which resets the instance) whenever this
+   * binding's value changes by reference, so a fresh object literal here would reset - and break -
+   * the tippy instance on every change-detection cycle, including reentrantly from inside onShow.
+   */
+  public getTeamTooltipProps(teamCell: TableCell): NgxTippyProps {
+    const cachedProps = this._teamTooltipPropsCache.get(teamCell.cellValue);
+    if (cachedProps) {
+      return cachedProps;
+    }
+
+    const props: NgxTippyProps = {
+      allowHTML: true,
+      interactive: true,
+      placement: 'auto-end',
+      trigger: 'click manual',
+      hideOnClick: 'toggle',
+      maxWidth: 'none',
+      arrow: false,
+      onShow: (instance) => {
+        this._openTeamTooltipNames.add(teamCell.cellValue);
+        this._changeDetectorRef.detectChanges();
+
+        instance.popper
+          .querySelector('.team-tooltip-close-btn')
+          ?.addEventListener('click', () => instance.hide(), { once: true });
+      },
+      onHidden: () => {
+        this._openTeamTooltipNames.delete(teamCell.cellValue);
+        this._changeDetectorRef.detectChanges();
+      },
+    };
+
+    this._teamTooltipPropsCache.set(teamCell.cellValue, props);
+    return props;
+  }
+
   public generateTeamCellToolTip(teamCell: TableCell): string | null {
     let header: string = `
-      <div style="font-size: 20px; line-height: 19px; text-align: center;">
+      <div style="position: relative; font-size: 20px; line-height: 19px; text-align: center;">
+        <span class="team-tooltip-close-btn" style="position: absolute; top: -4px; right: 0; cursor: pointer; font-size: 16px; line-height: 16px;">&#10005;</span>
         ${teamCell.displayValue}
       </div>`;
 
@@ -437,11 +515,106 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           </div>
       `;
 
+    const gameHistory: string = this._buildTeamGameHistoryTable(
+      teamStat.teamGameStats
+    );
+    const bestPicks: string = this._buildTeamBestPicksSection(
+      teamStat.teamID
+    );
+
     return `
       <div>
         ${header} <br>
-        ${averageTeamStat}
+        ${averageTeamStat} <br>
+        ${gameHistory}
+        ${bestPicks}
       </div>`;
+  }
+
+  /**
+   * Builds the "Лучшие пики" section for the team's next upcoming game, reusing the same
+   * teamPlayerExpectedOfoMap lookup as the per-game calendar cell tooltip
+   */
+  private _buildTeamBestPicksSection(teamID: number): string {
+    const nearestGame: GamePredictionDTO | undefined = this.games
+      .filter(
+        (g) =>
+          !g.isOldGame && (g.homeTeamId === teamID || g.awayTeamId === teamID)
+      )
+      .sort((a, b) => Utils.sortTypes(a.gameDate, b.gameDate))[0];
+
+    if (!nearestGame) {
+      return '';
+    }
+
+    const playersMap: PlayerExpectedFantasyPointsInfo[] | undefined =
+      this.teamPlayerExpectedOfoMap
+        .get(teamID)
+        ?.get(nearestGame.gameDate);
+
+    if (!playersMap || playersMap.length === 0) {
+      return '';
+    }
+
+    const playersList: string = playersMap
+      .map(
+        (x) =>
+          `${x.playerName} (${x.price}), ${x.powerPlayNumber}, ${x.playerExpectedFantasyPoints.toFixed(0)} ${this.EFP_LABEL} <br>`
+      )
+      .join('');
+
+    return `<div style="margin-top: 6px;">Лучшие пики: <br>${playersList}</div>`;
+  }
+
+  /**
+   * Builds the per-game history table (last N games, N being the form length filter) shown in the team tooltip
+   */
+  private _buildTeamGameHistoryTable(
+    teamGameStats: TeamGameStatDTO[] | undefined
+  ): string {
+    if (!teamGameStats || teamGameStats.length === 0) {
+      return '';
+    }
+
+    const cellStyle: string =
+      'padding: 4px 12px; border: 1px solid white; text-align: center;';
+    const headerCellStyle: string = `${cellStyle} font-weight: 700;`;
+
+    const rows: string = teamGameStats
+      .map((game) => {
+        const opponent: string = game.isAway
+          ? `@${game.opponentAcronym}`
+          : game.opponentAcronym;
+        const result: string = `${game.resultType} ${game.teamGoals}-${game.teamGoalsAway}`;
+        const shotsAndHdcf: string = `${game.teamShots}-${game.teamShotsAway}, ${game.teamHdcf}-${game.teamHdcfAway}`;
+
+        return `
+          <tr>
+            <td style="${cellStyle}">${this.datepipe.transform(game.gameDateTime, 'dd.MM.yy')}</td>
+            <td style="${cellStyle}">${opponent}</td>
+            <td style="${cellStyle}">${result}</td>
+            <td style="${cellStyle}">${shotsAndHdcf}</td>
+          </tr>`;
+      })
+      .join('');
+
+    return `
+      <div style="background: transparent; color: white; border-radius: 6px; padding: 8px; margin-top: 4px;">
+        <table style="border-collapse: collapse; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="${headerCellStyle}">Дата</th>
+              <th style="${headerCellStyle}">Соп</th>
+              <th style="${headerCellStyle}">Исход</th>
+              <th style="${headerCellStyle}">Броски, HDCF</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+      `;
   }
 
   public generateCellToolTip(

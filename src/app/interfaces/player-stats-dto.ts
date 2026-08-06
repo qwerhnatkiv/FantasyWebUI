@@ -20,6 +20,15 @@ export interface PlayerStatsDTO {
     formIxG: number
     formICF: number
     formIHDCF: number
+    seasonGamesPlayed: number
+    seasonGoals: number
+    seasonAssists: number
+    seasonPlusMinus: number
+    seasonPIM: number
+    seasonGoalsAgainst: number
+    seasonSaves: number
+    seasonShutouts: number
+    seasonPowerPlayNumber: number
     forecastGamesPlayed?: number
     forecastGoals?: number
     forecastAssists?: number

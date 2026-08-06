@@ -323,47 +323,62 @@ export class PlayersTableComponent
       }
     }
 
-    this.applyPlayersFilter({
+    // These used to be 8 separate applyPlayersFilter() calls, each of which
+    // re-stringifies the whole filter dict and makes MatTableDataSource run
+    // its filter predicate over every row (which itself re-parses that JSON
+    // per row - see _filterPlayers). That was 8 full-table passes on every
+    // date change. Update the dictionary entries first, then filter once
+    // (see docs/perf-notes.md).
+    this.setPlayersFilter({
       name: 'playersAreNotPlayedDisabled',
       value: this.playersAreNotPlayedDisabled,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'hideLowGPPlayersEnabled',
       value: this.hideLowGPPlayersEnabled,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'lowerBoundPrice',
       value: this.lowerBoundPrice,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'upperBoundPrice',
       value: this.upperBoundPrice,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'positions',
       value: this.positions,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'teams',
       value: this.teams,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'powerPlayUnits',
       value: this.powerPlayUnits,
     });
 
-    this.applyPlayersFilter({
+    this.setPlayersFilter({
       name: 'selectedPlayerIds',
       value: this.selectedPlayerIds,
     });
 
+    this.refreshPlayersFilter();
+
     this._changeDetectorRef.detectChanges();
+  }
+
+  // Lets Angular Material diff rows by player identity instead of tearing
+  // down/rebuilding every row's DOM whenever `dataSource`/filtered arrays are
+  // replaced with new array instances (see docs/perf-notes.md).
+  public trackByPlayerId(index: number, item: PlayerChooseRecord): number {
+    return item.playerObject.playerID;
   }
 
   ngAfterViewInit() {
@@ -659,8 +674,19 @@ export class PlayersTableComponent
     }
   }
 
+  // MatTableDataSource calls the filter predicate once per row with the same
+  // filter string each time a filter is applied, so re-parsing that JSON on
+  // every row (up to ~1000 players) was pure waste. Cache the parsed result
+  // for the current filter string (see docs/perf-notes.md).
+  private _lastFilterString: string | undefined;
+  private _lastFilterMap: Map<string, any> | undefined;
+
   private _filterPlayers(record: PlayerChooseRecord, filter: string) {
-    var map = new Map<string, any>(JSON.parse(filter));
+    if (this._lastFilterString !== filter || this._lastFilterMap == null) {
+      this._lastFilterString = filter;
+      this._lastFilterMap = new Map<string, any>(JSON.parse(filter));
+    }
+    var map = this._lastFilterMap;
     let isMatch = false;
 
     for (let [key, value] of map) {
@@ -731,12 +757,24 @@ export class PlayersTableComponent
       });
   }
 
-  private applyPlayersFilter(filter: PlayersFilter) {
+  // Records a filter value without triggering MatTableDataSource's (expensive,
+  // full-table) filtering pass. Call refreshPlayersFilter() once after setting
+  // every filter that changed.
+  private setPlayersFilter(filter: PlayersFilter) {
     this.filterDictionary.set(filter.name, filter.value);
+  }
+
+  private refreshPlayersFilter() {
     var jsonString = JSON.stringify(
       Array.from(this.filterDictionary.entries())
     );
     this.dataSource.filter = jsonString;
+  }
+
+  // Convenience for call sites that only ever change one filter at a time.
+  private applyPlayersFilter(filter: PlayersFilter) {
+    this.setPlayersFilter(filter);
+    this.refreshPlayersFilter();
   }
 
   private _handlePlayerLines(playerLines: Map<number, PlayerLineFormatted[]>) {

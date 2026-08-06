@@ -145,8 +145,8 @@ export const ORANGE_COLOR_ACTIVE = '#EFA42A'
 // TEXT
 export const EXPAND_CALENDAR: string = 'Развернуть';
 export const COLLAPSE_CALENDAR: string = 'Свернуть';
-export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показать завершенные недели';
-export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Скрыть завершенные недели';
+export const ENABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Показать завершенные матчи';
+export const DISABLE_PAST_GAMES_CALENDAR_MODE_LABEL: string = 'Скрыть завершенные матчи';
 export const ENABLE_FULL_CALENDAR_MODE_LABEL: string = 'Показать полный календарь';
 export const ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL: string = 'Показать только число игр (режим сапера)';
 export const ENABLE_CALENDAR_ADVANCED_DRAWING_MODE_LABEL: string = 'Включить доп. режим сапера';
@@ -154,8 +154,6 @@ export const EFP_LABEL: string = 'ОФО'
 export const SHOW_BEST_PLAYERS_BY_EFP: string = 'Отобразить лучших по ОФО игроков';
 export const DATA_UPDATED_LOG_INFO: string = 'Данные обновлены:';
 export const COEFS_UPDATED_LOG_INFO: string = 'Кэфы обновлены:';
-export const FROM_DATE_CALENDAR_FILTER: string = 'С: '
-export const TO_DATE_CALENDAR_FILTER: string = 'По: '
 export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 export const MODEL_CHOICE_LABEL: string = 'Выбор модели:';
 export const WEEK_BACK_BUTTON_LABEL: string = 'Перейти на прошлую неделю';
@@ -168,8 +166,6 @@ export const HIDE_TEAMS_EASY_SERIES: string = 'Скрыть легкие сер�
 export const SHOW_UPSIDE_LINES_LABEL: string = 'Показать игроков в крутых звеньях';
 
 // EXTERNAL SOURCES
-export const GAME_DAY_TWEETS_URL: string = 'https://www.gamedaytweets.com/';
-export const KNOWLEDGE_BASE_URL: string = 'https://docs.google.com/document/d/1LzuQizI0w6AEy2eZJBsmhE6Zg-6BbrzkLZ31BU2a9Os/edit';
 
 
 export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;

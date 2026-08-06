@@ -1,3 +1,5 @@
+import { TeamGameStatDTO } from "./team-game-stat-dto";
+
 export interface TeamStatsDTO {
   teamID: number;
   teamAcronym: string;
@@ -10,4 +12,5 @@ export interface TeamStatsDTO {
   teamFormSA: number,
   teamFormXGF: number,
   teamFormXGA: number,
+  teamGameStats: TeamGameStatDTO[],
 }

@@ -4,12 +4,20 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { MainViewComponent } from './main-view/main-view.component';
-import { MonitoringComponent } from './monitoring/monitoring.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'main', component: MainViewComponent, canActivate: [AuthGuard] },
-  { path: 'monitoring', component: MonitoringComponent, canActivate: [AuthGuard] },
+  {
+    // Lazy-loaded: rarely-visited monitoring dashboard, kept out of the
+    // initial bundle everyone downloads on first load (see docs/perf-notes.md).
+    path: 'monitoring',
+    loadComponent: () =>
+      import('./monitoring/monitoring.component').then(
+        (m) => m.MonitoringComponent
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: 'main' }
 ];
 
