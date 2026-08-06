@@ -29,6 +29,10 @@ export module PlayerTooltipBuilder {
       player.position == DEFAULT_POSITIONS[0]
         ? buildGoalkeeperForm(player)
         : buildPlayerForm(player);
+    const seasonForm: string =
+      player.position == DEFAULT_POSITIONS[0]
+        ? buildGoalkeeperSeasonForm(player)
+        : buildPlayerSeasonForm(player);
     const teamForm: string = buildTeamForm(player);
     const opponentInfo: string = buildOpponentInformation(
       player,
@@ -51,6 +55,7 @@ export module PlayerTooltipBuilder {
       ${header} <br>
       ${forecast} <br>
       ${form} <br>
+      ${seasonForm} <br>
       ${teamForm} <br>
       ${opponentInfo} <br>
       ${linesInformation}
@@ -257,6 +262,78 @@ export module PlayerTooltipBuilder {
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
             player.powerPlayNumber
+          }</td>
+        </tr
+      </tbody>
+    </table>
+    `;
+  }
+
+  function buildGoalkeeperSeasonForm(player: PlayerCommonRecord): string {
+    return `
+    <div>С начала сезона:<div>
+    <table class="tooltip-table">
+      <thead>
+        <tr>
+          <th>GP</th>
+          <th>GA</th>
+          <th>SV</th>
+          <th>SO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonGamesPlayed ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonGoalsAgainst ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonSaves ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonShutouts ?? '-'
+          }</td>
+        </tr
+      </tbody>
+    </table>
+    `;
+  }
+
+  function buildPlayerSeasonForm(player: PlayerCommonRecord): string {
+    return `
+    <div>С начала сезона:<div>
+    <table class="tooltip-table">
+      <thead>
+        <tr>
+          <th>GP</th>
+          <th>G</th>
+          <th>A</th>
+          <th>PIM</th>
+          <th>+-</th>
+          <th>ПП</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonGamesPlayed ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonGoals ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonAssists ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonPIM ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonPlusMinus ?? '-'
+          }</td>
+          <td style="text-align: center; vertical-align: middle;">${
+            player.playerObject.seasonPowerPlayNumber ?? '-'
           }</td>
         </tr
       </tbody>

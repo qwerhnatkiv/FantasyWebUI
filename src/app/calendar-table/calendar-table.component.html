@@ -12,16 +12,10 @@
           [class.replaced-by-player]="
             element['team'].displayValue.includes(EFP_LABEL)
           "
+          [class.team-cell-tooltip-open]="isTeamTooltipOpen(element['team'])"
           [ngxTippy]="generateTeamCellToolTip(element['team'])"
           tippyClassName="tooltip-general"
-          [tippyProps]="{
-            allowHTML: true,
-            placement: 'auto-end',
-            trigger: 'click manual',
-            hideOnClick: 'toggle',
-            maxWidth: 'none',
-            arrow: false
-          }"
+          [tippyProps]="getTeamTooltipProps(element['team'])"
           (click)="deselectPlayerRow(element['team'])"
         >
           <img
@@ -123,17 +117,33 @@
             "
             class="small-team-logo"
           />
-          <span>
-            {{
-              !element[column.header].isWeekCell || !showFullCalendar
-                ? element[column.header].isWeekCell
-                  ? isSimplifiedCalendarModeEnabled
-                    ? element[column.header].displayValue
-                    : element[column.header].cellValue
-                  : element[column.header].displayValue
-                : element[column.header].weekGames
-            }}
-          </span>
+          <ng-container
+            *ngIf="
+              getOldGameScore(element[column.header]) as oldGameScore;
+              else defaultCellText
+            "
+          >
+            <span
+              [class.old-game-score-win]="oldGameScore.isWin"
+              [class.old-game-score-loss]="!oldGameScore.isWin"
+              >{{ oldGameScore.rowGoals }}</span
+            >:<span class="old-game-score-opponent">{{
+              oldGameScore.opponentGoals
+            }}</span>
+          </ng-container>
+          <ng-template #defaultCellText>
+            <span>
+              {{
+                !element[column.header].isWeekCell || !showFullCalendar
+                  ? element[column.header].isWeekCell
+                    ? isSimplifiedCalendarModeEnabled
+                      ? element[column.header].displayValue
+                      : element[column.header].cellValue
+                    : element[column.header].displayValue
+                  : element[column.header].weekGames
+              }}
+            </span>
+          </ng-template>
           <img
             loading="lazy"
             *ngIf="element[column.header].game?.isOldGame && !isPlayerSelectedCell(element, element[column.header])"

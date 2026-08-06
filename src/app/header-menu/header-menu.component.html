@@ -75,7 +75,6 @@
     </div>
     <div class="header-date-filters">
       <mat-form-field>
-        <mat-label>{{ FROM_DATE_CALENDAR_FILTER }}</mat-label>
         <input
           matInput
           [matDatepicker]="pickerFrom"
@@ -91,7 +90,6 @@
       </mat-form-field>
 
       <mat-form-field>
-        <mat-label>{{ TO_DATE_CALENDAR_FILTER }}</mat-label>
         <input
           matInput
           [matDatepicker]="pickerTo"
@@ -152,20 +150,6 @@
       <a
         mat-raised-button
         color="primary"
-        [href]="GAME_DAY_TWEETS_URL"
-        target="_blank"
-        >GameDayNews NHL</a
-      >
-      <a
-        mat-raised-button
-        color="primary"
-        [href]="KNOWLEDGE_BASE_URL"
-        target="_blank"
-        >База знаний</a
-      >
-      <a
-        mat-raised-button
-        color="primary"
         class="monitoring-link-button"
         href="/monitoring"
         target="_blank"
@@ -174,6 +158,29 @@
       >
         <mat-icon>analytics</mat-icon>
       </a>
+    </div>
+    <div
+      class="account-bar"
+      [style.--background-color]="YELLOW_COLOR"
+      [style.--background-color-active]="YELLOW_COLOR_ACTIVE"
+    >
+      <span class="account-username">{{ username }}</span>
+      <button
+        class="account-icon-button"
+        (click)="logout()"
+        aria-label="Выход"
+        title="Выход"
+      >
+        <mat-icon>logout</mat-icon>
+      </button>
+      <button
+        class="account-icon-button"
+        (click)="openSettings()"
+        aria-label="Настройки"
+        title="Настройки"
+      >
+        <mat-icon>settings</mat-icon>
+      </button>
     </div>
   </div>
   <div

@@ -96,7 +96,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
   set selectedUser(value: string | undefined) {
     this._selectedUser = value;
     this.squadPlayers = [];
-    this.getUserSquad();
+    this.fetchUserSquad();
   }
 
   public firstChoiceOfo: OfoVariant = {
@@ -121,6 +121,19 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
     number,
     TeamGameInformation[]
   >();
+
+  // O(1) lookup indexes built once whenever games/playerStats/teamStats are
+  // (re)loaded (see getCalendarData), so per-player/per-game lookups on the
+  // "date changed" hot path don't have to re-scan the full arrays every time.
+  private playerStatsById: Map<number, PlayerStatsDTO> = new Map();
+  private playerStatsBySportsId: Map<number, PlayerStatsDTO> = new Map();
+  private teamStatsById: Map<number, TeamStatsDTO> = new Map();
+  private gamesById: Map<number, GamePredictionDTO> = new Map();
+
+  // Cached response from the last successful squad fetch, so a date change
+  // can recompute squad OFO totals locally instead of re-fetching the squad
+  // (see docs/perf-notes.md).
+  private _sportsSquadResult?: SportsSquadDTO;
 
   constructor(
     private ngxLoader: NgxUiLoaderService,
@@ -151,7 +164,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedUser']?.currentValue) {
-      this.getUserSquad();
+      this.fetchUserSquad();
     }
   }
 
@@ -177,6 +190,16 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
         this.teamStats = result.teamsStats;
         this.playerStats = result.playerStats;
         this.updateLogInformation = result.updateLogInformation;
+
+        this.playerStatsById = new Map(
+          this.playerStats.map((x) => [x.playerID, x])
+        );
+        this.playerStatsBySportsId = new Map(
+          this.playerStats.map((x) => [x.playerIdSports, x])
+        );
+        this.teamStatsById = new Map(this.teamStats.map((x) => [x.teamID, x]));
+        this.gamesById = new Map(this.games.map((x) => [x.gameId, x]));
+
         this.setUpFilters(setDefaultDates);
       },
       error: (err) => {
@@ -206,16 +229,23 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
       number,
       TeamGameInformation[]
     >();
+
+    // Hoisted out of the per-team loop below: previously every team re-parsed
+    // every game's date (O(teams x games) Date construction) to check the
+    // range. Parsing each game's date once up front makes this O(games) +
+    // O(teams x games) cheap comparisons instead (see docs/perf-notes.md).
+    const minDateMs: number = this._filterDates?.minDate?.getTime()!;
+    const maxDateMs: number = this._filterDates?.maxDate?.getTime()!;
+    const gamesInDateRange: GamePredictionDTO[] = this.games.filter((x) => {
+      const gameDateMs = new Date(x.gameDate).getTime();
+      return gameDateMs >= minDateMs && gameDateMs <= maxDateMs;
+    });
+
     for (var i = 0, n = this.teamStats?.length!; i < n; ++i) {
       const teamStats: TeamStatsDTO = this.teamStats![i];
 
-      const gamesByDateRange: GamePredictionDTO[] = this.games.filter(
-        (x) =>
-          new Date(x.gameDate).getTime() <=
-            this._filterDates?.maxDate?.getTime()! &&
-          new Date(x.gameDate).getTime() >=
-            this._filterDates?.minDate?.getTime()! &&
-          (x.awayTeamId == teamStats.teamID || x.homeTeamId == teamStats.teamID)
+      const gamesByDateRange: GamePredictionDTO[] = gamesInDateRange.filter(
+        (x) => x.awayTeamId == teamStats.teamID || x.homeTeamId == teamStats.teamID
       );
 
       let teamGameInformation: TeamGameInformation[] = [];
@@ -312,7 +342,16 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
           }
 
           this.playerGamesOfoMap = localOfoMap;
-          this.getUserSquad();
+
+          // The squad membership itself doesn't depend on the selected date
+          // range, only each player's OFO total does - so once we already
+          // have a squad, recompute it locally instead of re-fetching it
+          // from the server (a sports.ru-backed call) on every date change.
+          if (this._sportsSquadResult) {
+            this.buildSquadPlayers(this._sportsSquadResult);
+          } else {
+            this.fetchUserSquad();
+          }
         },
         error: (err) => {
           console.error(err);
@@ -321,111 +360,109 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  private getUserSquad() {
+  // Fetches the squad from the server (sports.ru-backed). Only needed when the
+  // selected user changes - date changes reuse the cached result via
+  // buildSquadPlayers() instead of calling this again (see docs/perf-notes.md).
+  private fetchUserSquad() {
     if (this._selectedUser == null || this._selectedUser == '') {
       this.squadPlayers = [];
       this.balanceValue = 0;
+      this._sportsSquadResult = undefined;
       return;
     }
 
     this.ngxLoader.start();
     this._apiService.getSportsSquad(this._selectedUser).subscribe({
       next: (result) => {
-        let removedIds: Array<number> = this.squadPlayers
-          .filter((x) => x.isRemoved)
-          .map((x) => x.playerObject.playerID);
-        let addedIds: Array<number> = this.squadPlayers
-          .filter((x) => x.isNew)
-          .map((x) => x.playerObject.playerID);
-        this.squadPlayers = [];
-
-        this.balanceValue = result.balance;
-        this.substitutionsLeft = result.substitutions;
-        for (var i = 0, n = result.players.length; i < n; ++i) {
-          let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
-            (x) => x.playerIdSports == result.players[i].id
-          )!;
-
-          let matchingTeam: TeamStatsDTO = this.teamStats?.find(
-            (team) => team.teamID == matchingPlayerInfo.teamID
-          )!;
-
-          let ofo: number = this.playerGamesOfoMap
-            ?.get(matchingPlayerInfo.playerID)
-            ?.reduce(
-              (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
-              0.0
-            )!;
-
-          this.squadPlayers.push({
-            playerName: matchingPlayerInfo.playerName,
-            position: matchingPlayerInfo.position,
-            price: matchingPlayerInfo.price,
-            startPrice: matchingPlayerInfo.startPrice,
-            gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
-              ?.length!,
-            expectedFantasyPoints: ofo ?? 0,
-            isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
-            isNew: addedIds.includes(matchingPlayerInfo.playerID),
-            isOptimal: false,
-            playerObject: matchingPlayerInfo,
-            teamObject: matchingTeam,
-            powerPlayNumber: GamesUtils.GetPPText(
-              matchingPlayerInfo.formPowerPlayNumber
-            ),
-            sortOrder: matchingPlayerInfo.price,
-            tooltipLines: []
-          });
-        }
-
-        for (var i = 0, n = addedIds.length; i < n; ++i) {
-          let matchingPlayerInfo: PlayerStatsDTO = this.playerStats.find(
-            (x) => x.playerID == addedIds[i]
-          )!;
-
-          let matchingTeam: TeamStatsDTO = this.teamStats?.find(
-            (team) => team.teamID == matchingPlayerInfo.teamID
-          )!;
-
-          let ofo: number = this.playerGamesOfoMap
-            ?.get(matchingPlayerInfo.playerID)
-            ?.reduce(
-              (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
-              0.0
-            )!;
-
-          this.squadPlayers.push({
-            playerName: matchingPlayerInfo.playerName,
-            position: matchingPlayerInfo.position,
-            price: matchingPlayerInfo.price,
-            startPrice: matchingPlayerInfo.startPrice,
-            gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
-              ?.length!,
-            expectedFantasyPoints: ofo ?? 0,
-            isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
-            isNew: addedIds.includes(matchingPlayerInfo.playerID),
-            isOptimal: false,
-            playerObject: matchingPlayerInfo,
-            teamObject: matchingTeam,
-            powerPlayNumber: GamesUtils.GetPPText(
-              matchingPlayerInfo.formPowerPlayNumber
-            ),
-            sortOrder: matchingPlayerInfo.price,
-            tooltipLines: []
-          });
-        }
-
-        this.squadPlayers.sort(
-          (a, b) =>
-            DEFAULT_POSITIONS.indexOf(a.position) -
-              DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price
-        );
+        this._sportsSquadResult = result;
+        this.buildSquadPlayers(result);
       },
       error: (err) => {
         console.error(err);
       },
       complete: () => this.ngxLoader.stop(),
     });
+  }
+
+  // Pure/local: builds squadPlayers from an already-fetched squad result plus
+  // whatever is currently known (playerStats/teamStats/playerGamesOfoMap).
+  // Safe to call again whenever playerGamesOfoMap changes (i.e. on every date
+  // change) without hitting the network.
+  private buildSquadPlayers(result: SportsSquadDTO) {
+    let removedIds: Array<number> = this.squadPlayers
+      .filter((x) => x.isRemoved)
+      .map((x) => x.playerObject.playerID);
+    let addedIds: Array<number> = this.squadPlayers
+      .filter((x) => x.isNew)
+      .map((x) => x.playerObject.playerID);
+
+    this.balanceValue = result.balance;
+    this.substitutionsLeft = result.substitutions;
+
+    const newSquadPlayers: PlayerSquadRecord[] = [];
+
+    for (var i = 0, n = result.players.length; i < n; ++i) {
+      let matchingPlayerInfo: PlayerStatsDTO = this.playerStatsBySportsId.get(
+        result.players[i].id
+      )!;
+      newSquadPlayers.push(
+        this.createSquadRecord(matchingPlayerInfo, removedIds, addedIds)
+      );
+    }
+
+    for (var i = 0, n = addedIds.length; i < n; ++i) {
+      let matchingPlayerInfo: PlayerStatsDTO = this.playerStatsById.get(
+        addedIds[i]
+      )!;
+      newSquadPlayers.push(
+        this.createSquadRecord(matchingPlayerInfo, removedIds, addedIds)
+      );
+    }
+
+    newSquadPlayers.sort(
+      (a, b) =>
+        DEFAULT_POSITIONS.indexOf(a.position) -
+          DEFAULT_POSITIONS.indexOf(b.position) || b.price - a.price
+    );
+
+    this.squadPlayers = newSquadPlayers;
+  }
+
+  private createSquadRecord(
+    matchingPlayerInfo: PlayerStatsDTO,
+    removedIds: number[],
+    addedIds: number[]
+  ): PlayerSquadRecord {
+    let matchingTeam: TeamStatsDTO = this.teamStatsById.get(
+      matchingPlayerInfo.teamID
+    )!;
+
+    let ofo: number = this.playerGamesOfoMap
+      ?.get(matchingPlayerInfo.playerID)
+      ?.reduce(
+        (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+        0.0
+      )!;
+
+    return {
+      playerName: matchingPlayerInfo.playerName,
+      position: matchingPlayerInfo.position,
+      price: matchingPlayerInfo.price,
+      startPrice: matchingPlayerInfo.startPrice,
+      gamesCount: this.filteredTeamGames.get(matchingPlayerInfo.teamID)
+        ?.length!,
+      expectedFantasyPoints: ofo ?? 0,
+      isRemoved: removedIds.includes(matchingPlayerInfo.playerID),
+      isNew: addedIds.includes(matchingPlayerInfo.playerID),
+      isOptimal: false,
+      playerObject: matchingPlayerInfo,
+      teamObject: matchingTeam,
+      powerPlayNumber: GamesUtils.GetPPText(
+        matchingPlayerInfo.formPowerPlayNumber
+      ),
+      sortOrder: matchingPlayerInfo.price,
+      tooltipLines: [],
+    };
   }
 
   private setTop3PlayersForEachTeam(
@@ -445,9 +482,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
       );
     }
 
-    let playerStat: PlayerStatsDTO = this.playerStats.find(
-      (y) => playerId == y.playerID
-    )!;
+    let playerStat: PlayerStatsDTO = this.playerStatsById.get(playerId)!;
 
     if (playerStat == null) {
       return;
@@ -455,9 +490,7 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
 
     playersOfoDataArray.forEach((x) => {
       let playerOfoSum = x.playerExpectedFantasyPoints;
-      let game: GamePredictionDTO = this.games.find(
-        (y) => y.gameId == x.gameID
-      )!;
+      let game: GamePredictionDTO = this.gamesById.get(x.gameID)!;
 
       let gameOfoMap: Map<Date, PlayerExpectedFantasyPointsInfo[]> =
         this.teamPlayerExpectedOfoMap.get(teamID)!;
