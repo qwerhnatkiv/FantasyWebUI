@@ -1,27 +1,30 @@
-# Angularapp
+# FantasyWebUI
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
+Angular 17.3 frontend for the fantasy hockey project: calendar of games, player stats table, squad
+builder, and date-range driven expected-fantasy-points ("EFP") projections.
 
-## Development server
+## Running locally
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```powershell
+npm install
+npm start
+```
 
-## Code scaffolding
+`npm start` runs `ng serve --ssl` with an ASP.NET dev cert and serves on **:4200**. If the cert step
+fails, trust it once with `dotnet dev-certs https --trust`.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+**Local dev talks to the production backend by default** — the API base URL is hardcoded in
+`src/services/api/api.service.ts` rather than read from an environment file. Pointing the app at a
+locally running `FantasyWeb` means editing those URLs or wiring up `src/proxy.conf.js`, which is
+currently unused.
 
-## Build
+## Documentation
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- [`AGENTS.md`](AGENTS.md) — component/service inventory, data flow, routing and auth, known traps.
+- [`docs/perf-notes.md`](docs/perf-notes.md) — the reasoning behind several load-bearing perf patterns.
+- [`../AGENTS.md`](../AGENTS.md) — system-wide context across all four repos.
 
-## Running unit tests
+## Deployment
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Push to `master` → Vercel builds and deploys automatically to https://fantasy-web-ui.vercel.app. No
+manual step, and no safety net.
