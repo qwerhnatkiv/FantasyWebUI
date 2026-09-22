@@ -437,10 +437,14 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
       matchingPlayerInfo.teamID
     )!;
 
+    // Состав подбирается по ОФО 3 - она лучшая из трёх по всем пяти метрикам. Пока бэкенд с ОФО 3
+    // не выкачен, поле приходит пустым, и берётся ОФО, как раньше.
     let ofo: number = this.playerGamesOfoMap
       ?.get(matchingPlayerInfo.playerID)
       ?.reduce(
-        (partialSum, x) => partialSum + x.playerExpectedFantasyPoints,
+        (partialSum, x) =>
+          partialSum +
+          (x.playerExpectedFantasyPointsOfo3 || x.playerExpectedFantasyPoints),
         0.0
       )!;
 
@@ -489,7 +493,11 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     playersOfoDataArray.forEach((x) => {
-      let playerOfoSum = x.playerExpectedFantasyPoints;
+      // Лучшие игроки матча в календаре - тоже по ОФО 3, с откатом на ОФО, пока бэкенд с ней
+      // не выкачен. Ниже по потоку всё считается из этого числа: сортировка тройки и сумма
+      // в клетке календаря.
+      let playerOfoSum =
+        x.playerExpectedFantasyPointsOfo3 || x.playerExpectedFantasyPoints;
       let game: GamePredictionDTO = this.gamesById.get(x.gameID)!;
 
       let gameOfoMap: Map<Date, PlayerExpectedFantasyPointsInfo[]> =

@@ -310,15 +310,20 @@ export class PlayersTableComponent
 
         player.expectedFantasyPoints = ofo;
         player.expectedFantasyPointsOfo3 = ofo3;
+
+        // Производные величины считаются по ОФО 3: из трёх моделей она лучшая по всем пяти
+        // метрикам. Пока бэкенд с ОФО 3 не выкачен, поле приходит пустым, ofo3 равен нулю - тогда
+        // берётся ОФО, как раньше, и цена за очко не превращается в бесконечность.
+        const points: number = ofo3 > 0 ? ofo3 : ofo;
         player.fantasyPointsPerGame =
-          ofo > 0
-            ? Utils.formatNumber(ofo / player.gamesCount)
+          points > 0
+            ? Utils.formatNumber(points / player.gamesCount)
             : '0';
         player.priceByExpectedFantasyPoints =
-          ofo > 0 && player.price > 0 ? player.price / ofo : 999;
+          points > 0 && player.price > 0 ? player.price / points : 999;
         player.priceByExpectedFantasyPointsPerGame =
-          ofo > 0 && player.price > 0
-            ? player.price / (ofo / player.gamesCount)
+          points > 0 && player.price > 0
+            ? player.price / (points / player.gamesCount)
             : 999;
       }
     }
