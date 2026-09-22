@@ -168,5 +168,9 @@ export const SHOW_UPSIDE_LINES_LABEL: string = 'Показать игроков 
 // EXTERNAL SOURCES
 
 
-export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;
+// Галка «Скрыть игроков без игр в N последних матчах». Сезон 17 стартует 29.09.2026, и до
+// первых матчей она прячет вообще всех: сыгранных матчей нет ни у кого. Поэтому до утра
+// 30.09 она снята, а дальше включается сама (заказчик, 2026-09-23).
+export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean =
+  new Date() >= new Date(2026, 8, 30, 6, 0, 0);
 export const SHOW_ONLY_PLAYERS_IN_UPSIDE_LINES: boolean = false;
