@@ -304,17 +304,17 @@ export class PlayersTableComponent
         const ofo3: number = this.playerGamesOfoMap
           ?.get(player.playerObject.playerID)
           ?.reduce(
-            (partialSum, x) => partialSum + (x.playerExpectedFantasyPointsOfo3 ?? 0),
+            (partialSum, x) => partialSum + x.playerExpectedFantasyPointsOfo3,
             0.0
           )!;
 
         player.expectedFantasyPoints = ofo;
         player.expectedFantasyPointsOfo3 = ofo3;
 
-        // Производные величины считаются по ОФО 3: из трёх моделей она лучшая по всем пяти
-        // метрикам. Пока бэкенд с ОФО 3 не выкачен, поле приходит пустым, ofo3 равен нулю - тогда
-        // берётся ОФО, как раньше, и цена за очко не превращается в бесконечность.
-        const points: number = ofo3 > 0 ? ofo3 : ofo;
+        // Производные величины считаются ТОЛЬКО по ОФО 3: из трёх моделей она лучшая по всем пяти
+        // метрикам. Отката на ОФО 1 здесь нет намеренно (решение заказчика `2026-09-23`) - иначе
+        // поломка на стороне бэкенда прикидывается рабочими числами и остаётся незамеченной.
+        const points: number = ofo3;
         player.fantasyPointsPerGame =
           points > 0
             ? Utils.formatNumber(points / player.gamesCount)
