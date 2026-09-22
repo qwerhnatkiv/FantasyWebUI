@@ -58,7 +58,7 @@ export class PlayersTableComponent
     'position',
     'price',
     'expectedFantasyPoints',
-    'expectedFantasyPointsByModel',
+    'expectedFantasyPointsOfo3',
     'priceByExpectedFantasyPoints',
     'gamesCount',
     'easyGamesCount',
@@ -249,7 +249,7 @@ export class PlayersTableComponent
           iCF: player.formICF,
           iHDCF: player.formIHDCF,
           expectedFantasyPoints: 0,
-          expectedFantasyPointsByModel: 0,
+          expectedFantasyPointsOfo3: 0,
           fantasyPointsPerGame: '',
           priceByExpectedFantasyPoints: 0,
           priceByExpectedFantasyPointsPerGame: 0,
@@ -301,15 +301,15 @@ export class PlayersTableComponent
             0.0
           )!;
 
-        const ofoByModel: number = this.playerGamesOfoMap
+        const ofo3: number = this.playerGamesOfoMap
           ?.get(player.playerObject.playerID)
           ?.reduce(
-            (partialSum, x) => partialSum + x.playerExpectedFantasyPointsByModel,
+            (partialSum, x) => partialSum + (x.playerExpectedFantasyPointsOfo3 ?? 0),
             0.0
           )!;
 
         player.expectedFantasyPoints = ofo;
-        player.expectedFantasyPointsByModel = ofoByModel;
+        player.expectedFantasyPointsOfo3 = ofo3;
         player.fantasyPointsPerGame =
           ofo > 0
             ? Utils.formatNumber(ofo / player.gamesCount)
