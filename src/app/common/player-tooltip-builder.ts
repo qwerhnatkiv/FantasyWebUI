@@ -391,7 +391,7 @@ export module PlayerTooltipBuilder {
 
     const nearestGameOFO: number = playerGamesOfoMap
       ?.get(player.playerObject.playerID)
-      ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPoints!;
+      ?.find((x) => x.gameID == teamGame?.gameID)?.playerExpectedFantasyPointsOfo3!;
 
     return `
     <div>Ближайший соперник: ${opponentAcronym}, <span style="color:${teamWinColor}">Поб: ${Math.round(

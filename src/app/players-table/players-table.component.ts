@@ -450,7 +450,7 @@ export class PlayersTableComponent
     let ofoFirstChoice: OfoVariant = {
       priceSum: playersWithFirstChoice.reduce((n, { price }) => n + price, 0),
       expectedFantasyPointsSum: playersWithFirstChoice.reduce(
-        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        (n, { expectedFantasyPointsOfo3 }) => n + +expectedFantasyPointsOfo3,
         0
       ),
       priceByExpectedFantasyPointsSum: playersWithFirstChoice.reduce(
@@ -478,7 +478,7 @@ export class PlayersTableComponent
     let ofoSecondChoice: OfoVariant = {
       priceSum: playersWithSecondChoice.reduce((n, { price }) => n + price, 0),
       expectedFantasyPointsSum: playersWithSecondChoice.reduce(
-        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        (n, { expectedFantasyPointsOfo3 }) => n + +expectedFantasyPointsOfo3,
         0
       ),
       priceByExpectedFantasyPointsSum: playersWithSecondChoice.reduce(
@@ -613,8 +613,10 @@ export class PlayersTableComponent
       playerInfo?.map((x) => ({
         playerName: player.playerObject.playerName,
         playerID: player.playerObject.playerID,
-        playerExpectedFantasyPointsFormatted: Utils.formatNumber(x.playerExpectedFantasyPoints),
-        playerExpectedFantasyPoints: x.playerExpectedFantasyPoints,
+        playerExpectedFantasyPointsFormatted: Utils.formatNumber(
+          x.playerExpectedFantasyPointsOfo3
+        ),
+        playerExpectedFantasyPoints: x.playerExpectedFantasyPointsOfo3,
         teamName: teamName,
         gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
       }))!
@@ -661,11 +663,11 @@ export class PlayersTableComponent
         (x) =>
           x.teamObject.teamID == teamStat.teamID &&
           x.position != DEFAULT_POSITIONS[0] &&
-          x.expectedFantasyPoints != null
+          x.expectedFantasyPointsOfo3 != null
       );
 
       const bestTeamPlayer: PlayerChooseRecord = teamPlayers.sort(
-        (n1, n2) => n2.expectedFantasyPoints - n1.expectedFantasyPoints
+        (n1, n2) => n2.expectedFantasyPointsOfo3 - n1.expectedFantasyPointsOfo3
       )[0];
 
       if (bestTeamPlayer == null || bestTeamPlayer.gamesCount == 0) {
