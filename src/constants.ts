@@ -26,7 +26,9 @@ export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string
 
 export const ONE_DIGIT_NUMBER_FORMAT: string = '1.0-1'
 
-export const DEFAULT_FORM_LENGTH = 5;
+// Семь матчей: столько же, сколько окно формы у модели ОФО 3 (`fp_form_7`, `toi_form_7`).
+// Решение заказчика `2026-09-24`.
+export const DEFAULT_FORM_LENGTH = 7;
 export const DEFAULT_FORM_LENGTH_COUNT = 12;
 
 export const RED_PIM_LOWER_BOUNDARY = 40;
