@@ -37,7 +37,8 @@ export class PlayerCombinationsService {
           team: x.team,
           price: x.price,
           position: x.position,
-          expectedFantasyPoints: x.expectedFantasyPoints,
+          // Оптимизатор ранжирует кандидатов по этому числу - значит это ОФО 3, а не ОФО 1.
+          expectedFantasyPoints: x.expectedFantasyPointsOfo3,
           toi: x.toi,
           hasProjections: x.projectedGamesCount > 0,
         };
@@ -76,7 +77,7 @@ export class PlayerCombinationsService {
       price: player.playerObject.price,
       startPrice: player.playerObject.startPrice,
       gamesCount: player.gamesCount,
-      expectedFantasyPoints: player.expectedFantasyPoints,
+      expectedFantasyPoints: player.expectedFantasyPointsOfo3,
       isRemoved: false,
       isNew: true,
       isOptimal: isOptimal,

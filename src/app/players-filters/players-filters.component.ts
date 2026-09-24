@@ -151,7 +151,10 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
       if (this.playerGamesOfoMap) {
         const playerOfo = this.playerGamesOfoMap.get(player.playerID);
         if (playerOfo && Array.isArray(playerOfo)) {
-          efp = playerOfo.reduce((sum, o) => sum + (o.playerExpectedFantasyPoints || 0), 0);
+          efp = playerOfo.reduce(
+            (sum, o) => sum + (o.playerExpectedFantasyPointsOfo3 || 0),
+            0
+          );
         }
       }
       return {

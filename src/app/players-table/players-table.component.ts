@@ -66,10 +66,7 @@ export class PlayersTableComponent
     'powerPlayTime',
     'powerPlayNumber',
     'toi',
-    'shotsOnGoal',
-    'iXG',
     'iCF',
-    'iHDCF',
     'fantasyPointsPerGame',
     'priceByExpectedFantasyPointsPerGame',
     'linemates',
@@ -304,21 +301,26 @@ export class PlayersTableComponent
         const ofo3: number = this.playerGamesOfoMap
           ?.get(player.playerObject.playerID)
           ?.reduce(
-            (partialSum, x) => partialSum + (x.playerExpectedFantasyPointsOfo3 ?? 0),
+            (partialSum, x) => partialSum + x.playerExpectedFantasyPointsOfo3,
             0.0
           )!;
 
         player.expectedFantasyPoints = ofo;
         player.expectedFantasyPointsOfo3 = ofo3;
+
+        // Производные величины считаются ТОЛЬКО по ОФО 3: из трёх моделей она лучшая по всем пяти
+        // метрикам. Отката на ОФО 1 здесь нет намеренно (решение заказчика `2026-09-23`) - иначе
+        // поломка на стороне бэкенда прикидывается рабочими числами и остаётся незамеченной.
+        const points: number = ofo3;
         player.fantasyPointsPerGame =
-          ofo > 0
-            ? Utils.formatNumber(ofo / player.gamesCount)
+          points > 0
+            ? Utils.formatNumber(points / player.gamesCount)
             : '0';
         player.priceByExpectedFantasyPoints =
-          ofo > 0 && player.price > 0 ? player.price / ofo : 999;
+          points > 0 && player.price > 0 ? player.price / points : 999;
         player.priceByExpectedFantasyPointsPerGame =
-          ofo > 0 && player.price > 0
-            ? player.price / (ofo / player.gamesCount)
+          points > 0 && player.price > 0
+            ? player.price / (points / player.gamesCount)
             : 999;
       }
     }
@@ -448,7 +450,7 @@ export class PlayersTableComponent
     let ofoFirstChoice: OfoVariant = {
       priceSum: playersWithFirstChoice.reduce((n, { price }) => n + price, 0),
       expectedFantasyPointsSum: playersWithFirstChoice.reduce(
-        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        (n, { expectedFantasyPointsOfo3 }) => n + +expectedFantasyPointsOfo3,
         0
       ),
       priceByExpectedFantasyPointsSum: playersWithFirstChoice.reduce(
@@ -476,7 +478,7 @@ export class PlayersTableComponent
     let ofoSecondChoice: OfoVariant = {
       priceSum: playersWithSecondChoice.reduce((n, { price }) => n + price, 0),
       expectedFantasyPointsSum: playersWithSecondChoice.reduce(
-        (n, { expectedFantasyPoints }) => n + +expectedFantasyPoints,
+        (n, { expectedFantasyPointsOfo3 }) => n + +expectedFantasyPointsOfo3,
         0
       ),
       priceByExpectedFantasyPointsSum: playersWithSecondChoice.reduce(
@@ -611,8 +613,10 @@ export class PlayersTableComponent
       playerInfo?.map((x) => ({
         playerName: player.playerObject.playerName,
         playerID: player.playerObject.playerID,
-        playerExpectedFantasyPointsFormatted: Utils.formatNumber(x.playerExpectedFantasyPoints),
-        playerExpectedFantasyPoints: x.playerExpectedFantasyPoints,
+        playerExpectedFantasyPointsFormatted: Utils.formatNumber(
+          x.playerExpectedFantasyPointsOfo3
+        ),
+        playerExpectedFantasyPoints: x.playerExpectedFantasyPointsOfo3,
         teamName: teamName,
         gameDate: teamGame.find((game) => game.gameID == x.gameID)?.gameDate!,
       }))!
@@ -659,11 +663,11 @@ export class PlayersTableComponent
         (x) =>
           x.teamObject.teamID == teamStat.teamID &&
           x.position != DEFAULT_POSITIONS[0] &&
-          x.expectedFantasyPoints != null
+          x.expectedFantasyPointsOfo3 != null
       );
 
       const bestTeamPlayer: PlayerChooseRecord = teamPlayers.sort(
-        (n1, n2) => n2.expectedFantasyPoints - n1.expectedFantasyPoints
+        (n1, n2) => n2.expectedFantasyPointsOfo3 - n1.expectedFantasyPointsOfo3
       )[0];
 
       if (bestTeamPlayer == null || bestTeamPlayer.gamesCount == 0) {

@@ -26,7 +26,9 @@ export const DEFAULT_POSITIONS_MAP: Map<string, string> = new Map<string, string
 
 export const ONE_DIGIT_NUMBER_FORMAT: string = '1.0-1'
 
-export const DEFAULT_FORM_LENGTH = 5;
+// Семь матчей: столько же, сколько окно формы у модели ОФО 3 (`fp_form_7`, `toi_form_7`).
+// Решение заказчика `2026-09-24`.
+export const DEFAULT_FORM_LENGTH = 7;
 export const DEFAULT_FORM_LENGTH_COUNT = 12;
 
 export const RED_PIM_LOWER_BOUNDARY = 40;
@@ -168,5 +170,9 @@ export const SHOW_UPSIDE_LINES_LABEL: string = 'Показать игроков 
 // EXTERNAL SOURCES
 
 
-export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean = true;
+// Галка «Скрыть игроков без игр в N последних матчах». Сезон 17 стартует 29.09.2026, и до
+// первых матчей она прячет вообще всех: сыгранных матчей нет ни у кого. Поэтому до утра
+// 30.09 она снята, а дальше включается сама (заказчик, 2026-09-23).
+export const REMOVE_PLAYERS_WITH_NO_GAMES: boolean =
+  new Date() >= new Date(2026, 8, 30, 6, 0, 0);
 export const SHOW_ONLY_PLAYERS_IN_UPSIDE_LINES: boolean = false;
