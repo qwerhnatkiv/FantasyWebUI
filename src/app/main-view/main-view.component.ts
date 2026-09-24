@@ -34,6 +34,8 @@ import { PlayersObservableProxyService } from 'src/services/observable-proxy/pla
 import { Subscription } from 'rxjs';
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 import { ApiService } from 'src/services/api/api.service';
+import { ViewStateUrlService } from 'src/services/url-state/view-state-url.service';
+import { ViewUrlState } from '../interfaces/view-url-state';
 
 @Component({
   selector: 'app-main-view',
@@ -140,10 +142,40 @@ export class MainViewComponent implements OnInit, OnChanges, OnDestroy {
     private _dateFiltersService: DateFiltersService,
     private _playersObservableProxyService: PlayersObservableProxyService,
     private _teamsEasySeriesService: TeamsEasySeriesService,
-    private _apiService: ApiService
+    private _apiService: ApiService,
+    private _viewStateUrlService: ViewStateUrlService
   ) {
+    // Строго до первого запроса: getGames уходит с formLength, а состав - с выбранной УЗ,
+    // так что восстановиться надо раньше, чем полетят запросы, иначе они полетят дважды.
+    this._restoreStateFromUrl();
+
     this._teamsEasySeriesService.getTeamsEasySeries();
     this.getCalendarData(true);
+  }
+
+  /**
+   * Restores everything the view was opened with, so a copied link reproduces the same screen.
+   *
+   * Значения проставляются полям напрямую, без сеттера `selectedUser` и без событий от фильтров:
+   * состав всё равно подтянется после загрузки ОФО (см. `setOfoDataForPlayers`), а компонент
+   * фильтров разбирает тот же снимок для своих контролов.
+   */
+  private _restoreStateFromUrl(): void {
+    const initialState: Readonly<ViewUrlState> =
+      this._viewStateUrlService.initialState;
+
+    this.isCalendarHidden = initialState.isCalendarHidden;
+    this.formLength = initialState.formLength;
+    this._selectedUser = initialState.selectedUser;
+
+    this.lowerBoundPrice = initialState.lowerBoundPrice;
+    this.upperBoundPrice = initialState.upperBoundPrice;
+    this.positions = initialState.positions;
+    this.teams = initialState.teams;
+    this.powerPlayUnits = initialState.powerPlayUnits;
+    this.selectedPlayerIds = initialState.searchedPlayerIds;
+    this.playersAreNotPlayedDisabled = initialState.playersAreNotPlayedDisabled;
+    this.hideLowGPPlayersEnabled = initialState.hideLowGPPlayersEnabled;
   }
 
   ngOnInit(): void {

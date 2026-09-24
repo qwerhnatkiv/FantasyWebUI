@@ -37,6 +37,8 @@ import { PlayerStatsDTO } from '../interfaces/player-stats-dto';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { ViewStateUrlService } from 'src/services/url-state/view-state-url.service';
+import { ViewUrlState } from '../interfaces/view-url-state';
 
 @Component({
   selector: 'app-players-filters',
@@ -118,9 +120,14 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
     playersCount: 0,
   };
 
+  // Фишки выбранных в поиске игроков восстанавливаются из адреса один раз - как только
+  // приедет список игроков, из которого берутся их имена.
+  private _areSearchedPlayersRestored: boolean = false;
+
   constructor(
     private _filtersObservableProxyService: FiltersObservableProxyService,
     private _tippyService: NgxTippyService,
+    private _viewStateUrlService: ViewStateUrlService,
   ) {}
 
   ngOnInit() {
@@ -135,7 +142,64 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   ngAfterViewInit() {
-    this.setDefaultPositions();
+    this._restoreStateFromUrl();
+  }
+
+  /**
+   * Заполняет контролы фильтров из адреса, с которым открыли страницу.
+   *
+   * Наверх ничего не эмитится: главный экран разбирает тот же снимок сам, в конструкторе,
+   * и лишние события только заставили бы его перезапрашивать данные.
+   */
+  private _restoreStateFromUrl(): void {
+    const initialState: Readonly<ViewUrlState> =
+      this._viewStateUrlService.initialState;
+
+    this.lowerBoundPrice = initialState.lowerBoundPrice;
+    this.upperBoundPrice = initialState.upperBoundPrice;
+    this.positionsFormControl.setValue([...initialState.positions]);
+    this.teamsFormControl.setValue([...initialState.teams]);
+    this.powerPlayFormControl.setValue([...initialState.powerPlayUnits]);
+    this.formLength = initialState.formLength;
+    this.playersAreNotPlayedDisabled = initialState.playersAreNotPlayedDisabled;
+    this.hideLowGPPlayersEnabled = initialState.hideLowGPPlayersEnabled;
+    this.showOnlyPlayersInUpsideLines =
+      initialState.showOnlyPlayersInUpsideLines;
+
+    this.selectedUser = initialState.selectedUser ?? null;
+    this.selectedUserId =
+      this.selectedUser != null
+        ? USER_ID_NAME.get(this.selectedUser)
+        : undefined;
+
+    this._restoreSearchedPlayers();
+  }
+
+  /**
+   * Восстанавливает фишки игроков, выбранных через поиск. Ждёт загруженный список игроков:
+   * в адресе лежат только идентификаторы, а на фишке нужно имя.
+   */
+  private _restoreSearchedPlayers(): void {
+    const searchedPlayerIds: number[] =
+      this._viewStateUrlService.initialState.searchedPlayerIds;
+
+    if (this._areSearchedPlayersRestored || searchedPlayerIds.length === 0) {
+      return;
+    }
+
+    if (this.allPlayers.length === 0) {
+      return;
+    }
+
+    for (const playerId of searchedPlayerIds) {
+      const player = this.allPlayers.find((x) => x.id === playerId);
+
+      if (player != null) {
+        this.selectedPlayers.set(player.id, player.name);
+      }
+    }
+
+    this._areSearchedPlayersRestored = true;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -166,6 +230,8 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
     
     // Sort by EFP descending (highest first)
     this.allPlayers.sort((a, b) => b.efp - a.efp);
+
+    this._restoreSearchedPlayers();
   }
 
   private _filterPlayers(
@@ -217,6 +283,7 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
 
   onSelectedPlayersChanged() {
     const playerIds = Array.from(this.selectedPlayers.keys());
+    this._viewStateUrlService.patch({ searchedPlayerIds: playerIds });
     this.sendSelectedPlayerIds.emit(playerIds);
   }
 
@@ -226,18 +293,26 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
       this.upperBoundPriceChanged();
     }
 
+    this._viewStateUrlService.patch({ lowerBoundPrice: this.lowerBoundPrice });
     this.sendLowerBoundPrice.emit(this.lowerBoundPrice);
   }
 
   upperBoundPriceChanged() {
+    this._viewStateUrlService.patch({ upperBoundPrice: this.upperBoundPrice });
     this.sendUpperBoundPrice.emit(this.upperBoundPrice);
   }
 
   playersAreNotPlayedDisabledChanged() {
+    this._viewStateUrlService.patch({
+      playersAreNotPlayedDisabled: this.playersAreNotPlayedDisabled,
+    });
     this.sendPlayersAreNotPlayedDisabled.emit(this.playersAreNotPlayedDisabled);
   }
 
   hideLowGPPlayersEnabledChanged() {
+    this._viewStateUrlService.patch({
+      hideLowGPPlayersEnabled: this.hideLowGPPlayersEnabled,
+    });
     this.sendHideLowGPPlayersEnabled.emit(this.hideLowGPPlayersEnabled);
   }
 
@@ -246,10 +321,19 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   positionsChanged() {
+    this._viewStateUrlService.patch({
+      positions: this.positionsFormControl.value ?? [],
+    });
     this.sendPositions.emit(this.positionsFormControl.value!);
   }
 
   positionOnClick(event: MatOptionSelectionChange) {
+    // Только на выбор руками: при программной установке значения (восстановление из адреса,
+    // сброс фильтров) ветка с вратарями сама звала бы setValue и зацикливала выбор.
+    if (!event.isUserInput) {
+      return;
+    }
+
     if (event.source.value == DEFAULT_POSITIONS[0]) {
       if (event.source.selected) {
         const GK_Position: any[] = [DEFAULT_POSITIONS[0]];
@@ -275,10 +359,14 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   formLengthChanged(event: MatSelectChange) {
+    this._viewStateUrlService.patch({ formLength: event.value });
     this.sendFormLength.emit(event.value);
   }
 
   selectedUserChanged() {
+    this._viewStateUrlService.patch({
+      selectedUser: this.selectedUser ?? undefined,
+    });
     this.sendSelectedUser.emit(this.selectedUser!);
 
     if (this.selectedUser == null) {
@@ -290,10 +378,16 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   teamsChanged() {
+    this._viewStateUrlService.patch({
+      teams: this.teamsFormControl.value ?? [],
+    });
     this.sendTeams.emit(this.teamsFormControl.value!);
   }
 
   powerPlayUnitsChanged() {
+    this._viewStateUrlService.patch({
+      powerPlayUnits: this.powerPlayFormControl.value ?? [],
+    });
     this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value!);
   }
 
@@ -355,6 +449,7 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
 
     if (this.formLength != DEFAULT_FORM_LENGTH) {
       this.formLength = DEFAULT_FORM_LENGTH;
+      this._viewStateUrlService.patch({ formLength: this.formLength });
       this.sendFormLength.emit(this.formLength);
     }
 

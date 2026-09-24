@@ -38,6 +38,7 @@ import { Utils } from '../common/utils';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 import { PlayerLineFormatted } from '../interfaces/player-line-formatted';
 import { ApiService } from 'src/services/api/api.service';
+import { ViewStateUrlService } from 'src/services/url-state/view-state-url.service';
 
 @Component({
   selector: 'app-players-table',
@@ -133,6 +134,10 @@ export class PlayersTableComponent
   dataSource = new MatTableDataSource(this.players);
   private clickedOnCheckboxOrButton: boolean = false;
 
+  // Выбор игроков в календаре восстанавливается из адреса ровно один раз - как только
+  // появятся и игроки, и их игры в выбранном диапазоне.
+  private _arePickedPlayersRestored: boolean = false;
+
   protected filterDates: DatesRangeModel = {
     minDate: new Date(),
     maxDate: new Date(),
@@ -144,7 +149,8 @@ export class PlayersTableComponent
     private _changeDetectorRef: ChangeDetectorRef,
     private _dateFiltersService: DateFiltersService,
     private _playerCombinationsService: PlayerCombinationsService,
-    private _apiService: ApiService
+    private _apiService: ApiService,
+    private _viewStateUrlService: ViewStateUrlService
   ) {
     this.dataSource.filterPredicate = (record: PlayerChooseRecord, filter: string) => 
       this._filterPlayers(record, filter);
@@ -373,6 +379,8 @@ export class PlayersTableComponent
 
     this.refreshPlayersFilter();
 
+    this._restorePickedPlayersFromUrl();
+
     this._changeDetectorRef.detectChanges();
   }
 
@@ -419,9 +427,7 @@ export class PlayersTableComponent
 
   public deselectAllPlayersInCalendar() {
     this.selectedPlayers = new Map<string, SelectedPlayerModel[]>();
-    this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
-      this.selectedPlayers
-    );
+    this._publishSelectedPlayers();
   }
 
   private _deselectAllPlayersInComparison(): void {
@@ -597,9 +603,7 @@ export class PlayersTableComponent
         currentSelectedPlayerForTeam[0].playerID ===
         player.playerObject.playerID
       ) {
-        this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
-          this.selectedPlayers
-        );
+        this._publishSelectedPlayers();
         return;
       }
     }
@@ -622,9 +626,7 @@ export class PlayersTableComponent
       }))!
     );
 
-    this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
-      this.selectedPlayers
-    );
+    this._publishSelectedPlayers();
   }
 
   public isPlayerSelected(player: PlayerChooseRecord) {
@@ -656,6 +658,70 @@ export class PlayersTableComponent
   //#endregion
 
   //#region Private methods
+
+  /**
+   * Отдаёт текущий выбор игроков календарю и кладёт его же в адресную строку,
+   * чтобы скопированная ссылка открылась с теми же подсвеченными игроками.
+   */
+  private _publishSelectedPlayers(): void {
+    const pickedPlayerIds: number[] = Array.from(this.selectedPlayers.values())
+      .map((x) => x?.[0]?.playerID)
+      .filter((x): x is number => x != null);
+
+    this._viewStateUrlService.patch({ pickedPlayerIds: pickedPlayerIds });
+
+    this._playersObservableProxyService.triggerSendSelectedPlayersToCalendar(
+      this.selectedPlayers
+    );
+  }
+
+  /**
+   * Восстанавливает выбранных кликом игроков из адреса, с которым открыли страницу.
+   *
+   * Ждёт и игроков, и их игры в выбранном диапазоне: без игр строку выбрать нельзя,
+   * поэтому вызывается на каждом ngOnChanges и отрабатывает один раз.
+   */
+  private _restorePickedPlayersFromUrl(): void {
+    if (
+      this._arePickedPlayersRestored ||
+      this.players.length === 0 ||
+      this.playerGamesOfoMap == null ||
+      this.filteredTeamGames.size === 0
+    ) {
+      return;
+    }
+
+    this._arePickedPlayersRestored = true;
+
+    const pickedPlayerIds: number[] =
+      this._viewStateUrlService.initialState.pickedPlayerIds;
+
+    if (pickedPlayerIds.length === 0) {
+      // Ссылка с нажатой кнопкой "лучшие по ОФО", но без перечня игроков - например,
+      // собранная руками. Лучших считаем сами, по тем же датам, что и в адресе.
+      if (this._viewStateUrlService.initialState.areBestPlayersByOfoSelected) {
+        this._selectBestPlayersForEachTeamInCalendar();
+      }
+
+      return;
+    }
+
+    for (const playerId of pickedPlayerIds) {
+      const player: PlayerChooseRecord | undefined = this.players.find(
+        (x) => x.playerObject.playerID === playerId
+      );
+
+      const hasGamesInRange: boolean =
+        player != null &&
+        (this.filteredTeamGames.get(player.teamObject.teamID)?.length ?? 0) > 0;
+
+      if (!hasGamesInRange) {
+        continue;
+      }
+
+      this.selectPlayerRow(player!);
+    }
+  }
 
   private _selectBestPlayersForEachTeamInCalendar() {
     for (const teamStat of this.teamStats) {

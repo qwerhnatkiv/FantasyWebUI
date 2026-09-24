@@ -41,6 +41,7 @@ import { Moment } from 'moment';
 import { DatesRangeModel } from '../interfaces/dates-range.model';
 import { Subscription } from 'rxjs';
 import { Utils } from '../common/utils';
+import { ViewStateUrlService } from 'src/services/url-state/view-state-url.service';
 
 @Component({
   selector: 'header-menu',
@@ -94,6 +95,7 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     maxDate: new Date(),
   };
   protected areTeamsEasySeriesEnabled: boolean = false;
+  protected areBestPlayersByOfoSelected: boolean = false;
   protected username: string = '';
 
   //#region CTOR
@@ -103,7 +105,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
     private _playersObservableProxyService: PlayersObservableProxyService,
     private _dateFiltersService: DateFiltersService,
     private _authService: AuthService,
-    private _router: Router
+    private _router: Router,
+    private _viewStateUrlService: ViewStateUrlService
   ) {}
 
   //#endregion CTOR
@@ -111,6 +114,8 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   //#region LIFECYCLE HOOKS
 
   ngOnInit(): void {
+    this._restoreStateFromUrl();
+
     this._filterDatesRangeSubscription =
       this._dateFiltersService.$dateFiltersObservable.subscribe(
         (value: DatesRangeModel) => {
@@ -135,6 +140,9 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
    */
   protected updateCalendarVisibility(): void {
     this.isCalendarHidden = !this.isCalendarHidden;
+    this._viewStateUrlService.patch({
+      isCalendarHidden: this.isCalendarHidden,
+    });
     this.calendarVisibilityUpdated.emit(this.isCalendarHidden);
   }
 
@@ -177,6 +185,13 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
    * Triggers event of showing most valuable player for each team in the calendar
    */
   protected showMostValuablePlayersInCalendar(): void {
+    // Повторное нажатие снимает выбор (selectPlayerRow работает переключателем),
+    // поэтому кнопка и в адресе живёт как обычный тумблер.
+    this.areBestPlayersByOfoSelected = !this.areBestPlayersByOfoSelected;
+    this._viewStateUrlService.patch({
+      areBestPlayersByOfoSelected: this.areBestPlayersByOfoSelected,
+    });
+
     this._playersObservableProxyService.triggerShowBestPlayersInCalendarEvent();
   }
 
@@ -275,6 +290,28 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
   //#endregion PROTECTED METHODS for HTML Template
 
   //#region PRIVATE METHODS
+
+  /**
+   * Restores button states from the URL the page was opened with.
+   *
+   * Only the menu's own fields are set here - the calendar itself picks the same values
+   * up from `CalendarObservableProxyService`, which is seeded from the very same snapshot.
+   */
+  private _restoreStateFromUrl(): void {
+    this.isCalendarHidden =
+      this._viewStateUrlService.initialState.isCalendarHidden;
+    this.areBestPlayersByOfoSelected =
+      this._viewStateUrlService.initialState.areBestPlayersByOfoSelected;
+
+    this.hasPastCalendarGames =
+      this._calendarObservableProxyService.hasPastCalendarGames;
+    this.isCalendarSimplifiedModeEnabled =
+      this._calendarObservableProxyService.isCalendarInSimplifiedMode;
+    this.isSimplifiedCalendarAdvancedDrawingModeEnabled =
+      this._calendarObservableProxyService.isSimplifiedCalendarAdvancedDrawingEnabled;
+    this.areTeamsEasySeriesEnabled =
+      this._calendarObservableProxyService.areTeamsEasySeriesEnabled;
+  }
 
   /**
    * Decodes the stored JWT to populate the displayed username

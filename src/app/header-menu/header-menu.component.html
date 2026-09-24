@@ -16,6 +16,7 @@
 
       <i-button
         [allowActiveState]="true"
+        [isActive]="hasPastCalendarGames"
         iconPath="/assets/images/calendar-small.png"
         (clickEmitter)="updateCalendarGamesRangeMode()"
         [tooltipText]="
@@ -27,6 +28,7 @@
 
       <i-button
         [allowActiveState]="true"
+        [isActive]="isCalendarSimplifiedModeEnabled"
         iconPath="/assets/images/minesweeper-small.png"
         [iconRelativeSize]="65"
         (clickEmitter)="updateCalendarSimplifiedMode()"
@@ -52,6 +54,7 @@
 
       <i-button
         [allowActiveState]="true"
+        [isActive]="areBestPlayersByOfoSelected"
         iconPath="/assets/images/select-best-players-small.png"
         [iconRelativeSize]="70"
         (clickEmitter)="showMostValuablePlayersInCalendar()"
@@ -60,6 +63,7 @@
 
       <i-button
         [allowActiveState]="true"
+        [isActive]="areTeamsEasySeriesEnabled"
         [iconPath]="
           areTeamsEasySeriesEnabled
             ? '/assets/images/easy-series-off.png'

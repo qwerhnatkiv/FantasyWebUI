@@ -4,6 +4,7 @@ import { GamesUtils } from 'src/app/common/games-utils';
 import { Utils } from 'src/app/common/utils';
 import { DatesRangeModel } from 'src/app/interfaces/dates-range.model';
 import { GamePredictionDTO } from 'src/app/interfaces/game-prediction-dto';
+import { ViewStateUrlService } from '../url-state/view-state-url.service';
 
 @Injectable()
 export class DateFiltersService {
@@ -11,6 +12,8 @@ export class DateFiltersService {
     new Subject<DatesRangeModel>();
 
   public minDefaultDate: Date | undefined = undefined;
+
+  constructor(private _viewStateUrlService: ViewStateUrlService) {}
 
   /**
    * Observable for the event of changing the date filters (one of the min and max).
@@ -27,6 +30,19 @@ export class DateFiltersService {
     weeks: number[],
     games: GamePredictionDTO[]
   ): void {
+    // Даты из скопированной ссылки важнее расчётных: иначе открытый по ссылке экран
+    // молча съезжал бы на текущую игровую неделю.
+    const urlDateFrom: Date | undefined =
+      this._viewStateUrlService.initialState.dateFrom;
+    const urlDateTo: Date | undefined =
+      this._viewStateUrlService.initialState.dateTo;
+
+    if (urlDateFrom != null && urlDateTo != null) {
+      this.minDefaultDate = urlDateFrom;
+      this.triggerDateFiltersSubjectUpdate(urlDateFrom, urlDateTo);
+      return;
+    }
+
     const minDate: Date = GamesUtils.getExtremumDateForGames(games, false);
 
     let minFilterDate: Date | undefined = new Date(minDate.getTime());
@@ -103,6 +119,8 @@ export class DateFiltersService {
     minDate: Date | undefined,
     maxDate: Date | undefined
   ): void {
+    this._viewStateUrlService.patch({ dateFrom: minDate, dateTo: maxDate });
+
     this._dateFiltersSubject.next({
       minDate: minDate,
       maxDate: maxDate,

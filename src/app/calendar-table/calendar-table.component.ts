@@ -177,6 +177,11 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   > = new Map<number, Map<Date, PlayerExpectedFantasyPointsInfo[]>>();
 
   private savedCalendarRows: Map<string, any> = new Map<string, any>();
+
+  // Последний присланный выбор игроков. Хранится, чтобы применить его ещё раз, когда
+  // строки календаря построятся позже самого выбора (см. _applySelectedPlayersToRows).
+  private _selectedPlayersInCalendar: Map<string, SelectedPlayerModel[]> =
+    new Map<string, SelectedPlayerModel[]>();
   public yesterdayDate: Date = new Date();
   public yesterdayDateStart: Date = new Date();
 
@@ -352,6 +357,9 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this.columnsToDisplay = displayColumns;
 
     this._isCalendarDataUpdated = false;
+
+    // Выбор игроков мог приехать раньше строк - переносим его в только что построенные
+    this._applySelectedPlayersToRows();
   }
 
   public isPlayerSelectedCell(element: any, cell: TableCell): boolean {
@@ -1082,51 +1090,74 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     this._selectedPlayersSubscription =
       this._playersObservableProxyService.$selectedPlayersObservable?.subscribe(
         (playersMap: Map<string, SelectedPlayerModel[]>) => {
-          for (const [_, valueRow] of this.savedCalendarRows) {
-            if (playersMap.has(valueRow.team.displayValue)) {
-              continue;
-            }
-
-            const index = this.dataSourceArray.findIndex(
-              (x) => x.team.cellValue == valueRow.team.cellValue
-            );
-            const concreteRow: any = this.dataSourceArray[index];
-
-            for (const key in valueRow) {
-              concreteRow[key].displayValue = valueRow[key].displayValue;
-            }
-          }
-
-          for (const [key, value] of playersMap) {
-            const rowToReplace: any = this.dataSourceArray.find(
-              (x) => x.team.cellValue == key
-            );
-
-            if (!this.savedCalendarRows.has(key)) {
-              this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
-            }
-
-            const playerEfpSum: number = value.reduce(
-              (sum, x) => sum + x.playerExpectedFantasyPoints,
-              0
-            );
-            rowToReplace.team.displayValue =
-              value[0].playerName +
-              `: ${Utils.formatNumber(playerEfpSum)} ${EFP_LABEL}`;
-            rowToReplace.team.playerId = value[0].playerID;
-
-            for (const game of value) {
-              const gameDateStr: string = this.datepipe.transform(
-                game.gameDate,
-                DEFAULT_DATE_FORMAT
-              )!;
-              rowToReplace[gameDateStr].displayValue =
-                game.playerExpectedFantasyPointsFormatted;
-            }
-          }
+          this._selectedPlayersInCalendar = playersMap;
+          this._applySelectedPlayersToRows();
           this._changeDetectorRef.detectChanges();
         }
       );
+  }
+
+  /**
+   * Переносит выбранных игроков в строки календаря.
+   *
+   * Строк может ещё не быть: выбор, восстановленный из адресной строки, приходит от таблицы
+   * игроков и способен обогнать отрисовку календаря (та ждёт ещё и лёгкие серии). Поэтому
+   * выбор запоминается и применяется повторно, как только строки построены.
+   */
+  private _applySelectedPlayersToRows(): void {
+    const playersMap: Map<string, SelectedPlayerModel[]> =
+      this._selectedPlayersInCalendar;
+
+    for (const [_, valueRow] of this.savedCalendarRows) {
+      if (playersMap.has(valueRow.team.displayValue)) {
+        continue;
+      }
+
+      const index = this.dataSourceArray.findIndex(
+        (x) => x.team.cellValue == valueRow.team.cellValue
+      );
+      const concreteRow: any = this.dataSourceArray[index];
+
+      if (concreteRow == null) {
+        continue;
+      }
+
+      for (const key in valueRow) {
+        concreteRow[key].displayValue = valueRow[key].displayValue;
+      }
+    }
+
+    for (const [key, value] of playersMap) {
+      const rowToReplace: any = this.dataSourceArray.find(
+        (x) => x.team.cellValue == key
+      );
+
+      if (rowToReplace == null || value == null || value.length === 0) {
+        continue;
+      }
+
+      if (!this.savedCalendarRows.has(key)) {
+        this.savedCalendarRows.set(key, cloneDeep(rowToReplace));
+      }
+
+      const playerEfpSum: number = value.reduce(
+        (sum, x) => sum + x.playerExpectedFantasyPoints,
+        0
+      );
+      rowToReplace.team.displayValue =
+        value[0].playerName +
+        `: ${Utils.formatNumber(playerEfpSum)} ${EFP_LABEL}`;
+      rowToReplace.team.playerId = value[0].playerID;
+
+      for (const game of value) {
+        const gameDateStr: string = this.datepipe.transform(
+          game.gameDate,
+          DEFAULT_DATE_FORMAT
+        )!;
+        rowToReplace[gameDateStr].displayValue =
+          game.playerExpectedFantasyPointsFormatted;
+      }
+    }
   }
 
   private _subscribeToDataObservables(): void {
