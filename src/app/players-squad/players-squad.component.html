@@ -1,13 +1,22 @@
 <div class="user-squad-container">
   <div class="user-squad-table-container">
-    <i-button
-      class="btn-get-optimal-players-combinations"
-      iconPath="/assets/images/lightbulb.png"
-      [iconRelativeSize]="65"
-      (clickEmitter)="getOptimalPlayersCombinations()"
-      tooltipText="Выбрать оптимальных игроков"
-      [hidden]="squadPlayers.length === 0"
-    ></i-button>
+    <div
+      class="squad-buttons-container"
+      *ngIf="squadPlayers.length > 0"
+    >
+      <i-button
+        iconPath="/assets/images/lightbulb.png"
+        [iconRelativeSize]="65"
+        (clickEmitter)="getOptimalPlayersCombinations()"
+        tooltipText="Выбрать оптимальных игроков"
+      ></i-button>
+      <i-button
+        iconPath="/assets/images/clear-list-small.png"
+        [iconRelativeSize]="55"
+        (clickEmitter)="resetWholeSquad()"
+        tooltipText="Сбросить весь состав"
+      ></i-button>
+    </div>
 
     <table mat-table [dataSource]="dataSource" [trackBy]="trackByPlayerId" class="players-squad-table">
       <ng-container matColumnDef="action">

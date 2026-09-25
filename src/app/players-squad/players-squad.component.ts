@@ -28,6 +28,9 @@ import { PlayerCombinationsService } from 'src/services/player-combinations/play
 import { Subscription } from 'rxjs';
 import { OptimalCombinationsResultDto } from '../interfaces/player-combinations/optimal-combinations-result-dto.model';
 import { PlayerChooseRecord } from '../interfaces/player-choose-record';
+
+const FULL_COMBINATION_MAX_PLAYERS: number = 5;
+
 @Component({
   selector: 'app-players-squad',
   templateUrl: './players-squad.component.html',
@@ -172,6 +175,9 @@ export class PlayersSquadComponent implements OnInit {
   }
 
   protected getOptimalPlayersCombinations(): void {
+    // Каждый запуск решает с нуля: прошлая подсказка оптимизатора не должна занимать слоты и бюджет.
+    this._revertOptimalPlayers();
+
     this._playerCombinationsService.getOptimalPlayersCombinations(
       this.getTotalBalance(false),
       this.squadPlayers
@@ -225,6 +231,24 @@ export class PlayersSquadComponent implements OnInit {
     this.playerCombinations = [];
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
+  }
+
+  /**
+   * Убирает из состава всех: добавленные удаляются, текущие помечаются удалёнными.
+   * После этого лампочка подбирает все 17 мест с нуля на весь бюджет.
+   */
+  public resetWholeSquad() {
+    this.squadPlayers = this.squadPlayers.filter((x) => !x.isNew);
+    this.squadPlayers.forEach((x) => {
+      x.isRemoved = true;
+      x.isOptimal = false;
+    });
+
+    this.playerCombinations = [];
+
+    this.setSquadPlayersSortOrder();
+    this.sendAvailableSlots.emit(this.getAvailableSlots());
+    this.squadPlayersChange.emit(this.squadPlayers);
   }
 
   public generateCellToolTip(player: PlayerSquadRecord): string | null {
@@ -418,18 +442,28 @@ export class PlayersSquadComponent implements OnInit {
     this.playerCombinations.length = 0;
 
     if (combinations.length > 0 && combinations[0].players.length > 0) {
-      const shownCombinations: OptimalCombinationsResultDto[] = combinations.slice(1);
-      for (const combination of shownCombinations) {
-        this.playerCombinations.push(combination.players.map(x => x.name).join(', '));
-      }
-
       const bestCombination: OptimalCombinationsResultDto = combinations[0];
 
-      this.squadPlayers = this.squadPlayers.filter((x) => !x.isOptimal);
+      const shownCombinations: OptimalCombinationsResultDto[] = combinations.slice(1);
+      for (const combination of shownCombinations) {
+        this.playerCombinations.push(this._describeCombination(combination, bestCombination));
+      }
+
+      this._revertOptimalPlayers();
       for (const player of bestCombination.players) {
-        const playerChooseRecord: PlayerChooseRecord = 
+        // Оптимизатор может вернуть удалённого из состава игрока - тогда он восстанавливается на месте, а не дублируется.
+        const removedSquadPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
+          (x) => x.isRemoved && x.playerObject.playerID === player.id
+        );
+        if (removedSquadPlayer) {
+          removedSquadPlayer.isRemoved = false;
+          removedSquadPlayer.isOptimal = true;
+          continue;
+        }
+
+        const playerChooseRecord: PlayerChooseRecord =
           this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
-  
+
         const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
         this.squadPlayers.push(playerSquadRecord);
       }
@@ -441,5 +475,45 @@ export class PlayersSquadComponent implements OnInit {
     this.sendAvailableSlots.emit(this.getAvailableSlots());
     this.squadPlayersChange.emit(this.squadPlayers);
     this._changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Снимает прошлую подсказку оптимизатора: добавленных им убирает, восстановленных им снова помечает удалёнными.
+   */
+  private _revertOptimalPlayers() {
+    this.squadPlayers = this.squadPlayers.filter((x) => !(x.isNew && x.isOptimal));
+    this.squadPlayers
+      .filter((x) => x.isOptimal)
+      .forEach((x) => {
+        x.isRemoved = true;
+        x.isOptimal = false;
+      });
+  }
+
+  /**
+   * Короткая альтернатива показывается целиком. Длинная (например, все 17 после сброса состава)
+   * отличается от лучшей на одного-двух игроков, поэтому показывается только разница с ней.
+   */
+  private _describeCombination(
+    combination: OptimalCombinationsResultDto,
+    bestCombination: OptimalCombinationsResultDto
+  ): string {
+    if (combination.players.length <= FULL_COMBINATION_MAX_PLAYERS) {
+      return combination.players.map((x) => x.name).join(', ');
+    }
+
+    const bestIds: Set<number> = new Set(bestCombination.players.map((x) => x.id));
+    const ids: Set<number> = new Set(combination.players.map((x) => x.id));
+    const playersIn: string = combination.players
+      .filter((x) => !bestIds.has(x.id))
+      .map((x) => x.name)
+      .join(', ');
+    const playersOut: string = bestCombination.players
+      .filter((x) => !ids.has(x.id))
+      .map((x) => x.name)
+      .join(', ');
+    const difference: string = Utils.formatNumber(combination.total - bestCombination.total);
+
+    return `${playersIn} вместо ${playersOut} (${difference} ОФО)`;
   }
 }

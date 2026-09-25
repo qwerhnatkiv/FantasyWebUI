@@ -17,11 +17,14 @@
   z-index: 1;
 }
 
-.btn-get-optimal-players-combinations {
+.squad-buttons-container {
   z-index: 2;
   position: relative;
   left: 10%;
   height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .mat-mdc-cell,
