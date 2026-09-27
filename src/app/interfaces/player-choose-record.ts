@@ -22,6 +22,8 @@ export interface PlayerChooseRecord extends PlayerCommonRecord{
     priceByExpectedFantasyPoints: number;
     priceByExpectedFantasyPointsPerGame: number;
     linemates: string;
+    // 'Да' when the player has no contract for next season (UFA or RFA), '' otherwise.
+    freeAgent: string;
     isPlayingInUpsideLine: boolean;
     forecastSources: string;
   }

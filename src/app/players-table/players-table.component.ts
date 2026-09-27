@@ -71,6 +71,7 @@ export class PlayersTableComponent
     'fantasyPointsPerGame',
     'priceByExpectedFantasyPointsPerGame',
     'linemates',
+    'freeAgent',
     'sources',
     'addPlayerToSquad',
   ];
@@ -260,6 +261,7 @@ export class PlayersTableComponent
             player.forecastSources.length > 0 ? player.forecastSources : 'NONE',
           teamObject: matchingTeam,
           linemates: '',
+          freeAgent: player.isFreeAgentNextSeason ? 'Да' : '',
           isPlayingInUpsideLine: false,
           tooltipLines: [],
           playerObject: player,

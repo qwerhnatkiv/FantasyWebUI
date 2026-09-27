@@ -419,6 +419,22 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="freeAgent">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        sortActionDescription="Sort by free agent status"
+        start="desc"
+        matTooltip="Свободный агент на начало следующего сезона (UFA или RFA)"
+      >
+        КГ
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.freeAgent }}
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="sources">
       <th
         mat-header-cell

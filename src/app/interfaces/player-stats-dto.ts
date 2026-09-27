@@ -44,6 +44,7 @@ export interface PlayerStatsDTO {
     forecastGoalsAgainst?: number
     forecastSaves?: number
     isGoaliePlayedMostGames?: boolean
+    isFreeAgentNextSeason?: boolean
   }
   
   export interface ExpectedFpforGame {}
