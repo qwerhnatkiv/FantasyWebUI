@@ -124,12 +124,16 @@
             "
           >
             <span
-              [class.old-game-score-win]="oldGameScore.isWin"
-              [class.old-game-score-loss]="!oldGameScore.isWin"
-              >{{ oldGameScore.rowGoals }}</span
-            >:<span class="old-game-score-opponent">{{
-              oldGameScore.opponentGoals
-            }}</span>
+              [class.old-game-score-win]="!oldGameScore.isRowTeamAway && oldGameScore.isWin"
+              [class.old-game-score-loss]="!oldGameScore.isRowTeamAway && !oldGameScore.isWin"
+              [class.old-game-score-opponent]="oldGameScore.isRowTeamAway"
+              >{{ oldGameScore.homeGoals }}</span
+            >:<span
+              [class.old-game-score-win]="oldGameScore.isRowTeamAway && oldGameScore.isWin"
+              [class.old-game-score-loss]="oldGameScore.isRowTeamAway && !oldGameScore.isWin"
+              [class.old-game-score-opponent]="!oldGameScore.isRowTeamAway"
+              >{{ oldGameScore.awayGoals }}</span
+            >
           </ng-container>
           <ng-template #defaultCellText>
             <span>

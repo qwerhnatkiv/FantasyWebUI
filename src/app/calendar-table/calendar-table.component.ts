@@ -375,26 +375,29 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   /**
-   * Splits a completed game's score into the row team's goals and the opponent's goals,
+   * Splits a completed game's score into home and away goals, in the same order as the
+   * home/away logos around it, and tells which side is the row team's,
    * so only the row team's number can be color-highlighted
    */
-  public getOldGameScore(
-    cell: TableCell
-  ): { rowGoals: number; opponentGoals: number; isWin: boolean } | null {
+  public getOldGameScore(cell: TableCell): {
+    homeGoals: number;
+    awayGoals: number;
+    isRowTeamAway: boolean;
+    isWin: boolean;
+  } | null {
     if (!cell.game?.isOldGame) {
       return null;
     }
 
     const isRowTeamAway: boolean =
       cell.game.homeTeamAcronym === cell.opponentTeamName;
-    const rowGoals: number = (
-      isRowTeamAway ? cell.game.awayTeamGoals : cell.game.homeTeamGoals
-    ) ?? 0;
-    const opponentGoals: number = (
-      isRowTeamAway ? cell.game.homeTeamGoals : cell.game.awayTeamGoals
-    ) ?? 0;
+    const homeGoals: number = cell.game.homeTeamGoals ?? 0;
+    const awayGoals: number = cell.game.awayTeamGoals ?? 0;
+    const isWin: boolean = isRowTeamAway
+      ? awayGoals > homeGoals
+      : homeGoals > awayGoals;
 
-    return { rowGoals, opponentGoals, isWin: rowGoals > opponentGoals };
+    return { homeGoals, awayGoals, isRowTeamAway, isWin };
   }
 
   public getSelectedPlayerCellOpponentName(
