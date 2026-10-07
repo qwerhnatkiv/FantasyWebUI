@@ -686,7 +686,8 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
       1
     )} GF | ${awayTeamStats.teamGoalsAwayForm.toFixed(1)} GA | ${
       awayTeamStats.teamForm
-    }<br>
+    }<br><br>
+    ${this.datepipe.transform(game.gameDate, 'dd.MM.yyyy')}<br>
     ${playersToolTip}
     `;
   }
