@@ -38,6 +38,8 @@ import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/m
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
+const ALL_TEAMS_VALUE = '__all__';
+
 @Component({
   selector: 'app-players-filters',
   templateUrl: './players-filters.component.html',
@@ -46,6 +48,7 @@ import { Observable } from 'rxjs';
 })
 export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges {
   protected UTILS = Utils;
+  protected ALL_TEAMS_VALUE = ALL_TEAMS_VALUE;
   protected RESET_ALL_FILTERS_LABEL = RESET_ALL_FILTERS_LABEL;
   protected GO_TO_FANTASY_TEAM_LABEL = GO_TO_FANTASY_TEAM_LABEL;
 
@@ -289,8 +292,37 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
     this.selectedUserId = USER_ID_NAME.get(this.selectedUser!);
   }
 
+  // The "All" row is an ordinary option whose value rides along in the control, so mat-select draws
+  // its checkbox itself. The control therefore holds ALL_TEAMS_VALUE plus the real teams; only the
+  // real teams ever leave this component.
+  private allTeamsMarked = false;
+
+  get selectedTeams(): string[] {
+    return (this.teamsFormControl.value ?? []).filter((team) => team !== ALL_TEAMS_VALUE);
+  }
+
   teamsChanged() {
-    this.sendTeams.emit(this.teamsFormControl.value!);
+    const value = this.teamsFormControl.value ?? [];
+    const teams = value.filter((team) => team !== ALL_TEAMS_VALUE);
+    const hasAll = value.includes(ALL_TEAMS_VALUE);
+    const allTeamsPicked = teams.length === this.selectTeams.length;
+
+    let next = value;
+    if (hasAll && !this.allTeamsMarked) {
+      next = [ALL_TEAMS_VALUE, ...this.selectTeams]; // "All" ticked: select everything
+    } else if (!hasAll && this.allTeamsMarked && allTeamsPicked) {
+      next = []; // "All" unticked: clear everything
+    } else if (hasAll && !allTeamsPicked) {
+      next = teams; // one team unticked while "All" was on
+    } else if (!hasAll && allTeamsPicked) {
+      next = [ALL_TEAMS_VALUE, ...teams]; // the last team ticked by hand
+    }
+
+    this.allTeamsMarked = next.includes(ALL_TEAMS_VALUE);
+    if (next !== value) {
+      this.teamsFormControl.setValue(next);
+    }
+    this.sendTeams.emit(this.selectedTeams);
   }
 
   powerPlayUnitsChanged() {
@@ -298,12 +330,8 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
 
-  public selectAllTeams() {
-    this.teamsFormControl.setValue(this.selectTeams);
-    this.teamsChanged();
-  }
-
   public deselectAllTeams() {
+    this.allTeamsMarked = false;
     this.teamsFormControl.setValue([]);
     this.teamsChanged();
   }

@@ -93,15 +93,10 @@
         (selectionChange)="teamsChanged()"
       >
         <mat-select-trigger>
-          <span
-            *ngIf="teamsFormControl.value?.length! <= 1"
-            >{{teamsFormControl.value?.[0] || ''}}</span
-          >
-          <span *ngIf="teamsFormControl.value?.length! > 1"
-            >{{ teamsFormControl.value?.length }} шт.</span
-          >
+          <span *ngIf="selectedTeams.length <= 1">{{ selectedTeams[0] || '' }}</span>
+          <span *ngIf="selectedTeams.length > 1">{{ selectedTeams.length }} шт.</span>
         </mat-select-trigger>
-        <mat-option (click)="selectAllTeams()" style="font-weight: 800"
+        <mat-option [value]="ALL_TEAMS_VALUE" style="font-weight: 800"
           >All</mat-option
         >
         <mat-divider></mat-divider>
@@ -113,7 +108,7 @@
 
     <button
       (click)="deselectAllTeams()"
-      [hidden]="teamsFormControl.value?.length === 0"
+      [hidden]="selectedTeams.length === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear teams filter"
