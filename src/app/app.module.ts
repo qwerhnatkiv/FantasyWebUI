@@ -72,7 +72,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { MainViewComponent } from './main-view/main-view.component';
 import { ApiService } from 'src/services/api/api.service';
 import { AuthInterceptor } from 'src/services/auth/auth.interceptor';
-import { ViewStateUrlService } from 'src/services/url-state/view-state-url.service';
 
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 0,
@@ -151,8 +150,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CalendarWeekGamesMapService,
     PlayerCombinationsService,
     TeamsEasySeriesService,
-    ApiService,
-    ViewStateUrlService
+    ApiService
   ],
   bootstrap: [AppComponent],
 })

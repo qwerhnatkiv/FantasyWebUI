@@ -35,28 +35,18 @@ export class IButtonComponent implements OnInit {
   @Input() removeBackgroundColor: boolean = false;
 
   /**
-   * Sets button's active state from the outside, so a view restored from the URL
-   * shows the same pressed buttons as the one the link was copied from
-   */
-  @Input() set isActive(value: boolean) {
-    this._isActive = value;
-    this._setBackgroundColor();
-  }
-
-  /**
    * Emits click events to the parent component
    */
   @Output() clickEmitter: EventEmitter<void> = new EventEmitter();
 
   private _isActive: boolean = false;
-
+  
   public backgroundColor: string = WHITE_COLOR;
   public backgroundColorActive: string = WHITE_COLOR;
 
   ngOnInit(): void {
-    // Пересчёт здесь, а не только в сеттере: к ngOnInit уже проставлены и
-    // removeBackgroundColor, и allowActiveState, от которых зависит цвет.
-    this._setBackgroundColor();
+    this.backgroundColor = this.removeBackgroundColor ? WHITE_COLOR : YELLOW_COLOR;
+    this.backgroundColorActive = this.removeBackgroundColor ? WHITE_COLOR : YELLOW_COLOR_ACTIVE;
   }
 
   /**
@@ -73,13 +63,7 @@ export class IButtonComponent implements OnInit {
   }
 
   private _setBackgroundColor(): void {
-    if (this.removeBackgroundColor) {
-      this.backgroundColor = WHITE_COLOR;
-      this.backgroundColorActive = WHITE_COLOR;
-      return;
-    }
-
-    if (this._isActive && this.allowActiveState) {
+    if (this._isActive) {
       this.backgroundColor = ORANGE_COLOR;
       this.backgroundColorActive = ORANGE_COLOR_ACTIVE;
     }
