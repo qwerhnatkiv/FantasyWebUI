@@ -10,6 +10,7 @@ import { TeamStatsDTO } from '../interfaces/team-stats-dto';
 import { PlayerExpectedFantasyPointsDTO } from '../interfaces/player-expected-fantasy-points-dto';
 import { GamesUtils } from './games-utils';
 import { PlayerCommonRecord } from '../interfaces/player-common-record';
+import { ToiPipe } from '../pipes/toi.pipe';
 
 export module PlayerTooltipBuilder {
   export function generatePlayerTooltip(
@@ -229,6 +230,12 @@ export module PlayerTooltipBuilder {
     `;
   }
 
+  // Average time on ice, minutes.seconds as the backend sends it, shown as m:ss like the players table.
+  // Undefined until the backend that sends seasonTOI is deployed, or for a player with no games.
+  function formatToi(toi: number | null | undefined): string {
+    return toi == null || toi <= 0 ? '-' : new ToiPipe().transform(toi);
+  }
+
   function buildPlayerForm(player: PlayerCommonRecord): string {
     return `
     <div>Форма:<div>
@@ -241,6 +248,7 @@ export module PlayerTooltipBuilder {
           <th>PIM</th>
           <th>+-</th>
           <th>ПП</th>
+          <th>TOI</th>
         </tr>
       </thead>
       <tbody>
@@ -263,6 +271,9 @@ export module PlayerTooltipBuilder {
           <td style="text-align: center; vertical-align: middle;">${
             player.powerPlayNumber
           }</td>
+          <td style="text-align: center; vertical-align: middle;">${formatToi(
+            player.playerObject.formTOI
+          )}</td>
         </tr
       </tbody>
     </table>
@@ -313,6 +324,7 @@ export module PlayerTooltipBuilder {
           <th>PIM</th>
           <th>+-</th>
           <th>ПП</th>
+          <th>TOI</th>
         </tr>
       </thead>
       <tbody>
@@ -333,8 +345,13 @@ export module PlayerTooltipBuilder {
             player.playerObject.seasonPlusMinus ?? '-'
           }</td>
           <td style="text-align: center; vertical-align: middle;">${
-            player.playerObject.seasonPowerPlayNumber ?? '-'
+            player.playerObject.seasonPowerPlayNumber == null
+              ? '-'
+              : GamesUtils.GetPPText(player.playerObject.seasonPowerPlayNumber)
           }</td>
+          <td style="text-align: center; vertical-align: middle;">${formatToi(
+            player.playerObject.seasonTOI
+          )}</td>
         </tr
       </tbody>
     </table>

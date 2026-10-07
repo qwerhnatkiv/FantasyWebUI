@@ -29,6 +29,7 @@ export interface PlayerStatsDTO {
     seasonSaves: number
     seasonShutouts: number
     seasonPowerPlayNumber: number
+    seasonTOI?: number
     forecastGamesPlayed?: number
     forecastGoals?: number
     forecastAssists?: number
