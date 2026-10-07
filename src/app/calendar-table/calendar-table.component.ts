@@ -521,52 +521,13 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
     const gameHistory: string = this._buildTeamGameHistoryTable(
       teamStat.teamGameStats
     );
-    const bestPicks: string = this._buildTeamBestPicksSection(
-      teamStat.teamID
-    );
 
     return `
       <div>
         ${header} <br>
         ${averageTeamStat} <br>
         ${gameHistory}
-        ${bestPicks}
       </div>`;
-  }
-
-  /**
-   * Builds the "Лучшие пики" section for the team's next upcoming game, reusing the same
-   * teamPlayerExpectedOfoMap lookup as the per-game calendar cell tooltip
-   */
-  private _buildTeamBestPicksSection(teamID: number): string {
-    const nearestGame: GamePredictionDTO | undefined = this.games
-      .filter(
-        (g) =>
-          !g.isOldGame && (g.homeTeamId === teamID || g.awayTeamId === teamID)
-      )
-      .sort((a, b) => Utils.sortTypes(a.gameDate, b.gameDate))[0];
-
-    if (!nearestGame) {
-      return '';
-    }
-
-    const playersMap: PlayerExpectedFantasyPointsInfo[] | undefined =
-      this.teamPlayerExpectedOfoMap
-        .get(teamID)
-        ?.get(nearestGame.gameDate);
-
-    if (!playersMap || playersMap.length === 0) {
-      return '';
-    }
-
-    const playersList: string = playersMap
-      .map(
-        (x) =>
-          `${x.playerName} (${x.price}), ${x.powerPlayNumber}, ${x.playerExpectedFantasyPoints.toFixed(0)} ${this.EFP_LABEL} <br>`
-      )
-      .join('');
-
-    return `<div style="margin-top: 6px;">Лучшие пики: <br>${playersList}</div>`;
   }
 
   /**
