@@ -441,7 +441,7 @@ export module PlayerTooltipBuilder {
   }
 
   function buildLinesInformation(player: PlayerCommonRecord): string {
-    const sectionStart: string = "<div>Звенья:<div>\n";
+    const sectionStart: string = `<div>${player.tooltipLinesTitle ?? 'Звенья:'}<div>\n`;
     const sectionBody: string = player.tooltipLines.map(x => `<div>${x}</div>`).join('\n');
 
     return sectionStart + sectionBody;

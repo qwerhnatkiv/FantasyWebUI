@@ -783,6 +783,17 @@ export class PlayersTableComponent
     this.refreshPlayersFilter();
   }
 
+  // Lineups (shown without percentages) take priority over lines rebuilt from the last N played games
+  private _linesTitle(isFromLineup: boolean | undefined): string {
+    if (isFromLineup === undefined) {
+      return 'Звенья:';
+    }
+
+    return isFromLineup
+      ? 'Звенья (раскатки):'
+      : `Звенья (последние ${this.formLength} матчей):`;
+  }
+
   private _handlePlayerLines(playerLines: Map<number, PlayerLineFormatted[]>) {
     for (const player of this.players) {
       const lines = playerLines.get(player.playerObject.playerID);
@@ -794,6 +805,7 @@ export class PlayersTableComponent
       player.linemates = lines[0].playerLinematesSimplified;
       player.isPlayingInUpsideLine = lines[0].isPlayingInUpsideLine;
       player.tooltipLines = lines.map(x => x.playerLinematesTooltip);
+      player.tooltipLinesTitle = this._linesTitle(lines[0].isFromLineup);
     }
   }
 

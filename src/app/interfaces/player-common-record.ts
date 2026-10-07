@@ -12,4 +12,6 @@ export interface PlayerCommonRecord {
     powerPlayNumber: string;
     teamObject: TeamStatsDTO;
     tooltipLines: string[];
+    // Heading of the lines block in the player tooltip: lineups, or the last N played games
+    tooltipLinesTitle?: string;
 }
