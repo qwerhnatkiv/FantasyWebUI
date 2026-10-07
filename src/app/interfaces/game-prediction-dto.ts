@@ -4,6 +4,8 @@ export interface GamePredictionDTO {
   awayTeamName: string;
   awayTeamAcronym: string;
   gameDate: Date;
+  // Moscow wall-clock start time without an offset ("2026-10-08T02:30:00"), null when unknown.
+  gameStartTimeMsk: string | null;
   homeTeamWinChance: number;
   awayTeamWinChance: number;
   drawChance: number;
