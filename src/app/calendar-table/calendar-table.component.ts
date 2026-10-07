@@ -570,6 +570,20 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   /**
+   * The viewed team's number (always printed first), green when above the opponent's and red when
+   * below, same colors as the played-game score in the calendar cells. The opponent's stays white.
+   */
+  private _colorTeamNumber(own: number, opponent: number): string {
+    if (own > opponent) {
+      return `<span style="color:#64ff8f">${own}</span>`;
+    }
+    if (own < opponent) {
+      return `<span style="color:#ff7e7e">${own}</span>`;
+    }
+    return `${own}`;
+  }
+
+  /**
    * Builds the per-game history table (last N games, N being the form length filter) shown in the team tooltip
    */
   private _buildTeamGameHistoryTable(
@@ -589,7 +603,7 @@ export class CalendarTableComponent implements OnChanges, OnInit, OnDestroy {
           ? `@${game.opponentAcronym}`
           : game.opponentAcronym;
         const result: string = `${game.resultType} ${game.teamGoals}-${game.teamGoalsAway}`;
-        const shotsAndHdcf: string = `${game.teamShots}-${game.teamShotsAway}, ${game.teamHdcf}-${game.teamHdcfAway}`;
+        const shotsAndHdcf: string = `${this._colorTeamNumber(game.teamShots, game.teamShotsAway)}-${game.teamShotsAway}, ${this._colorTeamNumber(game.teamHdcf, game.teamHdcfAway)}-${game.teamHdcfAway}`;
 
         return `
           <tr>
