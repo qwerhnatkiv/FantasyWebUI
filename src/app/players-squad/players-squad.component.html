@@ -222,20 +222,36 @@
         {{ MODEL_CHOICE_LABEL }}
       </b>
     </p>
-    <p *ngFor="let combination of playerCombinations; let i = index">
-      <b>{{ (i + 2).toString() + ': ' }} </b>
-      <ng-container
-        *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersIn }"
-      ></ng-container>
-      <ng-container *ngIf="combination.playersOut.length > 0">
-        вместо
+    <!-- 1 is the best one and is in the squad by default; "+" puts the chosen one in instead. -->
+    <p
+      class="combination-row"
+      *ngFor="let combination of playerCombinations; let i = index"
+      [class.combination-row-selected]="i === selectedCombinationIndex"
+    >
+      <button
+        class="player-action-button apply-combination-button"
+        mat-icon-button
+        [attr.aria-label]="'Выбрать вариант ' + (i + 1)"
+        [title]="'Заменить выбранных игроков вариантом ' + (i + 1)"
+        (click)="applyCombination(i)"
+      >
+        <mat-icon class="player-action-icon">add</mat-icon>
+      </button>
+      <span class="combination-text">
+        <b>{{ i + 1 }}: </b>
         <ng-container
-          *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersOut }"
+          *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersIn }"
         ></ng-container>
-      </ng-container>
-      <ng-container *ngIf="combination.difference !== null">
-        ({{ combination.difference }} ОФО)
-      </ng-container>
+        <ng-container *ngIf="combination.playersOut.length > 0">
+          вместо
+          <ng-container
+            *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersOut }"
+          ></ng-container>
+        </ng-container>
+        <ng-container *ngIf="combination.difference !== null">
+          ({{ combination.difference }} ОФО)
+        </ng-container>
+      </span>
     </p>
   </div>
 </div>

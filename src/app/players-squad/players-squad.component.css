@@ -181,6 +181,20 @@
   display: block !important;
 }
 
+.combination-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.combination-row-selected .combination-text {
+  font-weight: 700;
+}
+
+.apply-combination-button {
+  flex: 0 0 auto;
+}
+
 .combination-player {
   cursor: default;
   text-decoration: underline dotted;

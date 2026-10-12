@@ -79,6 +79,10 @@ export class PlayersSquadComponent implements OnInit {
   protected UTILS = Utils;
   protected MODEL_CHOICE_LABEL = MODEL_CHOICE_LABEL;
   protected playerCombinations: CombinationView[] = [];
+  // Raw optimizer results behind `playerCombinations`, same order; index 0 is the best one
+  private _optimalCombinations: OptimalCombinationsResultDto[] = [];
+  // Alternative currently put into the squad
+  protected selectedCombinationIndex: number = 0;
 
   // Teams whose players the lightbulb never picks (see getOptimalPlayersCombinations)
   protected selectTeams: string[] = TEAMS;
@@ -92,6 +96,12 @@ export class PlayersSquadComponent implements OnInit {
   }
   @Input('squadPlayers') set squadPlayers(value: PlayerSquadRecord[]) {
     this._squadPlayers = value;
+
+    // An emptied squad means the manager was switched or reset: the alternatives
+    // listed below belonged to that squad and must not outlive it.
+    if (value.length === 0) {
+      this._clearCombinations();
+    }
 
     this.setSquadPlayersSortOrder();
 
@@ -265,7 +275,7 @@ export class PlayersSquadComponent implements OnInit {
       .filter((x) => x.isRemoved)
       .forEach((x) => (x.isRemoved = false));
 
-    this.playerCombinations = [];
+    this._clearCombinations();
 
     this.sendAvailableSlots.emit(this.getAvailableSlots());
   }
@@ -281,7 +291,7 @@ export class PlayersSquadComponent implements OnInit {
       x.isOptimal = false;
     });
 
-    this.playerCombinations = [];
+    this._clearCombinations();
 
     this.setSquadPlayersSortOrder();
     this.sendAvailableSlots.emit(this.getAvailableSlots());
@@ -512,36 +522,74 @@ export class PlayersSquadComponent implements OnInit {
   }
 
   private _addOptimalPlayerCombinations(combinations: OptimalCombinationsResultDto[]) {
-    this.playerCombinations.length = 0;
+    // The squad was reset while the request was in flight: nothing to apply the result to.
+    if (this.squadPlayers.length === 0) {
+      return;
+    }
+
+    this._clearCombinations();
 
     if (combinations.length > 0 && combinations[0].players.length > 0) {
       const bestCombination: OptimalCombinationsResultDto = combinations[0];
 
-      const shownCombinations: OptimalCombinationsResultDto[] = combinations.slice(1);
-      for (const combination of shownCombinations) {
-        this.playerCombinations.push(this._describeCombination(combination, bestCombination));
-      }
+      this._optimalCombinations = combinations;
+      this.playerCombinations = combinations.map((combination, index) =>
+        this._describeCombination(combination, bestCombination, index === 0)
+      );
 
-      this._revertOptimalPlayers();
-      for (const player of bestCombination.players) {
-        // Оптимизатор может вернуть удалённого из состава игрока - тогда он восстанавливается на месте, а не дублируется.
-        const removedSquadPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
-          (x) => x.isRemoved && x.playerObject.playerID === player.id
-        );
-        if (removedSquadPlayer) {
-          removedSquadPlayer.isRemoved = false;
-          removedSquadPlayer.isOptimal = true;
-          continue;
-        }
-
-        const playerChooseRecord: PlayerChooseRecord =
-          this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
-
-        const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
-        this.squadPlayers.push(playerSquadRecord);
-      }
+      // The best one is applied and selected by default
+      this._putCombinationIntoSquad(bestCombination);
     }
-    
+
+    this._refreshSquadAfterCombination();
+  }
+
+  /**
+   * Replaces the players the optimizer put into the squad (the yellow ones) with the chosen alternative.
+   * @param index Position of the alternative in the list, 0 is the best one
+   */
+  public applyCombination(index: number): void {
+    const combination: OptimalCombinationsResultDto | undefined = this._optimalCombinations[index];
+    if (!combination) {
+      return;
+    }
+
+    this.selectedCombinationIndex = index;
+    this._putCombinationIntoSquad(combination);
+    this._refreshSquadAfterCombination();
+  }
+
+  private _clearCombinations() {
+    this.playerCombinations = [];
+    this._optimalCombinations = [];
+    this.selectedCombinationIndex = 0;
+  }
+
+  /**
+   * Makes the combination the only optimizer pick in the squad: the previous pick is taken off first.
+   */
+  private _putCombinationIntoSquad(combination: OptimalCombinationsResultDto) {
+    this._revertOptimalPlayers();
+    for (const player of combination.players) {
+      // Оптимизатор может вернуть удалённого из состава игрока - тогда он восстанавливается на месте, а не дублируется.
+      const removedSquadPlayer: PlayerSquadRecord | undefined = this.squadPlayers.find(
+        (x) => x.isRemoved && x.playerObject.playerID === player.id
+      );
+      if (removedSquadPlayer) {
+        removedSquadPlayer.isRemoved = false;
+        removedSquadPlayer.isOptimal = true;
+        continue;
+      }
+
+      const playerChooseRecord: PlayerChooseRecord =
+        this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id)!;
+
+      const playerSquadRecord: PlayerSquadRecord = this._playerCombinationsService.createPlayerSquadRecord(playerChooseRecord, true);
+      this.squadPlayers.push(playerSquadRecord);
+    }
+  }
+
+  private _refreshSquadAfterCombination() {
     this.squadPlayers = Object.assign([], this.squadPlayers);
     this.setSquadPlayersSortOrder();
 
@@ -564,14 +612,15 @@ export class PlayersSquadComponent implements OnInit {
   }
 
   /**
-   * Короткая альтернатива показывается целиком. Длинная (например, все 17 после сброса состава)
+   * Лучшая и короткая альтернативы показываются целиком. Длинная (например, все 17 после сброса состава)
    * отличается от лучшей на одного-двух игроков, поэтому показывается только разница с ней.
    */
   private _describeCombination(
     combination: OptimalCombinationsResultDto,
-    bestCombination: OptimalCombinationsResultDto
+    bestCombination: OptimalCombinationsResultDto,
+    isBest: boolean
   ): CombinationView {
-    if (combination.players.length <= FULL_COMBINATION_MAX_PLAYERS) {
+    if (isBest || combination.players.length <= FULL_COMBINATION_MAX_PLAYERS) {
       return {
         playersIn: combination.players.map((x) => this._toCombinationPlayerView(x)),
         playersOut: [],
