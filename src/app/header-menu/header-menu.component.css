@@ -122,6 +122,10 @@
   margin: 0;
 }
 
+.header-schedule-information-container .deadline-soon {
+  color: red;
+}
+
 .header-schedule-information-container p:empty {
   display: none;
 }

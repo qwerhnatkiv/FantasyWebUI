@@ -21,6 +21,7 @@ import {
   ENABLE_SIMPLIFIED_CALENDAR_MODE_LABEL,
   EXPAND_CALENDAR,
   HIDE_TEAMS_EASY_SERIES,
+  DEADLINE_WARNING_MS,
   NEXT_DEADLINE_DATE_LABEL,
   SHOW_BEST_PLAYERS_BY_EFP,
   SHOW_TEAMS_EASY_SERIES,
@@ -39,7 +40,7 @@ import {
 } from '@angular/material/datepicker';
 import { Moment } from 'moment';
 import { DatesRangeModel } from '../interfaces/dates-range.model';
-import { Subscription } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { Utils } from '../common/utils';
 
 @Component({
@@ -49,6 +50,9 @@ import { Utils } from '../common/utils';
 })
 export class HeaderMenuComponent implements OnInit, OnDestroy {
   private _filterDatesRangeSubscription?: Subscription;
+  private _clockSubscription?: Subscription;
+  // "Now" for the deadline warning, refreshed every 30 seconds
+  private _nowMs: number = Date.now();
 
   @Input() updateLogInformation?: UpdateLogInformation;
 
@@ -120,15 +124,37 @@ export class HeaderMenuComponent implements OnInit, OnDestroy {
       );
 
     this._setUsernameFromToken();
+
+    this._clockSubscription = interval(30_000).subscribe(() => {
+      this._nowMs = Date.now();
+    });
   }
 
   ngOnDestroy(): void {
     this._filterDatesRangeSubscription?.unsubscribe();
+    this._clockSubscription?.unsubscribe();
   }
 
   //#endregion LIFECYCLE HOOKS
 
   //#region Protected Methods for HTML Template
+
+  /**
+   * True when the next deadline is less than an hour away (and has not passed yet).
+   * The backend sends the deadline as Moscow wall-clock time without an offset.
+   */
+  protected isDeadlineSoon(): boolean {
+    const raw: unknown = this.updateLogInformation?.nextDeadlineTime;
+    if (typeof raw !== 'string') {
+      return false;
+    }
+
+    const hasOffset: boolean = /(Z|[+-]\d{2}:?\d{2})$/.test(raw);
+    const deadlineMs: number = new Date(hasOffset ? raw : raw + '+03:00').getTime();
+    const leftMs: number = deadlineMs - this._nowMs;
+
+    return leftMs >= 0 && leftMs < DEADLINE_WARNING_MS;
+  }
 
   /**
    * Updates calendar visibility (expand/collapse)

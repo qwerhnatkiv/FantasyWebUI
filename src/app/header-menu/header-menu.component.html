@@ -137,7 +137,7 @@
       </p>
     </div>
     <div class="header-schedule-information-container">
-      <p>
+      <p [class.deadline-soon]="isDeadlineSoon()">
         {{ NEXT_DEADLINE_DATE_LABEL }}
         {{
           updateLogInformation?.nextDeadlineTime

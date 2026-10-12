@@ -168,7 +168,9 @@ export const START_DATE_CALENDAR_FILTER: string = 'Start: ';
 export const MODEL_CHOICE_LABEL: string = 'Выбор модели:';
 export const WEEK_BACK_BUTTON_LABEL: string = 'Перейти на прошлую неделю';
 export const WEEK_FORWARD_BUTTON_LABEL: string = 'Перейти на следующую неделю';
-export const NEXT_DEADLINE_DATE_LABEL: string = 'След. дедлайн:';
+export const NEXT_DEADLINE_DATE_LABEL: string = 'ДЕДЛАЙН:';
+// The deadline label turns red when less than this is left
+export const DEADLINE_WARNING_MS: number = 60 * 60 * 1000;
 export const RESET_ALL_FILTERS_LABEL: string = 'Сбросить все фильтры';
 export const GO_TO_FANTASY_TEAM_LABEL: string = 'Перейти в фентези-команду';
 export const SHOW_TEAMS_EASY_SERIES: string = 'Отобразить легкие серии для команд';
