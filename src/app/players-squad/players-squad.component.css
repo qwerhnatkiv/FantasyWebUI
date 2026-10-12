@@ -7,6 +7,58 @@
   display: flex;
 }
 
+/* Excluded teams filter: sits under the squad table, aligned with the alternatives list below it. */
+.excluded-teams-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 20px;
+  padding-left: 32%;
+}
+
+.excluded-teams-label {
+  font-size: 13px;
+  line-height: 40px;
+}
+
+.excluded-teams-form {
+  width: 110px;
+}
+
+.excluded-teams-filter ::ng-deep .mat-mdc-form-field-flex {
+  align-items: center;
+}
+
+.excluded-teams-filter ::ng-deep .mat-mdc-form-field-infix {
+  min-height: unset;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.excluded-teams-filter ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.clear-excluded-teams-button {
+  transform: scale(0.8);
+}
+
+.clear-excluded-teams-button[hidden] {
+  visibility: hidden;
+  display: block !important;
+}
+
+::ng-deep .excluded-teams-select-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: row;
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 360px !important;
+  max-width: 360px !important;
+}
+
 .player-combinations-container {
   padding-top: 30px;
   padding-left: 32%;
@@ -25,6 +77,14 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* Out of the column flow: the lightbulb keeps its place, the reset button hangs to its left on the same row. */
+.reset-squad-button {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 6px;
 }
 
 .mat-mdc-cell,
@@ -119,6 +179,12 @@
 .clear-squad-changes-button[hidden] {
   visibility: hidden;
   display: block !important;
+}
+
+.combination-player {
+  cursor: default;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
 }
 
 .model-choice-label {

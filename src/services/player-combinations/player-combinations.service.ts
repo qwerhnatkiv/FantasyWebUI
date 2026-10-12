@@ -25,24 +25,28 @@ export class PlayerCombinationsService {
 
   public getOptimalPlayersCombinations(
     availableBudget: number,
-    squadPlayers: PlayerSquadRecord[]
+    squadPlayers: PlayerSquadRecord[],
+    excludedTeams: string[] = []
   ): void {
     const playerCombinationsDto: PlayerCombinationsDto = {
       availableBudget: availableBudget,
       solutionsCount: PLAYER_COMBINATIONS_COUNT,
-      availablePlayers: this.availablePlayers.map((x) => {
-        return {
-          id: x.playerObject.playerID,
-          name: x.playerName,
-          team: x.team,
-          price: x.price,
-          position: x.position,
-          // Оптимизатор ранжирует кандидатов по этому числу - значит это ОФО 3, а не ОФО 1.
-          expectedFantasyPoints: x.expectedFantasyPointsOfo3,
-          toi: x.toi,
-          hasProjections: x.projectedGamesCount > 0,
-        };
-      }),
+      // Players of the excluded teams are never offered by the optimizer; the squad itself is sent as is.
+      availablePlayers: this.availablePlayers
+        .filter((x) => !excludedTeams.includes(x.team))
+        .map((x) => {
+          return {
+            id: x.playerObject.playerID,
+            name: x.playerName,
+            team: x.team,
+            price: x.price,
+            position: x.position,
+            // Оптимизатор ранжирует кандидатов по этому числу - значит это ОФО 3, а не ОФО 1.
+            expectedFantasyPoints: x.expectedFantasyPointsOfo3,
+            toi: x.toi,
+            hasProjections: x.projectedGamesCount > 0,
+          };
+        }),
       squadPlayers: squadPlayers,
       defaultPositions: DEFAULT_POSITIONS
     };

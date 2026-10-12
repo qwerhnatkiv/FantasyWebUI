@@ -10,10 +10,12 @@ import {
 } from '@angular/core';
 import { PlayerSquadRecord } from '../interfaces/player-squad-record';
 import {
+  DEADLINE_DELAY_MINS,
   DEFAULT_POSITIONS,
   DEFAULT_SUBSTITUTION_VALUE,
   MODEL_CHOICE_LABEL,
   SQUAD_PLAYERS_COUNT,
+  TEAMS,
 } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
@@ -26,10 +28,34 @@ import { GamesUtils } from '../common/games-utils';
 import { Utils } from '../common/utils';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 import { Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
 import { OptimalCombinationsResultDto } from '../interfaces/player-combinations/optimal-combinations-result-dto.model';
 import { PlayerChooseRecord } from '../interfaces/player-choose-record';
+import { GamePredictionDTO } from '../interfaces/game-prediction-dto';
+import { PlayerCombinationsStatsDto } from '../interfaces/player-combinations/player-combinations-stats-dto.model';
+import { PlayerCommonRecord } from '../interfaces/player-common-record';
 
 const FULL_COMBINATION_MAX_PLAYERS: number = 5;
+
+// gameStartTimeMsk is Moscow wall-clock time without an offset
+const MSK_UTC_OFFSET: string = '+03:00';
+
+/** Player in an optimizer alternative: name with the team code, plus the same tooltip as in the tables. */
+interface CombinationPlayerView {
+  name: string;
+  team: string;
+  tooltip: string | null;
+}
+
+/**
+ * One optimizer alternative. A short one lists its players in `playersIn`; a long one (e.g. all 17
+ * after the squad reset) lists only the difference with the best one: who comes in, who goes out, ОФО delta.
+ */
+interface CombinationView {
+  playersIn: CombinationPlayerView[];
+  playersOut: CombinationPlayerView[];
+  difference: string | null;
+}
 
 @Component({
   selector: 'app-players-squad',
@@ -52,7 +78,11 @@ export class PlayersSquadComponent implements OnInit {
 
   protected UTILS = Utils;
   protected MODEL_CHOICE_LABEL = MODEL_CHOICE_LABEL;
-  protected playerCombinations: string[] = [];
+  protected playerCombinations: CombinationView[] = [];
+
+  // Teams whose players the lightbulb never picks (see getOptimalPlayersCombinations)
+  protected selectTeams: string[] = TEAMS;
+  protected excludedTeamsControl = new FormControl<string[]>([]);
 
   @ViewChild(MatTable)
   table!: MatTable<PlayerSquadRecord>;
@@ -82,6 +112,12 @@ export class PlayersSquadComponent implements OnInit {
   public dataSource = new MatTableDataSource(this.squadPlayers);
 
   @Input() balanceValue: number = 0;
+
+  // Epoch ms of the season's first deadline; null while the games are not loaded yet.
+  private _firstDeadlineMs: number | null = null;
+  @Input() set games(value: GamePredictionDTO[]) {
+    this._firstDeadlineMs = this._getFirstDeadlineMs(value);
+  }
 
   @Input() filteredTeamGames: Map<number, TeamGameInformation[]> = new Map<
     number,
@@ -180,7 +216,8 @@ export class PlayersSquadComponent implements OnInit {
 
     this._playerCombinationsService.getOptimalPlayersCombinations(
       this.getTotalBalance(false),
-      this.squadPlayers
+      this.squadPlayers,
+      this.excludedTeamsControl.value ?? []
     );
   }
 
@@ -266,8 +303,44 @@ export class PlayersSquadComponent implements OnInit {
     return item.playerObject.playerID;
   }
 
+  protected clearExcludedTeams(): void {
+    this.excludedTeamsControl.setValue([]);
+  }
+
   public isClearAllSquadChangesButtonHidden() {
     return this.squadPlayers.filter((x) => x.isNew || x.isRemoved)?.length == 0;
+  }
+
+  /**
+   * Whole-squad reset makes sense only before the season starts, so the button lives until the first deadline.
+   */
+  public isResetSquadAvailable(): boolean {
+    return this._firstDeadlineMs !== null && Date.now() < this._firstDeadlineMs;
+  }
+
+  /**
+   * First deadline of the season: DEADLINE_DELAY_MINS before the earliest game start.
+   * Start time is known only for upcoming games (see GamePredictionsService.AttachGameStartTimes),
+   * so a game without it (already played, or not matched in the schedule) counts from the beginning of its day.
+   */
+  private _getFirstDeadlineMs(games: GamePredictionDTO[] | null | undefined): number | null {
+    if (!games?.length) {
+      return null;
+    }
+
+    let firstStartMs: number = Infinity;
+    for (const game of games) {
+      const startMs: number = game.gameStartTimeMsk
+        ? new Date(game.gameStartTimeMsk + MSK_UTC_OFFSET).getTime()
+        : new Date(game.gameDate).getTime();
+      if (!isNaN(startMs) && startMs < firstStartMs) {
+        firstStartMs = startMs;
+      }
+    }
+
+    return isFinite(firstStartMs)
+      ? firstStartMs - DEADLINE_DELAY_MINS * 60 * 1000
+      : null;
   }
 
   private getAvailableSlots(): PositionsAvailableToPick {
@@ -497,23 +570,48 @@ export class PlayersSquadComponent implements OnInit {
   private _describeCombination(
     combination: OptimalCombinationsResultDto,
     bestCombination: OptimalCombinationsResultDto
-  ): string {
+  ): CombinationView {
     if (combination.players.length <= FULL_COMBINATION_MAX_PLAYERS) {
-      return combination.players.map((x) => x.name).join(', ');
+      return {
+        playersIn: combination.players.map((x) => this._toCombinationPlayerView(x)),
+        playersOut: [],
+        difference: null,
+      };
     }
 
     const bestIds: Set<number> = new Set(bestCombination.players.map((x) => x.id));
     const ids: Set<number> = new Set(combination.players.map((x) => x.id));
-    const playersIn: string = combination.players
-      .filter((x) => !bestIds.has(x.id))
-      .map((x) => x.name)
-      .join(', ');
-    const playersOut: string = bestCombination.players
-      .filter((x) => !ids.has(x.id))
-      .map((x) => x.name)
-      .join(', ');
-    const difference: string = Utils.formatNumber(combination.total - bestCombination.total);
+    return {
+      playersIn: combination.players
+        .filter((x) => !bestIds.has(x.id))
+        .map((x) => this._toCombinationPlayerView(x)),
+      playersOut: bestCombination.players
+        .filter((x) => !ids.has(x.id))
+        .map((x) => this._toCombinationPlayerView(x)),
+      difference: Utils.formatNumber(combination.total - bestCombination.total),
+    };
+  }
 
-    return `${playersIn} вместо ${playersOut} (${difference} ОФО)`;
+  /**
+   * Tooltip is built from the full player record: a candidate from the players table,
+   * or a player already in the squad (the optimizer may return a removed one).
+   */
+  private _toCombinationPlayerView(player: PlayerCombinationsStatsDto): CombinationPlayerView {
+    const record: PlayerCommonRecord | undefined =
+      this._playerCombinationsService.availablePlayers.find((x) => x.playerObject.playerID === player.id) ??
+      this.squadPlayers.find((x) => x.playerObject.playerID === player.id);
+
+    return {
+      name: player.name,
+      team: player.team,
+      tooltip: record
+        ? PlayerTooltipBuilder.generatePlayerTooltip(
+            record,
+            this.filteredTeamGames,
+            this.teamStats,
+            this.playerGamesOfoMap
+          )
+        : null,
+    };
   }
 }

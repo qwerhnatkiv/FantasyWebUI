@@ -10,7 +10,10 @@
         (clickEmitter)="getOptimalPlayersCombinations()"
         tooltipText="Выбрать оптимальных игроков"
       ></i-button>
+      <!-- Only before the season's first deadline; sits to the left of the lightbulb on its row. -->
       <i-button
+        *ngIf="isResetSquadAvailable()"
+        class="reset-squad-button"
         iconPath="/assets/images/clear-list-small.png"
         [iconRelativeSize]="55"
         (clickEmitter)="resetWholeSquad()"
@@ -179,6 +182,39 @@
       <mat-icon>cancel</mat-icon>
     </button>
   </div>
+  <!-- Teams excluded from the lightbulb's picks: between the squad and the alternatives it produces. -->
+  <div class="excluded-teams-filter" *ngIf="squadPlayers.length > 0">
+    <label class="excluded-teams-label">Исключить команды:</label>
+    <mat-form-field class="excluded-teams-form">
+      <mat-select
+        [formControl]="excludedTeamsControl"
+        multiple
+        panelClass="excluded-teams-select-panel"
+        panelWidth="360px"
+      >
+        <mat-select-trigger>
+          <span *ngIf="(excludedTeamsControl.value?.length ?? 0) <= 1">{{
+            excludedTeamsControl.value?.[0] || ''
+          }}</span>
+          <span *ngIf="(excludedTeamsControl.value?.length ?? 0) > 1">{{
+            excludedTeamsControl.value?.length
+          }} шт.</span>
+        </mat-select-trigger>
+        <mat-option *ngFor="let team of selectTeams" [value]="team">{{
+          team
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button
+      (click)="clearExcludedTeams()"
+      [hidden]="(excludedTeamsControl.value?.length ?? 0) === 0"
+      class="clear-excluded-teams-button"
+      mat-icon-button
+      aria-label="Clear excluded teams"
+    >
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </div>
   <div class="player-combinations-container"
       [hidden]="playerCombinations.length === 0">
     <p class="model-choice-label">
@@ -188,7 +224,35 @@
     </p>
     <p *ngFor="let combination of playerCombinations; let i = index">
       <b>{{ (i + 2).toString() + ': ' }} </b>
-      {{ combination }}
+      <ng-container
+        *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersIn }"
+      ></ng-container>
+      <ng-container *ngIf="combination.playersOut.length > 0">
+        вместо
+        <ng-container
+          *ngTemplateOutlet="combinationPlayers; context: { $implicit: combination.playersOut }"
+        ></ng-container>
+      </ng-container>
+      <ng-container *ngIf="combination.difference !== null">
+        ({{ combination.difference }} ОФО)
+      </ng-container>
     </p>
   </div>
 </div>
+
+<!-- Players of one alternative: "Name (TEAM)" with the player tooltip on hover, comma-separated. -->
+<ng-template #combinationPlayers let-players>
+  <ng-container *ngFor="let player of players; let last = last"
+    ><span
+      class="combination-player"
+      [ngxTippy]="player.tooltip"
+      tippyClassName="tooltip-general"
+      [tippyProps]="{
+        allowHTML: true,
+        placement: 'right',
+        arrow: false
+      }"
+      >{{ player.name }} ({{ player.team }})</span
+    ><ng-container *ngIf="!last">, </ng-container></ng-container
+  >
+</ng-template>

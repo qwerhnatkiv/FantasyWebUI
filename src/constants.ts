@@ -50,6 +50,8 @@ export const LOW_GAMES_WEEK_BOUNDARY = 1;
 export const DAY_CHANGE_HOUR: number = 3;
 
 export const SQUAD_PLAYERS_COUNT: number = 17;
+// Deadline closes this many minutes before the match starts (same value as FantasyWeb.Common.Constants.DeadlineDelayMins)
+export const DEADLINE_DELAY_MINS: number = 30;
 export const PLAYER_COMBINATIONS_COUNT: number = 10;
 
 export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
