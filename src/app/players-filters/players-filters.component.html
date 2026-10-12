@@ -149,9 +149,10 @@
     <mat-button-toggle-group
       class="power-play-toggle"
       [formControl]="powerPlayFormControl"
-      hideSingleSelectionIndicator
+      multiple
+      hideMultipleSelectionIndicator
       aria-label="Power play filter"
-      (change)="powerPlayUnitsChanged()"
+      (change)="powerPlayToggled($event)"
     >
       <mat-button-toggle *ngFor="let powerPlay of selectPP" [value]="powerPlay">{{
         powerPlay
@@ -159,7 +160,7 @@
     </mat-button-toggle-group>
     <button
       (click)="resetPowerPlayFilter()"
-      [hidden]="powerPlayFormControl.value === null"
+      [hidden]="powerPlayFormControl.value?.length === 0"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear power play filter"
@@ -184,17 +185,30 @@
     </mat-form-field>
 
     <label class="filter-label" style="margin-left: auto">УЗ:</label>
-    <mat-form-field class="the-widest-filter-form">
-      <mat-select
-        [(value)]="selectedUser"
-        panelWidth=""
-        (selectionChange)="selectedUserChanged()"
+    <div class="user-avatars">
+      <button
+        *ngFor="let user of selectUsers"
+        type="button"
+        class="user-avatar-button"
+        [class.user-avatar-selected]="selectedUser === user"
+        [attr.aria-pressed]="selectedUser === user"
+        [attr.aria-label]="user"
+        [ngxTippy]="user"
+        [tippyProps]="{
+          placement: 'bottom',
+          arrow: false
+        }"
+        (click)="toggleUser(user)"
       >
-        <mat-option *ngFor="let user of selectUsers" [value]="user">{{
-          user
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+        <img
+          *ngIf="userAvatarPathMap[user]; else userInitial"
+          class="user-avatar-image"
+          [src]="userAvatarPathMap[user]"
+          [alt]="user"
+        />
+        <ng-template #userInitial>{{ user.charAt(0) }}</ng-template>
+      </button>
+    </div>
     <button
       (click)="resetSelectedUserFilter()"
       [hidden]="selectedUser == null"

@@ -17,6 +17,7 @@ import {
   DEFAULT_POSITIONS,
   TEAMS,
   POWER_PLAY_UNITS,
+  USER_AVATAR_PATH_MAP,
   USER_ID_NAME,
   DEFAULT_FORM_LENGTH,
   DEFAULT_FORM_LENGTH_COUNT,
@@ -37,6 +38,7 @@ import { PlayerStatsDTO } from '../interfaces/player-stats-dto';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 const ALL_TEAMS_VALUE = '__all__';
 
@@ -57,13 +59,14 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   selectTeams: string[] = TEAMS;
   selectPP: string[] = POWER_PLAY_UNITS;
   selectUsers: string[] = Array.from(USER_ID_NAME.keys());
+  userAvatarPathMap: Record<string, string> = USER_AVATAR_PATH_MAP;
   RED_GP_UPPER_BOUNDARY: number = RED_GP_UPPER_BOUNDARY;
   lowerBoundPrice: number | undefined = undefined;
   upperBoundPrice: number | undefined = undefined;
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
-  // Single choice of the power play unit ("нет" / "ПП1" / "ПП2"); null - filter is off
-  powerPlayFormControl = new FormControl<string | null>(null);
+  // Power play unit ("нет" / "ПП1" / "ПП2"): holds one value at most, empty - filter is off
+  powerPlayFormControl = new FormControl<string[]>([]);
   playerSearchInputControl = new FormControl<string>('');
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
@@ -282,6 +285,15 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
     this.sendFormLength.emit(event.value);
   }
 
+  /**
+   * Manager avatars work like the power play toggle: a click on another one switches to it,
+   * a click on the selected one resets the choice.
+   */
+  toggleUser(user: string) {
+    this.selectedUser = this.selectedUser === user ? null : user;
+    this.selectedUserChanged();
+  }
+
   selectedUserChanged() {
     this.sendSelectedUser.emit(this.selectedUser!);
 
@@ -326,9 +338,17 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
     this.sendTeams.emit(this.selectedTeams);
   }
 
+  /**
+   * The toggle group works in multiple mode only to make a click on the selected value deselect it;
+   * the filter itself is single-choice: the clicked value replaces the previous one.
+   */
+  powerPlayToggled(event: MatButtonToggleChange) {
+    this.powerPlayFormControl.setValue(event.source.checked ? [event.source.value] : []);
+    this.powerPlayUnitsChanged();
+  }
+
   powerPlayUnitsChanged() {
-    const unit: string | null = this.powerPlayFormControl.value;
-    this.sendPowerPlayUnits.emit(unit === null ? [] : [unit]);
+    this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value ?? []);
   }
 
 
@@ -359,7 +379,7 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   public resetPowerPlayFilter() {
-    this.powerPlayFormControl.setValue(null);
+    this.powerPlayFormControl.setValue([]);
     this.powerPlayUnitsChanged();
   }
 

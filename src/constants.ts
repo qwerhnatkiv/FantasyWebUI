@@ -65,6 +65,12 @@ export const USER_ID_NAME: Map<string, number> = new Map<string, number>([
   // ['Graf_007', 551516]
 ]);
 
+// Avatars of the fantasy managers shown as round toggles in the filters; a manager without one gets an initial
+export const USER_AVATAR_PATH_MAP: Record<string, string> = {
+  'RaisingTheBar': '/assets/images/managers/raisingthebar.png',
+  'A-N-O N-I-M': '/assets/images/managers/a-n-o-n-i-m.webp',
+};
+
 export const TEAMS = [
   'ANA',
   'BOS',
