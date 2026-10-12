@@ -182,6 +182,21 @@
       <mat-icon>cancel</mat-icon>
     </button>
   </div>
+  <!-- Logos of the teams excluded from the lightbulb's picks, in a row right under the squad totals. -->
+  <div class="excluded-teams-logos" *ngIf="(excludedTeamsControl.value?.length ?? 0) > 0">
+    <ng-container *ngFor="let item of getExcludedTeamLogos(); trackBy: trackByTeam">
+      <img
+        *ngIf="item.logo; else teamCode"
+        class="excluded-team-logo"
+        [src]="'/assets/images/logo/' + item.logo"
+        [alt]="item.team"
+        [title]="item.teamName"
+      />
+      <ng-template #teamCode>
+        <span class="excluded-team-code" [title]="item.teamName">{{ item.team }}</span>
+      </ng-template>
+    </ng-container>
+  </div>
   <!-- Teams excluded from the lightbulb's picks: between the squad and the alternatives it produces. -->
   <div class="excluded-teams-filter" *ngIf="squadPlayers.length > 0">
     <label class="excluded-teams-label">Исключить команды:</label>
@@ -231,11 +246,12 @@
       <button
         class="player-action-button apply-combination-button"
         mat-icon-button
+        [hidden]="i === selectedCombinationIndex"
         [attr.aria-label]="'Выбрать вариант ' + (i + 1)"
         [title]="'Заменить выбранных игроков вариантом ' + (i + 1)"
         (click)="applyCombination(i)"
       >
-        <mat-icon class="player-action-icon">add</mat-icon>
+        <mat-icon class="player-action-icon">add_circle</mat-icon>
       </button>
       <span class="combination-text">
         <b>{{ i + 1 }}: </b>

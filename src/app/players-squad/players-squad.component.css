@@ -8,6 +8,29 @@
 }
 
 /* Excluded teams filter: sits under the squad table, aligned with the alternatives list below it. */
+/* Excluded team logos: the calendar's logo size, one row between the squad totals and the filter. */
+.excluded-teams-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-left: 32%;
+}
+
+.excluded-teams-logos:empty {
+  display: none;
+}
+
+.excluded-team-logo {
+  width: 23px;
+  height: 23px;
+}
+
+.excluded-team-code {
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .excluded-teams-filter {
   display: flex;
   align-items: center;
@@ -193,6 +216,12 @@
 
 .apply-combination-button {
   flex: 0 0 auto;
+}
+
+/* The selected one is already in the squad: no button, but its place stays so the rows keep aligned */
+.apply-combination-button[hidden] {
+  visibility: hidden;
+  display: block !important;
 }
 
 .combination-player {

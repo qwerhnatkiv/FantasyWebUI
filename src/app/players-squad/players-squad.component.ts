@@ -15,6 +15,7 @@ import {
   DEFAULT_SUBSTITUTION_VALUE,
   MODEL_CHOICE_LABEL,
   SQUAD_PLAYERS_COUNT,
+  TEAM_NAME_LOGO_PATH_MAP,
   TEAMS,
 } from 'src/constants';
 import { PositionsAvailableToPick } from '../interfaces/positions-available-to-pick';
@@ -87,6 +88,7 @@ export class PlayersSquadComponent implements OnInit {
   // Teams whose players the lightbulb never picks (see getOptimalPlayersCombinations)
   protected selectTeams: string[] = TEAMS;
   protected excludedTeamsControl = new FormControl<string[]>([]);
+  protected teamNameLogoPathMap: Record<string, string> = TEAM_NAME_LOGO_PATH_MAP;
 
   @ViewChild(MatTable)
   table!: MatTable<PlayerSquadRecord>;
@@ -311,6 +313,29 @@ export class PlayersSquadComponent implements OnInit {
   // every row's DOM whenever `dataSource` is reassigned (see docs/perf-notes.md).
   public trackByPlayerId(index: number, item: PlayerSquadRecord): number {
     return item.playerObject.playerID;
+  }
+
+  /**
+   * Excluded teams as logos (the calendar's team logos), in the order of the TEAMS list.
+   * A team without a known logo keeps its code.
+   */
+  protected getExcludedTeamLogos(): { team: string; teamName: string; logo: string | null }[] {
+    const excluded: string[] = this.excludedTeamsControl.value ?? [];
+
+    return TEAMS.filter((team) => excluded.includes(team)).map((team) => {
+      const teamName: string =
+        this.teamStats.find((x) => x.teamAcronym === team)?.teamName ?? team;
+
+      return {
+        team,
+        teamName,
+        logo: this.teamNameLogoPathMap[teamName] ?? null,
+      };
+    });
+  }
+
+  protected trackByTeam(index: number, item: { team: string }): string {
+    return item.team;
   }
 
   protected clearExcludedTeams(): void {
