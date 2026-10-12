@@ -18,18 +18,14 @@ footer {
 .players-configuration-section {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  /* leaves room for the reset button that hangs to the left of the squad block */
-  gap: 48px;
+  justify-content: space-between;
 }
 
-/* Takes the free width but never goes below its content, so the table cannot run under the squad */
 app-players-table {
-  flex: 1 1 70%;
+  flex-basis: 70%;
 }
 
-/* Lightbulb column + squad table + the optimizer lists; fixed so the squad is never squeezed */
 .user-team-block {
-  flex: 0 0 340px;
-  margin-right: 16px;
+  flex-basis: 20%;
+  margin-right: 50px;
 }
