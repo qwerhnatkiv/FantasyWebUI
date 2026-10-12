@@ -62,7 +62,8 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   upperBoundPrice: number | undefined = undefined;
   positionsFormControl = new FormControl<string[]>([]);
   teamsFormControl = new FormControl<string[]>([]);
-  powerPlayFormControl = new FormControl<string[]>([]);
+  // Single choice of the power play unit ("нет" / "ПП1" / "ПП2"); null - filter is off
+  powerPlayFormControl = new FormControl<string | null>(null);
   playerSearchInputControl = new FormControl<string>('');
   selectedUser: string | null = null;
   selectedUserId: number | undefined = undefined;
@@ -326,7 +327,8 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   powerPlayUnitsChanged() {
-    this.sendPowerPlayUnits.emit(this.powerPlayFormControl.value!);
+    const unit: string | null = this.powerPlayFormControl.value;
+    this.sendPowerPlayUnits.emit(unit === null ? [] : [unit]);
   }
 
 
@@ -357,7 +359,7 @@ export class PlayersFiltersComponent implements AfterViewInit, OnInit, OnChanges
   }
 
   public resetPowerPlayFilter() {
-    this.powerPlayFormControl.setValue([]);
+    this.powerPlayFormControl.setValue(null);
     this.powerPlayUnitsChanged();
   }
 

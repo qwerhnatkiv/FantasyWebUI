@@ -50,6 +50,7 @@ import { PlayersSquadComponent } from './players-squad/players-squad.component';
 import { MatRadioModule } from '@angular/material/radio';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { CustomDateAdapter } from './common/custom-date-adapter';
 import { PositionsMapPipe } from './pipes/positions-map.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -127,6 +128,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     MatPaginatorModule,
     MatRadioModule,
     MatCheckboxModule,
+    MatButtonToggleModule,
     ScrollingModule,
     AppRoutingModule
 ],

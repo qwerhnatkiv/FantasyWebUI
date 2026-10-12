@@ -146,21 +146,20 @@
 
     <div class="vl"></div>
     <label class="filter-label" style="margin-left: 10px">ПП:</label>
-    <mat-form-field class="filter-form">
-      <mat-select
-        [formControl]="powerPlayFormControl"
-        multiple
-        panelWidth=""
-        (selectionChange)="powerPlayUnitsChanged()"
-      >
-        <mat-option *ngFor="let powerPlay of selectPP" [value]="powerPlay">{{
-          powerPlay
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <mat-button-toggle-group
+      class="power-play-toggle"
+      [formControl]="powerPlayFormControl"
+      hideSingleSelectionIndicator
+      aria-label="Power play filter"
+      (change)="powerPlayUnitsChanged()"
+    >
+      <mat-button-toggle *ngFor="let powerPlay of selectPP" [value]="powerPlay">{{
+        powerPlay
+      }}</mat-button-toggle>
+    </mat-button-toggle-group>
     <button
       (click)="resetPowerPlayFilter()"
-      [hidden]="powerPlayFormControl.value?.length === 0"
+      [hidden]="powerPlayFormControl.value === null"
       class="clear-filter-button"
       mat-icon-button
       aria-label="Clear power play filter"
