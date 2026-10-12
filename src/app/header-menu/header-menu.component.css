@@ -99,16 +99,26 @@
 
 .header-update-log-container {
   font-weight: 600;
-  margin-right: auto;
   margin-left: 1%;
   padding-top: 10px;
 }
 
+/* Deadline sits right next to the update log labels; the free space goes to its right */
 .header-schedule-information-container {
   font-weight: 600;
-  padding-top: 10px;
+  font-size: 1.7em;
   margin-right: auto;
-  margin-left: 1%;
+  /* keeps the bigger text off the links when the row is tight */
+  padding-right: 24px;
+  margin-left: 24px;
+}
+
+.header-schedule-information-container p {
+  margin: 0;
+}
+
+.header-schedule-information-container p:empty {
+  display: none;
 }
 
 .header-external-links {
