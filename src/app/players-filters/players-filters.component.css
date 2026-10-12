@@ -198,14 +198,14 @@
 .user-avatars {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-/* Round manager toggle; the selected one gets a yellow ring (the app's accent), the rest are plain */
+/* Round manager toggle, as tall as the i-buttons of the same row (45px); the selected one gets a yellow ring (the app's accent), the rest are plain */
 .user-avatar-button {
   flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
+  width: 45px;
+  height: 45px;
   padding: 0;
   overflow: hidden;
   border: 2px solid #bbb;
@@ -230,4 +230,20 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/*
+ * A label with its control never gets torn apart: when the row is too narrow the whole group wraps
+ * to the next line. The last group (managers and buttons) keeps to the right edge.
+ */
+.filter-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.filters-row > .filter-group:last-child {
+  margin-left: auto;
 }
