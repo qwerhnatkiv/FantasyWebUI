@@ -90,6 +90,10 @@
 .players-squad-table {
   border-spacing: 0 4px !important;
   z-index: 1;
+  /* beside the lightbulb column: takes what is left of the block instead of 100% of it, which stuck out by that column */
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
 }
 
 .squad-buttons-container {

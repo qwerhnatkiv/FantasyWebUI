@@ -1,5 +1,7 @@
 .players-table {
   margin-left: 20px;
+  /* the table is 100% wide by default: with the left margin it stuck out of the component by 20px */
+  width: calc(100% - 20px);
   border-collapse: separate !important;
   border-spacing: 0 4px !important;
 }
