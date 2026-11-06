@@ -66,6 +66,7 @@ import { DateFiltersService } from 'src/services/filtering/date-filters.service'
 import { CancelButtonComponent } from './common-components/cancel-button/cancel-button.component';
 import { CalendarWeekGamesMapService } from 'src/services/calendar/calendar-week-games-map.service';
 import { SquadPlayerPipe } from './pipes/squad-player.pipe';
+import { LineupNotesPipe } from './pipes/lineup-notes.pipe';
 import { PlayerCombinationsService } from 'src/services/player-combinations/player-combinations.service';
 import { TeamsEasySeriesService } from 'src/services/teams-easy-series/teams-easy-series.service';
 import { LoginComponent } from './login/login.component';
@@ -96,6 +97,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     CellClassPipe,
     CellTextClassPipe,
     SquadPlayerPipe,
+    LineupNotesPipe,
     IButtonComponent,
     SimpleSelectComponent,
     CancelButtonComponent,

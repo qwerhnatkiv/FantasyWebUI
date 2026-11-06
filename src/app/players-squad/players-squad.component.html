@@ -31,7 +31,18 @@
     >
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="action-cell">
+          <!-- Daily Faceoff notes hang in the free space to the left of the row; they don't take table width -->
+          <span class="lineup-notes" *ngIf="element.playerObject | lineupNotes as notes">
+            <span
+              *ngFor="let note of notes"
+              class="lineup-note"
+              [class.lineup-note-out]="note.kind === 'out'"
+              [class.lineup-note-up]="note.kind === 'up'"
+              [class.lineup-note-down]="note.kind === 'down'"
+              >{{ note.text }}</span
+            >
+          </span>
           <button
             class="player-action-button"
             mat-icon-button

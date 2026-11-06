@@ -46,6 +46,12 @@ export interface PlayerStatsDTO {
     forecastSaves?: number
     isGoaliePlayedMostGames?: boolean
     isFreeAgentNextSeason?: boolean
+    // Daily Faceoff lineup for the next game; all absent when the club has no current lineup
+    dfoOutReason?: 'scratch' | 'injured' | 'backup' | null
+    dfoLine?: number | null
+    dfoPrevLine?: number | null
+    dfoPpUnit?: number | null
+    dfoPrevPpUnit?: number | null
   }
   
   export interface ExpectedFpforGame {}

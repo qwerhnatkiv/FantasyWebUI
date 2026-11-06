@@ -235,3 +235,45 @@
   font-weight: 700;
   text-align: center;
 }
+/* Daily Faceoff notes: out of the row's flow, hanging left of the squad on the row's own line. */
+.action-cell {
+  position: relative;
+}
+
+.lineup-notes {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 8px;
+  display: flex;
+  gap: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.lineup-note {
+  font-size: 12px;
+  line-height: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  font-weight: 600;
+}
+
+.lineup-note-up {
+  color: #00aa30;
+  background: #e6f9ec;
+}
+
+.lineup-note-down {
+  color: #c43c00;
+  background: #fff0e6;
+}
+
+/* Predicted outside the lineup: the loud one */
+.lineup-note-out {
+  color: #ffffff;
+  background: #e00000;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
